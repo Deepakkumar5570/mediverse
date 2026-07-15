@@ -1,0 +1,12 @@
+{
+  "name": "mediverse",
+  "private": true,
+  "packageManager": "pnpm@11.10.0",
+  "scripts": {},
+  "devDependencies": {
+    "supabase": "^2.109.1"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}
