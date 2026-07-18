@@ -7,18 +7,30 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-export const programs = pgTable("programs", {
+import { programs } from "./program.schema";
+
+export const subjects = pgTable("subjects", {
   id: uuid("id").defaultRandom().primaryKey(),
+
+  programId: uuid("program_id")
+    .references(() => programs.id, {
+      onDelete: "restrict",
+    })
+    .notNull(),
 
   name: varchar("name", { length: 150 }).notNull(),
 
-  slug: varchar("slug", { length: 180 }).notNull().unique(),
+  slug: varchar("slug", { length: 180 })
+    .notNull()
+    .unique(),
 
-  code: varchar("code", { length: 30 }).notNull().unique(),
+  code: varchar("code", { length: 30 })
+    .notNull()
+    .unique(),
 
   description: text("description"),
 
-  duration: integer("duration").notNull(),
+  semester: integer("semester").notNull(),
 
   status: varchar("status", { length: 20 })
     .$default(() => "active")

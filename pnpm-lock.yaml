@@ -12,6 +12,9 @@ importers:
         specifier: ^17.4.2
         version: 17.4.2
     devDependencies:
+      drizzle-kit:
+        specifier: ^0.31.10
+        version: 0.31.10
       supabase:
         specifier: ^2.109.1
         version: 2.109.1

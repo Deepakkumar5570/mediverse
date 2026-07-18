@@ -17,6 +17,12 @@ export const CreateProgramSchema = z.object({
 
   description: DescriptionSchema,
 
+  duration: z.number().int().positive(),
+
+  status: z
+    .enum(["active", "inactive"])
+    .default("active"),
+
   icon: IconSchema,
 
   color: ColorSchema,
