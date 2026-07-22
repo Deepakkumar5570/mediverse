@@ -18,15 +18,17 @@ export const CreateUnitSchema = z.object({
   unitNumber: z
     .number()
     .int()
-    .min(1)
-    .max(50),
+    .min(1),
 
   description: z
     .string()
     .optional(),
 
   status: z
-    .enum(["active", "inactive"])
+    .enum([
+      "active",
+      "inactive",
+    ])
     .default("active"),
 });
 
