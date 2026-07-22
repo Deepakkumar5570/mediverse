@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const CreateSubjectSchema = z.object({
-  programId: z.uuid(),
+  semesterId: z.uuid(),
 
   name: z
     .string()

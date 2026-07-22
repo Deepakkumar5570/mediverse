@@ -20,11 +20,11 @@ export async function getSubjectsRepository() {
     .from(subjects);
 }
 
-export async function getSubjectsByProgramRepository(
-  programId: string
+export async function getSubjectsBySemesterRepository(
+  semesterId: string
 ) {
   return db
     .select()
     .from(subjects)
-    .where(eq(subjects.programId, programId));
+    .where(eq(subjects.semesterId, semesterId));
 }

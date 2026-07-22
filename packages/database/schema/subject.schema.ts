@@ -7,32 +7,42 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { programs } from "./program.schema";
+import { semesters } from "./semester.schema";
 
 export const subjects = pgTable("subjects", {
-  id: uuid("id").defaultRandom().primaryKey(),
+  id: uuid("id")
+    .defaultRandom()
+    .primaryKey(),
 
-  programId: uuid("program_id")
-    .references(() => programs.id, {
+  semesterId: uuid("semester_id")
+    .references(() => semesters.id, {
       onDelete: "restrict",
     })
     .notNull(),
 
-  name: varchar("name", { length: 150 }).notNull(),
+  name: varchar("name", {
+    length: 150,
+  }).notNull(),
 
-  slug: varchar("slug", { length: 180 })
-    .notNull()
-    .unique(),
+  slug: varchar("slug", {
+    length: 180,
+  })
+    .unique()
+    .notNull(),
 
-  code: varchar("code", { length: 30 })
-    .notNull()
-    .unique(),
+  code: varchar("code", {
+    length: 30,
+  })
+    .unique()
+    .notNull(),
 
   description: text("description"),
 
   semester: integer("semester").notNull(),
 
-  status: varchar("status", { length: 20 })
+  status: varchar("status", {
+    length: 20,
+  })
     .$default(() => "active")
     .notNull(),
 

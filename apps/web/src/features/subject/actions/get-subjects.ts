@@ -1,7 +1,7 @@
 "use server";
 
 import {
-  getSubjectsByProgramService,
+  getSubjectsBySemesterService,
   getSubjectsService,
 } from "../services";
 
@@ -9,8 +9,8 @@ export async function getSubjectsAction() {
   return getSubjectsService();
 }
 
-export async function getSubjectsByProgramAction(
-  programId: string
+export async function getSubjectsBySemesterAction(
+  semesterId: string
 ) {
-  return getSubjectsByProgramService(programId);
+  return getSubjectsBySemesterService(semesterId);
 }

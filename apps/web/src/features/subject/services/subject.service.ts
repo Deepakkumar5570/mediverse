@@ -1,6 +1,6 @@
 import {
   createSubjectRepository,
-  getSubjectsByProgramRepository,
+  getSubjectsBySemesterRepository,
   getSubjectsRepository,
 } from "../repositories";
 
@@ -16,8 +16,8 @@ export async function getSubjectsService() {
   return getSubjectsRepository();
 }
 
-export async function getSubjectsByProgramService(
-  programId: string
+export async function getSubjectsBySemesterService(
+  semesterId: string
 ) {
-  return getSubjectsByProgramRepository(programId);
+  return getSubjectsBySemesterRepository(semesterId);
 }

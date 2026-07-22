@@ -15,6 +15,27 @@
       "when": 1784354419821,
       "tag": "0001_plain_marvel_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784356526048,
+      "tag": "0002_nostalgic_molecule_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1784357624974,
+      "tag": "0003_glorious_emma_frost",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1784394385639,
+      "tag": "0004_chunky_baron_zemo",
+      "breakpoints": true
     }
   ]
 }
