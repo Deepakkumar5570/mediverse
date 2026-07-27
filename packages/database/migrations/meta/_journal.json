@@ -43,6 +43,13 @@
       "when": 1784750701048,
       "tag": "0005_amusing_stardust",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1785169958011,
+      "tag": "0006_tranquil_snowbird",
+      "breakpoints": true
     }
   ]
 }
