@@ -4,6 +4,7 @@ import {
   getContentBySlugRepository,
   getContentsBySubtopicRepository,
   getContentsRepository,
+  searchContentsRepository,
   updateContentRepository,
 } from "../repositories";
 
@@ -42,4 +43,10 @@ export async function deleteContentService(
   id: string
 ) {
   return deleteContentRepository(id);
+}
+
+export async function searchContentsService(
+    search: string
+) {
+    return searchContentsRepository(search);
 }

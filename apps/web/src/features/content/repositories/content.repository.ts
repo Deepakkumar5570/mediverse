@@ -1,5 +1,5 @@
 import { db, contents } from "@mediverse/database";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, ilike, or} from "drizzle-orm";
 
 import type { CreateContentInput } from "../validations";
 
@@ -65,4 +65,19 @@ export async function deleteContentRepository(
     .returning();
 
   return content ?? null;
+}
+
+
+export async function searchContentsRepository(
+    search: string
+) {
+    return db
+        .select()
+        .from(contents)
+        .where(
+            or(
+                ilike(contents.title, `%${search}%`),
+                ilike(contents.slug, `%${search}%`)
+            )
+        );
 }
