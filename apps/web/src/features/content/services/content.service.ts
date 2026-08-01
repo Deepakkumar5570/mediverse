@@ -3,6 +3,7 @@ import {
   deleteContentRepository,
   getContentBySlugRepository,
   getContentsBySubtopicRepository,
+  getContentsByStatusRepository,
   getContentsRepository,
   getPaginatedContentsRepository,
   searchContentsRepository,
@@ -61,4 +62,11 @@ export async function getPaginatedContentsService(
     page,
     limit
   );
+}
+
+
+export async function getContentsByStatusService(
+  status: "draft" | "active" | "archived"
+) {
+  return getContentsByStatusRepository(status);
 }

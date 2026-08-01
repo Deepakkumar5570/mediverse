@@ -3,8 +3,8 @@
 //     getContentsAction,
 //     searchContentsAction,
 // } from "../../../src/features/content/actions";
-
 import {
+    getContentsByStatusAction,
     getPaginatedContentsAction,
     searchContentsAction,
 } from "../../../src/features/content/actions";
@@ -13,6 +13,7 @@ type Props = {
     searchParams: Promise<{
         search?: string;
         page?: string;
+        status?: "draft" | "active" | "archived";
     }>;
 };
 
@@ -23,20 +24,26 @@ export default async function ContentsPage({
     const {
         search = "",
         page = "1",
+        status = "active",
     } = await searchParams;
 
     const currentPage = Number(page) || 1;
-    // const contents = search
-    //     ? await searchContentsAction(search)
-    //     : await getContentsAction();
+
+
     const pagination = await getPaginatedContentsAction(
         currentPage,
         10
     );
 
-    const contents = search
-        ? await searchContentsAction(search)
-        : pagination.items;
+    let contents = pagination.items;
+
+    if (search) {
+        contents = await searchContentsAction(search);
+    } else if (status) {
+        contents = await getContentsByStatusAction(status);
+    }
+
+
     const isSearching = search.trim().length > 0;
 
     const totalPages = pagination.totalPages;
@@ -78,6 +85,48 @@ export default async function ContentsPage({
                     </a>
                 </form>
 
+
+                <div className="mt-4 flex gap-2">
+                    <a
+                        href="/admin/contents"
+                        className={`rounded border px-3 py-2 ${!status ? "bg-blue-600 text-white" : ""
+                            }`}
+                    >
+                        All
+                    </a>
+
+                    <a
+                        href="/admin/contents?status=active"
+                        className={`rounded border px-3 py-2 ${status === "active"
+                            ? "bg-green-600 text-white"
+                            : ""
+                            }`}
+                    >
+                        Active
+                    </a>
+
+                    <a
+                        href="/admin/contents?status=draft"
+                        className={`rounded border px-3 py-2 ${status === "draft"
+                            ? "bg-yellow-500 text-white"
+                            : ""
+                            }`}
+                    >
+                        Draft
+                    </a>
+
+                    <a
+                        href="/admin/contents?status=archived"
+                        className={`rounded border px-3 py-2 ${status === "archived"
+                            ? "bg-gray-700 text-white"
+                            : ""
+                            }`}
+                    >
+                        Archived
+                    </a>
+                </div>
+
+
                 <a
                     href="/admin/contents/new"
                     className="rounded bg-green-600 px-4 py-2 text-white"
@@ -98,9 +147,11 @@ export default async function ContentsPage({
 
             {contents.length === 0 ? (
                 <div className="rounded border p-10 text-center text-gray-500">
-                    {isSearching
-                        ? `No content found for "${search}".`
-                        : "No content found."}
+                    {status
+                        ? `No ${status} content found.`
+                        : isSearching
+                            ? `No content found for "${search}".`
+                            : "No content found."}
                 </div>
             ) : (
                 <table className="w-full border-collapse border">
@@ -163,8 +214,8 @@ export default async function ContentsPage({
                                 : "#"
                         }
                         className={`rounded border px-4 py-2 ${hasPrevious
-                                ? "hover:bg-gray-100"
-                                : "pointer-events-none opacity-50"
+                            ? "hover:bg-gray-100"
+                            : "pointer-events-none opacity-50"
                             }`}
                     >
                         ← Previous
@@ -181,8 +232,8 @@ export default async function ContentsPage({
                                 : "#"
                         }
                         className={`rounded border px-4 py-2 ${hasNext
-                                ? "hover:bg-gray-100"
-                                : "pointer-events-none opacity-50"
+                            ? "hover:bg-gray-100"
+                            : "pointer-events-none opacity-50"
                             }`}
                     >
                         Next →

@@ -112,3 +112,17 @@ export async function getPaginatedContentsRepository(
         totalPages: Math.ceil(Number(count) / limit),
     };
 }
+
+
+export async function getContentsByStatusRepository(
+    status:
+        | "draft"
+        | "active"
+        | "archived"
+) {
+    return db
+        .select()
+        .from(contents)
+        .where(eq(contents.status, status))
+        .orderBy(desc(contents.createdAt));
+}
