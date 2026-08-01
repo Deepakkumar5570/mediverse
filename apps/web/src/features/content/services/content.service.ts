@@ -4,6 +4,7 @@ import {
   getContentBySlugRepository,
   getContentsBySubtopicRepository,
   getContentsRepository,
+  getPaginatedContentsRepository,
   searchContentsRepository,
   updateContentRepository,
 } from "../repositories";
@@ -49,4 +50,15 @@ export async function searchContentsService(
     search: string
 ) {
     return searchContentsRepository(search);
+}
+
+
+export async function getPaginatedContentsService(
+  page: number,
+  limit: number
+) {
+  return getPaginatedContentsRepository(
+    page,
+    limit
+  );
 }

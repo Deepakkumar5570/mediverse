@@ -1,23 +1,47 @@
 // import { getContentsAction } from "../../../src/features/content/actions/get-contents";
+// import {
+//     getContentsAction,
+//     searchContentsAction,
+// } from "../../../src/features/content/actions";
+
 import {
-    getContentsAction,
+    getPaginatedContentsAction,
     searchContentsAction,
 } from "../../../src/features/content/actions";
 
 type Props = {
     searchParams: Promise<{
         search?: string;
+        page?: string;
     }>;
 };
 
 export default async function ContentsPage({
     searchParams,
 }: Props) {
-    const { search = "" } = await searchParams;
+    // const { search = "" } = await searchParams;
+    const {
+        search = "",
+        page = "1",
+    } = await searchParams;
+
+    const currentPage = Number(page) || 1;
+    // const contents = search
+    //     ? await searchContentsAction(search)
+    //     : await getContentsAction();
+    const pagination = await getPaginatedContentsAction(
+        currentPage,
+        10
+    );
+
     const contents = search
         ? await searchContentsAction(search)
-        : await getContentsAction();
+        : pagination.items;
     const isSearching = search.trim().length > 0;
+
+    const totalPages = pagination.totalPages;
+    const hasPrevious = currentPage > 1;
+    const hasNext = currentPage < totalPages;
 
     return (
         <main className="mx-auto max-w-7xl p-6">
@@ -127,6 +151,43 @@ export default async function ContentsPage({
                         ))}
                     </tbody>
                 </table>
+
+
+            )}
+            {!isSearching && totalPages > 1 && (
+                <div className="mt-8 flex items-center justify-between">
+                    <a
+                        href={
+                            hasPrevious
+                                ? `/admin/contents?page=${currentPage - 1}`
+                                : "#"
+                        }
+                        className={`rounded border px-4 py-2 ${hasPrevious
+                                ? "hover:bg-gray-100"
+                                : "pointer-events-none opacity-50"
+                            }`}
+                    >
+                        ← Previous
+                    </a>
+
+                    <span className="text-sm text-gray-600">
+                        Page {currentPage} of {totalPages}
+                    </span>
+
+                    <a
+                        href={
+                            hasNext
+                                ? `/admin/contents?page=${currentPage + 1}`
+                                : "#"
+                        }
+                        className={`rounded border px-4 py-2 ${hasNext
+                                ? "hover:bg-gray-100"
+                                : "pointer-events-none opacity-50"
+                            }`}
+                    >
+                        Next →
+                    </a>
+                </div>
             )}
         </main>
     );
