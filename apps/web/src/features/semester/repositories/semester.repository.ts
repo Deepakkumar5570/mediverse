@@ -8,7 +8,7 @@ export async function createSemesterRepository(
 ) {
   const [semester] = await db
     .insert(semesters)
-    .values(data)
+    .values(data) 
     .returning();
 
   return semester;

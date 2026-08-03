@@ -7,6 +7,15 @@ import {
     PageHeader,
     StatCard,
 } from "@/src/components/learn";
+import {
+    ExplorerGrid,
+    Section,
+} from "@/src/components/learn";
+
+import {
+    getSemestersByProgramAction,
+    SemesterCard,
+} from "@/src/features/learn/semesters";
 
 type Props = {
     params: Promise<{
@@ -21,6 +30,10 @@ export default async function ProgramDetailsPage({
 
     const program =
         await getProgramBySlugAction(programSlug);
+    const semesters =
+        program
+            ? await getSemestersByProgramAction(program.id)
+            : [];
 
     if (!program) {
         notFound();
@@ -68,16 +81,27 @@ export default async function ProgramDetailsPage({
                 </p>
             </section>
 
-            <section className="rounded-xl border border-dashed p-10 text-center">
-                <h2 className="text-2xl font-semibold">
-                    Semester Explorer
-                </h2>
-
-                <p className="mt-3 text-gray-500">
-                    This section will be available in the
-                    next sprint.
-                </p>
-            </section>
+            <Section
+                title="Semesters"
+                description="Browse all semesters available in this program."
+            >
+                {semesters.length === 0 ? (
+                    <p className="text-gray-500">
+                        No semesters have been added to this
+                        program yet.
+                    </p>
+                ) : (
+                    <ExplorerGrid>
+                        {semesters.map((semester) => (
+                            <SemesterCard
+                                key={semester.id}
+                                semester={semester}
+                                programSlug={program.slug}
+                            />
+                        ))}
+                    </ExplorerGrid>
+                )}
+            </Section>
         </main>
     );
 }

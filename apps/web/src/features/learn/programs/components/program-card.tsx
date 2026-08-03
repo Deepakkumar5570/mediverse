@@ -1,38 +1,24 @@
-import Link from "next/link";
+import { ExplorerCard } from "@/src/components/learn";
 
 type Program = {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
 };
 
 type Props = {
-  program: Program;
+    program: Program;
 };
 
 export function ProgramCard({
-  program,
+    program,
 }: Props) {
-  return (
-    <Link
-      href={`/learn/programs/${program.slug}`}
-      className="block rounded-xl border bg-white p-6 shadow-sm transition hover:shadow-lg"
-    >
-      <h2 className="text-2xl font-semibold">
-        {program.name}
-      </h2>
-
-      <p className="mt-3 text-gray-600">
-        {program.description ??
-          "No description available."}
-      </p>
-
-      <div className="mt-6 flex items-center justify-between">
-        <span className="text-sm text-blue-600 font-medium">
-          Explore →
-        </span>
-      </div>
-    </Link>
-  );
+    return (
+        <ExplorerCard
+            href={`/learn/programs/${program.slug}`}
+            title={program.name}
+            description={program.description}
+        />
+    );
 }
