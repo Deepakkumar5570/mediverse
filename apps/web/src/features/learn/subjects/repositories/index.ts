@@ -1,0 +1,1 @@
+export * from "./get-subjects-by-semester.repository";

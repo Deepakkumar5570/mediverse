@@ -15,6 +15,8 @@ type Props = {
 
   breadcrumbs: BreadcrumbItem[];
 
+  sidebarTitle?: string;
+
   sidebar: SidebarItem[];
 
   children: ReactNode;
@@ -24,6 +26,7 @@ export function PageTemplate({
   title,
   description,
   breadcrumbs,
+  sidebarTitle = "Learn",
   sidebar,
   children,
 }: Props) {
@@ -39,7 +42,7 @@ export function PageTemplate({
       <div className="mt-10 grid gap-8 lg:grid-cols-12">
         <aside className="lg:col-span-3">
           <Sidebar
-            title="Learn"
+            title={sidebarTitle}
             items={sidebar}
           />
         </aside>

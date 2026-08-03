@@ -96,7 +96,6 @@ export default async function ProgramDetailsPage({
                             <SemesterCard
                                 key={semester.id}
                                 semester={semester}
-                                programSlug={program.slug}
                             />
                         ))}
                     </ExplorerGrid>
