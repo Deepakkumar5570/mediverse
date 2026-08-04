@@ -10,6 +10,11 @@ import {
     getSubtopicDetailsAction,
 } from "@/src/features/learn/subtopics";
 
+import {
+    getContentBySubtopicAction,
+    ReadingEngine,
+} from "@/src/features/learn/content";
+
 type Props = {
     params: Promise<{
         subtopicId: string;
@@ -23,6 +28,11 @@ export default async function SubtopicDetailsPage({
 
     const details =
         await getSubtopicDetailsAction(subtopicId);
+
+    const lesson =
+        await getContentBySubtopicAction(
+            subtopicId,
+        );
 
     if (!details) {
         notFound();
@@ -102,6 +112,21 @@ export default async function SubtopicDetailsPage({
                             "No description available."}
                     </p>
                 </div>
+            </Section>
+
+            <Section title="Lesson">
+                {lesson ? (
+                    <ReadingEngine
+                        title={lesson.title}
+                        summary={lesson.summary}
+                        content={lesson.content}
+                        readingTime={lesson.readingTime}
+                    />
+                ) : (
+                    <div className="rounded-xl border border-dashed p-8 text-center text-muted-foreground">
+                        Lesson content not available.
+                    </div>
+                )}
             </Section>
         </PageTemplate>
     );
