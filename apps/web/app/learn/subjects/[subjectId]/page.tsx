@@ -6,50 +6,51 @@ import {
     Section,
     StatCard,
 } from "@/src/components/learn";
-
 import {
-    getSemesterDetailsAction,
-} from "@/src/features/learn/semesters";
-
-import {
-    getSubjectsBySemesterAction,
-    SubjectCard,
+    getSubjectDetailsAction,
 } from "@/src/features/learn/subjects";
+
+import {
+    getUnitsBySubjectAction,
+    UnitCard,
+} from "@/src/features/learn/units";
 
 type Props = {
     params: Promise<{
-        semesterId: string;
+        subjectId: string;
     }>;
 };
 
-export default async function SemesterDetailsPage({
+export default async function SubjectDetailsPage({
     params,
 }: Props) {
-    const { semesterId } = await params;
+    const { subjectId } = await params;
 
     const details =
-        await getSemesterDetailsAction(
-            semesterId
+        await getSubjectDetailsAction(
+            subjectId
         );
 
     if (!details) {
         notFound();
     }
 
-    const subjects =
-        await getSubjectsBySemesterAction(
-            semesterId
+    const units =
+        await getUnitsBySubjectAction(
+            subjectId
         );
 
     const {
+        subject,
         semester,
         program,
     } = details;
 
     return (
         <PageTemplate
-            title={semester.name}
-            description={`${program.name} • Semester ${semester.number}`}
+            title={subject.name}
+            description={`${program.name} • ${subject.code}`}
+            sidebarTitle="Subject"
             breadcrumbs={[
                 {
                     label: "Programs",
@@ -61,72 +62,65 @@ export default async function SemesterDetailsPage({
                 },
                 {
                     label: semester.name,
+                    href: `/learn/semesters/${semester.id}`,
+                },
+                {
+                    label: subject.name,
                 },
             ]}
-            sidebarTitle="Semester"
             sidebar={[
                 {
                     label: "Overview",
                     href: "#overview",
                 },
                 {
-                    label: "Subjects",
-                    href: "#subjects",
+                    label: "Units",
+                    href: "#units",
                 },
             ]}
         >
             <section className="grid gap-6 md:grid-cols-3">
                 <StatCard
-                    label="Subjects"
-                    value={subjects.length}
+                    label="Units"
+                    value={units.length}
                 />
 
                 <StatCard
-                    label="Semester"
-                    value={semester.number}
+                    label="Subject Code"
+                    value={subject.code}
                 />
 
                 <StatCard
                     label="Status"
-                    value={semester.status}
+                    value={subject.status}
                 />
             </section>
 
-            <Section
-                title="Overview"
-                // id="overview"
-            >
+            <Section title="Overview">
                 <div className="rounded-xl border bg-white p-6">
                     <p className="text-gray-600">
-                        Semester {semester.number} of{" "}
-                        {program.name}.
+                        {subject.description ??
+                            "No description available."}
                     </p>
                 </div>
             </Section>
 
-            <Section
-                title="Subjects"
-                // id="subjects"
-            >
-                {subjects.length === 0 ? (
+            <Section title="Units">
+                {units.length === 0 ? (
                     <div className="rounded-xl border border-dashed p-10 text-center text-gray-500">
-                        No subjects available.
+                        No units available.
                     </div>
                 ) : (
                     <ExplorerGrid>
-                        {subjects.map((subject) => (
-                            <SubjectCard
-                                key={subject.id}
-                                subject={subject}
-                                // semesterId={semester.id}
-                                // programSlug={program.slug}
+                        {units.map((unit) => (
+                            <UnitCard
+                                key={unit.id}
+                                unit={unit}
                             />
                         ))}
                     </ExplorerGrid>
                 )}
             </Section>
         </PageTemplate>
-
-
     );
 }
