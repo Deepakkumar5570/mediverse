@@ -1,0 +1,1 @@
+export * from "./get-subtopics-by-topic.repository";
