@@ -1,5 +1,13 @@
 import { db, contents } from "@mediverse/database";
-import { asc, eq, ilike, or,sql,desc } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  ilike,
+  or,
+  sql,
+  desc,
+} from "drizzle-orm";
 
 import type { CreateContentInput } from "../validations";
 
@@ -69,60 +77,68 @@ export async function deleteContentRepository(
 
 
 export async function searchContentsRepository(
-    search: string
+  search: string,
+  status?: "draft" | "active" | "archived"
 ) {
-    return db
-        .select()
-        .from(contents)
-        .where(
-            or(
-                ilike(contents.title, `%${search}%`),
-                ilike(contents.slug, `%${search}%`)
-            )
-        );
+  const conditions = [
+    or(
+      ilike(contents.title, `%${search}%`),
+      ilike(contents.slug, `%${search}%`)
+    ),
+  ];
+
+  if (status) {
+    conditions.push(eq(contents.status, status));
+  }
+
+  return db
+    .select()
+    .from(contents)
+    .where(and(...conditions))
+    .orderBy(desc(contents.createdAt));
 }
 
 
 //  "feat(content): add content search"
 
 export async function getPaginatedContentsRepository(
-    page: number,
-    limit: number
+  page: number,
+  limit: number
 ) {
-    const offset = (page - 1) * limit;
+  const offset = (page - 1) * limit;
 
-    const items = await db
-        .select()
-        .from(contents)
-        .orderBy(desc(contents.createdAt))
-        .limit(limit)
-        .offset(offset);
+  const items = await db
+    .select()
+    .from(contents)
+    .orderBy(desc(contents.createdAt))
+    .limit(limit)
+    .offset(offset);
 
-    const [{ count }] = await db
-        .select({
-            count: sql<number>`count(*)`,
-        })
-        .from(contents);
+  const [{ count }] = await db
+    .select({
+      count: sql<number>`count(*)`,
+    })
+    .from(contents);
 
-    return {
-        items,
-        total: Number(count),
-        page,
-        limit,
-        totalPages: Math.ceil(Number(count) / limit),
-    };
+  return {
+    items,
+    total: Number(count),
+    page,
+    limit,
+    totalPages: Math.ceil(Number(count) / limit),
+  };
 }
 
 
 export async function getContentsByStatusRepository(
-    status:
-        | "draft"
-        | "active"
-        | "archived"
+  status:
+    | "draft"
+    | "active"
+    | "archived"
 ) {
-    return db
-        .select()
-        .from(contents)
-        .where(eq(contents.status, status))
-        .orderBy(desc(contents.createdAt));
+  return db
+    .select()
+    .from(contents)
+    .where(eq(contents.status, status))
+    .orderBy(desc(contents.createdAt));
 }

@@ -24,11 +24,10 @@ export default async function ContentsPage({
     const {
         search = "",
         page = "1",
-        status = "active",
+        status,
     } = await searchParams;
 
     const currentPage = Number(page) || 1;
-
 
     const pagination = await getPaginatedContentsAction(
         currentPage,
@@ -37,10 +36,15 @@ export default async function ContentsPage({
 
     let contents = pagination.items;
 
-    if (search) {
-        contents = await searchContentsAction(search);
+    if (search.trim()) {
+        contents = await searchContentsAction(
+            search,
+            status
+        );
     } else if (status) {
-        contents = await getContentsByStatusAction(status);
+        contents = await getContentsByStatusAction(
+            status
+        );
     }
 
 

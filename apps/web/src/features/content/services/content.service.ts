@@ -48,9 +48,10 @@ export async function deleteContentService(
 }
 
 export async function searchContentsService(
-    search: string
+    search: string,
+    status?: "draft" | "active" | "archived"
 ) {
-    return searchContentsRepository(search);
+    return searchContentsRepository(search, status);
 }
 
 

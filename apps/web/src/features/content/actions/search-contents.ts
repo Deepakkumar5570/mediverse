@@ -3,7 +3,8 @@
 import { searchContentsService } from "../services";
 
 export async function searchContentsAction(
-    search: string
+    search: string,
+    status?: "draft" | "active" | "archived"
 ) {
     const query = search.trim();
 
@@ -11,5 +12,5 @@ export async function searchContentsAction(
         return [];
     }
 
-    return searchContentsService(query);
+    return searchContentsService(query, status);
 }
