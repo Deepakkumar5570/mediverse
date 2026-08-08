@@ -12,6 +12,8 @@ import {
 
 import {
     getContentBySubtopicAction,
+    getLessonNavigationAction,
+    LessonNavigation,
     ReadingEngine,
 } from "@/src/features/learn/content";
 
@@ -31,6 +33,11 @@ export default async function SubtopicDetailsPage({
 
     const lesson =
         await getContentBySubtopicAction(
+            subtopicId,
+        );
+
+    const lessonNavigation =
+        await getLessonNavigationAction(
             subtopicId,
         );
 
@@ -127,6 +134,13 @@ export default async function SubtopicDetailsPage({
                         Lesson content not available.
                     </div>
                 )}
+
+                <LessonNavigation
+                    previous={lessonNavigation?.previous}
+                    next={lessonNavigation?.next}
+                />
+
+
             </Section>
         </PageTemplate>
     );
