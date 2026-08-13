@@ -96,7 +96,8 @@ export default async function SubjectDetailsPage({
                 />
             </section>
 
-            <Section title="Overview">
+            <Section title="Overview"
+                id="overview">
                 <div className="rounded-xl border bg-white p-6">
                     <p className="text-gray-600">
                         {subject.description ??
@@ -105,7 +106,9 @@ export default async function SubjectDetailsPage({
                 </div>
             </Section>
 
-            <Section title="Units">
+            <Section
+                title="Units"
+                id="units">
                 {units.length === 0 ? (
                     <div className="rounded-xl border border-dashed p-10 text-center text-gray-500">
                         No units available.

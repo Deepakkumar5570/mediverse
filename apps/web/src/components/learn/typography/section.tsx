@@ -1,18 +1,20 @@
 import { ReactNode } from "react";
 
 type Props = {
+  id?: string;
   title?: string;
   description?: string;
   children: ReactNode;
 };
 
 export function Section({
+  id,
   title,
   description,
   children,
 }: Props) {
   return (
-    <section className="rounded-xl border bg-white p-8 shadow-sm">
+    <section id={id} className="rounded-xl border bg-white p-8 shadow-sm">
       {(title || description) && (
         <header className="mb-6">
           {title && (

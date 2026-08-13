@@ -6,3 +6,4 @@ export * from "./schema/semester.schema";
 export * from "./schema/topic.schema";
 export * from "./schema/subtopic.schema";
 export * from "./schema/content.schema";
+export * from "./schema/progress.schema";

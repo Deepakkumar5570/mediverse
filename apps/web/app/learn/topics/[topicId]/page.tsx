@@ -101,7 +101,8 @@ export default async function TopicDetailsPage({
                 />
             </section>
 
-            <Section title="Overview">
+            <Section title="Overview"
+                id="overview">
                 <div className="rounded-xl border bg-white p-6">
                     <p className="text-gray-600">
                         {topic.description ??
@@ -110,7 +111,8 @@ export default async function TopicDetailsPage({
                 </div>
             </Section>
 
-            <Section title="Subtopics">
+            <Section title="Subtopics"
+                id="subtopics">
                 {subtopics.length === 0 ? (
                     <div className="rounded-xl border border-dashed p-10 text-center text-gray-500">
                         No subtopics available.

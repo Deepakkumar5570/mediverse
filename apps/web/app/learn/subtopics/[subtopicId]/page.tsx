@@ -17,6 +17,10 @@ import {
     ReadingEngine,
 } from "@/src/features/learn/content";
 
+import {
+    getContentProgressAction,
+} from "@/src/features/progress";
+
 type Props = {
     params: Promise<{
         subtopicId: string;
@@ -35,6 +39,10 @@ export default async function SubtopicDetailsPage({
         await getContentBySubtopicAction(
             subtopicId,
         );
+
+    const lessonProgress = lesson
+        ? await getContentProgressAction(lesson.id)
+        : null;
 
     const lessonNavigation =
         await getLessonNavigationAction(
@@ -112,7 +120,8 @@ export default async function SubtopicDetailsPage({
                 />
             </section>
 
-            <Section title="Overview">
+            <Section title="Overview"
+                id="overview">
                 <div className="rounded-xl border bg-white p-6">
                     <p className="text-gray-600">
                         {subtopic.description ??
@@ -121,13 +130,16 @@ export default async function SubtopicDetailsPage({
                 </div>
             </Section>
 
-            <Section title="Lesson">
+            <Section title="Lesson"
+                id="lesson">
                 {lesson ? (
                     <ReadingEngine
+                        contentId={lesson.id}
                         title={lesson.title}
                         summary={lesson.summary}
                         content={lesson.content}
                         readingTime={lesson.readingTime}
+                        initialCompleted={lessonProgress?.completed ?? false}
                     />
                 ) : (
                     <div className="rounded-xl border border-dashed p-8 text-center text-muted-foreground">

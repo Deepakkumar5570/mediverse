@@ -98,7 +98,7 @@ export default async function UnitDetailsPage({
 
             <Section
                 title="Overview"
-                // id="overview"
+                id="overview"
             >
                 <div className="rounded-xl border bg-white p-6">
                     <p className="text-gray-600">
@@ -110,7 +110,7 @@ export default async function UnitDetailsPage({
 
             <Section
                 title="Topics"
-                // id="topics"
+                id="topics"
             >
                 {topics.length === 0 ? (
                     <div className="rounded-xl border border-dashed p-10 text-center text-gray-500">
