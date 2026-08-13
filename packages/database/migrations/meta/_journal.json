@@ -64,6 +64,13 @@
       "when": 1786423317732,
       "tag": "0008_damp_mach_iv",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1786655110721,
+      "tag": "0009_lonely_mandroid",
+      "breakpoints": true
     }
   ]
 }

@@ -21,6 +21,11 @@ import {
     getContentProgressAction,
 } from "@/src/features/progress";
 
+import {
+    FlashcardDeck,
+    getFlashcardsByContentAction,
+} from "@/src/features/learn/flashcards";
+
 type Props = {
     params: Promise<{
         subtopicId: string;
@@ -48,6 +53,10 @@ export default async function SubtopicDetailsPage({
         await getLessonNavigationAction(
             subtopicId,
         );
+
+    const flashcards = lesson
+        ? await getFlashcardsByContentAction(lesson.id)
+        : [];
 
     if (!details) {
         notFound();
@@ -100,6 +109,10 @@ export default async function SubtopicDetailsPage({
                 {
                     label: "Overview",
                     href: "#overview",
+                },
+                {
+                    label: "Flashcards",
+                    href: "#flashcards",
                 },
             ]}
         >
@@ -154,6 +167,18 @@ export default async function SubtopicDetailsPage({
 
 
             </Section>
+
+
+            <Section
+                id="flashcards"
+                title="Flashcards"
+            >
+                <FlashcardDeck flashcards={flashcards} />
+            </Section>
+
+
+
+
         </PageTemplate>
     );
 }
