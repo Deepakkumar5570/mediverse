@@ -136,3 +136,54 @@ export async function getProgressSummaryRepository(
           ),
   };
 }
+
+
+
+export async function getSubtopicProgressRepository(
+  userId: string,
+  subtopicId: string,
+) {
+  const [{ total }] = await db
+    .select({
+      total: count(contents.id),
+    })
+    .from(contents)
+    .where(
+      and(
+        eq(contents.subtopicId, subtopicId),
+        eq(contents.status, "active"),
+      ),
+    );
+
+  const [{ completed }] = await db
+    .select({
+      completed: count(progress.id),
+    })
+    .from(progress)
+    .innerJoin(
+      contents,
+      eq(progress.contentId, contents.id),
+    )
+    .where(
+      and(
+        eq(progress.userId, userId),
+        eq(progress.completed, true),
+        eq(contents.subtopicId, subtopicId),
+        eq(contents.status, "active"),
+      ),
+    );
+
+  const totalCount = Number(total);
+  const completedCount = Number(completed);
+
+  return {
+    total: totalCount,
+    completed: completedCount,
+    percentage:
+      totalCount === 0
+        ? 0
+        : Math.round(
+            (completedCount / totalCount) * 100,
+          ),
+  };
+}

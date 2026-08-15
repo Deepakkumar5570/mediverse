@@ -4,6 +4,7 @@ import {
   getProgressSummaryRepository,
   markContentCompleteRepository,
   markContentIncompleteRepository,
+  getSubtopicProgressRepository,
 } from "../repositories/progress.repository";
 
 export async function getUserProgressService(
@@ -48,4 +49,16 @@ export async function getProgressSummaryService(
   userId: string,
 ) {
   return getProgressSummaryRepository(userId);
+}
+
+
+
+export async function getSubtopicProgressService(
+  userId: string,
+  subtopicId: string,
+) {
+  return getSubtopicProgressRepository(
+    userId,
+    subtopicId,
+  );
 }

@@ -8,6 +8,7 @@ import {
   getProgressSummaryService,
   getUserProgressService,
   incompleteContentService,
+  getSubtopicProgressService,
 } from "../services/progress.service";
 
 async function requireUserId() {
@@ -64,4 +65,16 @@ export async function getProgressSummaryAction() {
   const userId = await requireUserId();
 
   return getProgressSummaryService(userId);
+}
+
+
+export async function getSubtopicProgressAction(
+  subtopicId: string,
+) {
+  const userId = await requireUserId();
+
+  return getSubtopicProgressService(
+    userId,
+    subtopicId,
+  );
 }

@@ -18,13 +18,14 @@ import {
 } from "@/src/features/learn/content";
 
 import {
-    getContentProgressAction,
-} from "@/src/features/progress";
-
-import {
     FlashcardDeck,
     getFlashcardsByContentAction,
 } from "@/src/features/learn/flashcards";
+
+import {
+    getContentProgressAction,
+    getSubtopicProgressAction,
+} from "@/src/features/progress";
 
 type Props = {
     params: Promise<{
@@ -61,6 +62,9 @@ export default async function SubtopicDetailsPage({
     if (!details) {
         notFound();
     }
+
+    const subtopicProgress =
+        await getSubtopicProgressAction(subtopicId);
 
     const {
         subtopic,
@@ -116,7 +120,7 @@ export default async function SubtopicDetailsPage({
                 },
             ]}
         >
-            <section className="grid gap-6 md:grid-cols-3">
+            <section className="grid gap-6 md:grid-cols-4">
                 <StatCard
                     label="Subtopic Number"
                     value={subtopic.subtopicNumber}
@@ -130,6 +134,11 @@ export default async function SubtopicDetailsPage({
                 <StatCard
                     label="Topic"
                     value={topic.title}
+                />
+
+                <StatCard
+                    label="Progress"
+                    value={`${subtopicProgress.percentage}%`}
                 />
             </section>
 
