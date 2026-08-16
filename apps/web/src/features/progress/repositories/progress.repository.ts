@@ -267,3 +267,96 @@ export async function getSubjectProgressRepository(
     };
   });
 }
+
+
+
+
+
+export async function getSingleSubjectProgressRepository(
+  userId: string,
+  subjectId: string,
+) {
+  const [{ total }] = await db
+    .select({
+      total: count(contents.id),
+    })
+    .from(subjects)
+    .innerJoin(
+      units,
+      eq(units.subjectId, subjects.id),
+    )
+    .innerJoin(
+      topics,
+      eq(topics.unitId, units.id),
+    )
+    .innerJoin(
+      subtopics,
+      eq(subtopics.topicId, topics.id),
+    )
+    .innerJoin(
+      contents,
+      and(
+        eq(contents.subtopicId, subtopics.id),
+        eq(contents.status, "active"),
+      ),
+    )
+    .where(
+      and(
+        eq(subjects.id, subjectId),
+        eq(subjects.status, "active"),
+      ),
+    );
+
+  const [{ completed }] = await db
+    .select({
+      completed: count(progress.id),
+    })
+    .from(subjects)
+    .innerJoin(
+      units,
+      eq(units.subjectId, subjects.id),
+    )
+    .innerJoin(
+      topics,
+      eq(topics.unitId, units.id),
+    )
+    .innerJoin(
+      subtopics,
+      eq(subtopics.topicId, topics.id),
+    )
+    .innerJoin(
+      contents,
+      and(
+        eq(contents.subtopicId, subtopics.id),
+        eq(contents.status, "active"),
+      ),
+    )
+    .innerJoin(
+      progress,
+      and(
+        eq(progress.contentId, contents.id),
+        eq(progress.userId, userId),
+        eq(progress.completed, true),
+      ),
+    )
+    .where(
+      and(
+        eq(subjects.id, subjectId),
+        eq(subjects.status, "active"),
+      ),
+    );
+
+  const totalCount = Number(total);
+  const completedCount = Number(completed);
+
+  return {
+    total: totalCount,
+    completed: completedCount,
+    percentage:
+      totalCount === 0
+        ? 0
+        : Math.round(
+            (completedCount / totalCount) * 100,
+          ),
+  };
+}
