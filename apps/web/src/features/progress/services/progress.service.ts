@@ -1,4 +1,8 @@
 import {
+  getSubjectProgressRepository,
+} from "../repositories/progress.repository";
+
+import {
   getProgressByUserRepository,
   getProgressByUserAndContentRepository,
   getProgressSummaryRepository,
@@ -6,6 +10,16 @@ import {
   markContentIncompleteRepository,
   getSubtopicProgressRepository,
 } from "../repositories/progress.repository";
+
+
+
+
+export async function getSubjectProgressService(
+  userId: string,
+) {
+  return getSubjectProgressRepository(userId);
+}
+
 
 export async function getUserProgressService(
     userId: string

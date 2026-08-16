@@ -5,10 +5,14 @@ import {
 
 import {
   getProgressSummaryAction,
+  getSubjectProgressAction,
 } from "@/src/features/progress";
 
 export default async function ProgressPage() {
-  const summary = await getProgressSummaryAction();
+  const [summary, subjectProgress] = await Promise.all([
+    getProgressSummaryAction(),
+    getSubjectProgressAction(),
+  ]);
 
   const remaining = Math.max(
     summary.total - summary.completed,
@@ -38,53 +42,95 @@ export default async function ProgressPage() {
           label: "Progress",
           href: "#progress",
         },
+        {
+          label: "Subjects",
+          href: "#subjects",
+        },
       ]}
     >
       <div className="space-y-8">
 
-        {/* Hero */}
+        {/* ─────────────────────────────
+            HERO
+        ───────────────────────────── */}
         <section
           className="
-            relative overflow-hidden rounded-3xl
+            relative overflow-hidden rounded-[2rem]
             border border-slate-200
             bg-gradient-to-br from-white via-slate-50 to-slate-100
             p-8 shadow-sm
+            md:p-10
           "
         >
           <div className="relative z-10 max-w-2xl">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-1.5 text-xs font-medium text-slate-600 backdrop-blur">
+            <div
+              className="
+                mb-5 inline-flex items-center gap-2
+                rounded-full border border-slate-200
+                bg-white/80 px-3.5 py-2
+                text-xs font-medium text-slate-600
+                backdrop-blur
+              "
+            >
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
               Learning Progress
             </div>
 
-            <h2 className="text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
+            <h2
+              className="
+                text-3xl font-semibold tracking-tight
+                text-slate-900
+                md:text-5xl
+              "
+            >
               Keep going.
               <br />
               You're making progress.
             </h2>
 
-            <p className="mt-4 max-w-xl text-sm leading-6 text-slate-500 md:text-base">
+            <p
+              className="
+                mt-5 max-w-xl
+                text-sm leading-6 text-slate-500
+                md:text-base
+              "
+            >
               Every completed lesson brings you one step closer
               to mastering your subjects.
             </p>
           </div>
 
-          {/* Decorative circles */}
-          <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-slate-200/50" />
-          <div className="absolute -bottom-24 right-20 h-48 w-48 rounded-full bg-white/70" />
+          {/* Decorative elements */}
+          <div
+            className="
+              absolute -right-20 -top-20
+              h-64 w-64 rounded-full
+              bg-slate-200/50
+            "
+          />
+
+          <div
+            className="
+              absolute -bottom-28 right-24
+              h-52 w-52 rounded-full
+              bg-white/70
+            "
+          />
         </section>
 
-        {/* Overview */}
+        {/* ─────────────────────────────
+            OVERVIEW
+        ───────────────────────────── */}
         <Section title="Overview" id="overview">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
             {/* Total */}
             <div
               className="
-                group rounded-2xl border border-slate-200
-                bg-white p-6
-                shadow-sm transition-all duration-200
-                hover:-translate-y-0.5 hover:shadow-md
+                rounded-2xl border border-slate-200
+                bg-white p-6 shadow-sm
+                transition-all duration-200
+                hover:-translate-y-1 hover:shadow-md
               "
             >
               <div className="flex items-start justify-between">
@@ -98,7 +144,12 @@ export default async function ProgressPage() {
                   </p>
                 </div>
 
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-lg">
+                <div
+                  className="
+                    flex h-11 w-11 items-center justify-center
+                    rounded-xl bg-slate-100 text-lg
+                  "
+                >
                   📚
                 </div>
               </div>
@@ -111,10 +162,10 @@ export default async function ProgressPage() {
             {/* Completed */}
             <div
               className="
-                group rounded-2xl border border-slate-200
-                bg-white p-6
-                shadow-sm transition-all duration-200
-                hover:-translate-y-0.5 hover:shadow-md
+                rounded-2xl border border-slate-200
+                bg-white p-6 shadow-sm
+                transition-all duration-200
+                hover:-translate-y-1 hover:shadow-md
               "
             >
               <div className="flex items-start justify-between">
@@ -128,7 +179,12 @@ export default async function ProgressPage() {
                   </p>
                 </div>
 
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-lg">
+                <div
+                  className="
+                    flex h-11 w-11 items-center justify-center
+                    rounded-xl bg-emerald-50 text-lg
+                  "
+                >
                   ✓
                 </div>
               </div>
@@ -141,10 +197,10 @@ export default async function ProgressPage() {
             {/* Remaining */}
             <div
               className="
-                group rounded-2xl border border-slate-200
-                bg-white p-6
-                shadow-sm transition-all duration-200
-                hover:-translate-y-0.5 hover:shadow-md
+                rounded-2xl border border-slate-200
+                bg-white p-6 shadow-sm
+                transition-all duration-200
+                hover:-translate-y-1 hover:shadow-md
               "
             >
               <div className="flex items-start justify-between">
@@ -158,7 +214,12 @@ export default async function ProgressPage() {
                   </p>
                 </div>
 
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-lg">
+                <div
+                  className="
+                    flex h-11 w-11 items-center justify-center
+                    rounded-xl bg-sky-50 text-lg
+                  "
+                >
                   🌱
                 </div>
               </div>
@@ -170,26 +231,37 @@ export default async function ProgressPage() {
           </div>
         </Section>
 
-        {/* Main progress */}
+        {/* ─────────────────────────────
+            OVERALL PROGRESS
+        ───────────────────────────── */}
         <Section title="Your Progress" id="progress">
           <div
             className="
-              overflow-hidden rounded-3xl
+              overflow-hidden rounded-[2rem]
               border border-slate-200
               bg-white shadow-sm
             "
           >
             <div className="p-7 md:p-8">
 
-              <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-
+              <div
+                className="
+                  flex flex-col gap-6
+                  md:flex-row md:items-end md:justify-between
+                "
+              >
                 <div>
                   <p className="text-sm font-medium text-slate-500">
                     Overall completion
                   </p>
 
                   <div className="mt-2 flex items-baseline gap-2">
-                    <span className="text-5xl font-semibold tracking-tight text-slate-900">
+                    <span
+                      className="
+                        text-5xl font-semibold
+                        tracking-tight text-slate-900
+                      "
+                    >
                       {summary.percentage}
                     </span>
 
@@ -199,7 +271,13 @@ export default async function ProgressPage() {
                   </div>
                 </div>
 
-                <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
+                <div
+                  className="
+                    rounded-full bg-slate-100
+                    px-4 py-2 text-sm
+                    font-medium text-slate-600
+                  "
+                >
                   {summary.completed} of {summary.total} completed
                 </div>
               </div>
@@ -223,7 +301,6 @@ export default async function ProgressPage() {
                 </div>
               </div>
 
-              {/* Progress labels */}
               <div className="mt-3 flex justify-between text-xs text-slate-400">
                 <span>Start</span>
                 <span>Keep learning</span>
@@ -231,10 +308,22 @@ export default async function ProgressPage() {
               </div>
             </div>
 
-            {/* Bottom insight */}
-            <div className="border-t border-slate-100 bg-slate-50/70 px-7 py-5 md:px-8">
+            {/* Insight */}
+            <div
+              className="
+                border-t border-slate-100
+                bg-slate-50/70
+                px-7 py-5 md:px-8
+              "
+            >
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
+                <div
+                  className="
+                    flex h-9 w-9 shrink-0
+                    items-center justify-center
+                    rounded-full bg-white shadow-sm
+                  "
+                >
                   ✨
                 </div>
 
@@ -254,14 +343,191 @@ export default async function ProgressPage() {
           </div>
         </Section>
 
-        {/* Journey */}
+        {/* ─────────────────────────────
+            SUBJECT PROGRESS
+        ───────────────────────────── */}
+        <Section title="Subject Progress" id="subjects">
+          <div
+            className="
+              overflow-hidden rounded-[2rem]
+              border border-slate-200
+              bg-white shadow-sm
+            "
+          >
+            {/* Header */}
+            <div
+              className="
+                flex flex-col gap-2
+                border-b border-slate-100
+                px-7 py-6
+                md:flex-row md:items-center md:justify-between
+                md:px-8
+              "
+            >
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">
+                  Your subjects
+                </h3>
+
+                <p className="mt-1 text-sm text-slate-500">
+                  See how you're progressing through each subject.
+                </p>
+              </div>
+
+              <div
+                className="
+                  inline-flex w-fit items-center
+                  rounded-full bg-slate-100
+                  px-3 py-1.5
+                  text-xs font-medium text-slate-500
+                "
+              >
+                {subjectProgress.length} subjects
+              </div>
+            </div>
+
+            {/* Subject list */}
+            <div className="divide-y divide-slate-100">
+              {subjectProgress.length === 0 ? (
+                <div className="px-7 py-12 text-center md:px-8">
+                  <div
+                    className="
+                      mx-auto flex h-12 w-12
+                      items-center justify-center
+                      rounded-2xl bg-slate-100
+                    "
+                  >
+                    📖
+                  </div>
+
+                  <p className="mt-4 text-sm font-medium text-slate-700">
+                    No subject progress yet
+                  </p>
+
+                  <p className="mt-1 text-sm text-slate-400">
+                    Start completing lessons to see your progress here.
+                  </p>
+                </div>
+              ) : (
+                subjectProgress.map((subject) => (
+                  <div
+                    key={subject.subjectName}
+                    className="
+                      group px-7 py-6
+                      transition-colors duration-200
+                      hover:bg-slate-50/70
+                      md:px-8
+                    "
+                  >
+                    <div className="flex flex-col gap-5">
+
+                      {/* Subject heading */}
+                      <div
+                        className="
+                          flex flex-col gap-3
+                          sm:flex-row sm:items-center
+                          sm:justify-between
+                        "
+                      >
+                        <div className="min-w-0">
+                          <h4
+                            className="
+                              truncate text-base
+                              font-semibold text-slate-900
+                            "
+                          >
+                            {subject.subjectName}
+                          </h4>
+
+                          <p className="mt-1 text-xs text-slate-400">
+                            {subject.completed} of {subject.total} lessons completed
+                          </p>
+                        </div>
+
+                        {/* Percentage */}
+                        <div
+                          className="
+                            flex items-center gap-3
+                            sm:shrink-0
+                          "
+                        >
+                          <span
+                            className="
+                              text-sm font-semibold
+                              text-slate-700
+                            "
+                          >
+                            {subject.percentage}%
+                          </span>
+
+                          <span
+                            className="
+                              rounded-full
+                              bg-slate-100 px-2.5 py-1
+                              text-[11px] font-medium
+                              text-slate-500
+                            "
+                          >
+                            {subject.percentage === 100
+                              ? "Completed"
+                              : subject.percentage > 0
+                                ? "In progress"
+                                : "Not started"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Progress */}
+                      <div>
+                        <div
+                          className="
+                            h-2.5 overflow-hidden
+                            rounded-full bg-slate-100
+                          "
+                        >
+                          <div
+                            className="
+                              h-full rounded-full
+                              bg-gradient-to-r
+                              from-slate-900
+                              via-slate-700
+                              to-slate-500
+                              transition-all duration-700
+                            "
+                            style={{
+                              width: `${subject.percentage}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </Section>
+
+        {/* ─────────────────────────────
+            JOURNEY
+        ───────────────────────────── */}
         <section
           className="
-            rounded-3xl border border-slate-200
-            bg-slate-50/70 p-7
+            rounded-[2rem]
+            border border-slate-200
+            bg-gradient-to-br
+            from-slate-50 to-white
+            p-7 shadow-sm
+            md:p-8
           "
         >
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div
+            className="
+              flex flex-col gap-4
+              md:flex-row md:items-center
+              md:justify-between
+            "
+          >
             <div>
               <p className="text-sm font-semibold text-slate-800">
                 One lesson at a time.
@@ -272,7 +538,14 @@ export default async function ProgressPage() {
               </p>
             </div>
 
-            <div className="text-2xl">
+            <div
+              className="
+                flex h-12 w-12
+                items-center justify-center
+                rounded-2xl bg-white
+                text-xl shadow-sm
+              "
+            >
               🌿
             </div>
           </div>

@@ -1,5 +1,18 @@
-import { db, contents, progress } from "@mediverse/database";
-import { and, count, desc, eq } from "drizzle-orm";
+import { db } from "@mediverse/database";
+import {
+  contents,
+  progress,
+  subjects,
+  units,
+  topics,
+  subtopics,
+} from "@mediverse/database";
+import {
+  and,
+  count,
+  eq,
+  desc,
+} from "drizzle-orm";
 
 export async function getProgressByUserRepository(
     userId: string
@@ -186,4 +199,71 @@ export async function getSubtopicProgressRepository(
             (completedCount / totalCount) * 100,
           ),
   };
+}
+
+
+
+
+// ..................
+export async function getSubjectProgressRepository(
+  userId: string,
+) {
+  const rows = await db
+    .select({
+      subjectId: subjects.id,
+      subjectName: subjects.name,
+      total: count(contents.id),
+      completed: count(progress.id),
+    })
+    .from(subjects)
+    .innerJoin(
+      units,
+      eq(units.subjectId, subjects.id),
+    )
+    .innerJoin(
+      topics,
+      eq(topics.unitId, units.id),
+    )
+    .innerJoin(
+      subtopics,
+      eq(subtopics.topicId, topics.id),
+    )
+    .innerJoin(
+      contents,
+      and(
+        eq(contents.subtopicId, subtopics.id),
+        eq(contents.status, "active"),
+      ),
+    )
+    .leftJoin(
+      progress,
+      and(
+        eq(progress.contentId, contents.id),
+        eq(progress.userId, userId),
+        eq(progress.completed, true),
+      ),
+    )
+    .where(eq(subjects.status, "active"))
+    .groupBy(
+      subjects.id,
+      subjects.name,
+    );
+
+  return rows.map((row) => {
+    const total = Number(row.total);
+    const completed = Number(row.completed);
+
+    return {
+      subjectId: row.subjectId,
+      subjectName: row.subjectName,
+      total,
+      completed,
+      percentage:
+        total === 0
+          ? 0
+          : Math.round(
+              (completed / total) * 100,
+            ),
+    };
+  });
 }

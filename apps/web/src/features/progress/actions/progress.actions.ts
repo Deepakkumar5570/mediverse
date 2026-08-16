@@ -1,7 +1,6 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-
 import {
   completeContentService,
   getContentProgressService,
@@ -9,6 +8,7 @@ import {
   getUserProgressService,
   incompleteContentService,
   getSubtopicProgressService,
+  getSubjectProgressService,
 } from "../services/progress.service";
 
 async function requireUserId() {
@@ -77,4 +77,11 @@ export async function getSubtopicProgressAction(
     userId,
     subtopicId,
   );
+}
+
+
+export async function getSubjectProgressAction() {
+  const userId = await requireUserId();
+
+  return getSubjectProgressService(userId);
 }
