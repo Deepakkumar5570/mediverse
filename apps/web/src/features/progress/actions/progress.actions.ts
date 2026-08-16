@@ -10,6 +10,7 @@ import {
   getSubtopicProgressService,
   getSubjectProgressService,
   getSingleSubjectProgressService,
+  getSingleUnitProgressService,
 } from "../services/progress.service";
 
 async function requireUserId() {
@@ -97,5 +98,17 @@ export async function getSingleSubjectProgressAction(
   return getSingleSubjectProgressService(
     userId,
     subjectId,
+  );
+}
+
+
+export async function getSingleUnitProgressAction(
+  unitId: string,
+) {
+  const userId = await requireUserId();
+
+  return getSingleUnitProgressService(
+    userId,
+    unitId,
   );
 }

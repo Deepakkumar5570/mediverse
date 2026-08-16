@@ -360,3 +360,81 @@ export async function getSingleSubjectProgressRepository(
           ),
   };
 }
+
+
+
+
+export async function getSingleUnitProgressRepository(
+  userId: string,
+  unitId: string,
+) {
+  const [{ total }] = await db
+    .select({
+      total: count(contents.id),
+    })
+    .from(units)
+    .innerJoin(
+      topics,
+      eq(topics.unitId, units.id),
+    )
+    .innerJoin(
+      subtopics,
+      eq(subtopics.topicId, topics.id),
+    )
+    .innerJoin(
+      contents,
+      and(
+        eq(contents.subtopicId, subtopics.id),
+        eq(contents.status, "active"),
+      ),
+    )
+    .where(
+      eq(units.id, unitId),
+    );
+
+  const [{ completed }] = await db
+    .select({
+      completed: count(progress.id),
+    })
+    .from(units)
+    .innerJoin(
+      topics,
+      eq(topics.unitId, units.id),
+    )
+    .innerJoin(
+      subtopics,
+      eq(subtopics.topicId, topics.id),
+    )
+    .innerJoin(
+      contents,
+      and(
+        eq(contents.subtopicId, subtopics.id),
+        eq(contents.status, "active"),
+      ),
+    )
+    .innerJoin(
+      progress,
+      and(
+        eq(progress.contentId, contents.id),
+        eq(progress.userId, userId),
+        eq(progress.completed, true),
+      ),
+    )
+    .where(
+      eq(units.id, unitId),
+    );
+
+  const totalCount = Number(total);
+  const completedCount = Number(completed);
+
+  return {
+    total: totalCount,
+    completed: completedCount,
+    percentage:
+      totalCount === 0
+        ? 0
+        : Math.round(
+            (completedCount / totalCount) * 100,
+          ),
+  };
+}

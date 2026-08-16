@@ -1,6 +1,7 @@
 import {
   getSubjectProgressRepository,
   getSingleSubjectProgressRepository,
+  getSingleUnitProgressRepository,
 } from "../repositories/progress.repository";
 
 import {
@@ -30,6 +31,17 @@ export async function getSingleSubjectProgressService(
   return getSingleSubjectProgressRepository(
     userId,
     subjectId,
+  );
+}
+
+
+export async function getSingleUnitProgressService(
+  userId: string,
+  unitId: string,
+) {
+  return getSingleUnitProgressRepository(
+    userId,
+    unitId,
   );
 }
 
