@@ -23,10 +23,23 @@ import {
   getSubjectProgressRepository,
   getSingleSubjectProgressRepository,
   getSingleUnitProgressRepository,
+  getSingleTopicProgressRepository,
   getUnitProgressRepository,
   markContentCompleteRepository,
   markContentIncompleteRepository,
 } from "../repositories/progress.repository";
+
+
+
+export async function getSingleTopicProgressService(
+  userId: string,
+  topicId: string,
+) {
+  return getSingleTopicProgressRepository(
+    userId,
+    topicId,
+  );
+}
 
 
 export async function getUnitProgressService(

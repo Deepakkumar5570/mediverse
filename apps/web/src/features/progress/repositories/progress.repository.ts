@@ -517,6 +517,75 @@ export async function getUnitProgressRepository(
 
 
 
+export async function getSingleTopicProgressRepository(
+  userId: string,
+  topicId: string,
+) {
+  const [{ total }] = await db
+    .select({
+      total: count(contents.id),
+    })
+    .from(topics)
+    .innerJoin(
+      subtopics,
+      eq(subtopics.topicId, topics.id),
+    )
+    .innerJoin(
+      contents,
+      and(
+        eq(contents.subtopicId, subtopics.id),
+        eq(contents.status, "active"),
+      ),
+    )
+    .where(
+      eq(topics.id, topicId),
+    );
+
+  const [{ completed }] = await db
+    .select({
+      completed: count(progress.id),
+    })
+    .from(topics)
+    .innerJoin(
+      subtopics,
+      eq(subtopics.topicId, topics.id),
+    )
+    .innerJoin(
+      contents,
+      and(
+        eq(contents.subtopicId, subtopics.id),
+        eq(contents.status, "active"),
+      ),
+    )
+    .innerJoin(
+      progress,
+      and(
+        eq(progress.contentId, contents.id),
+        eq(progress.userId, userId),
+        eq(progress.completed, true),
+      ),
+    )
+    .where(
+      eq(topics.id, topicId),
+    );
+
+  const totalCount = Number(total);
+  const completedCount = Number(completed);
+
+  return {
+    total: totalCount,
+    completed: completedCount,
+    percentage:
+      totalCount === 0
+        ? 0
+        : Math.round(
+            (completedCount / totalCount) * 100,
+          ),
+  };
+}
+
+
+
 
 
 
