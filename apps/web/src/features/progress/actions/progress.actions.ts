@@ -13,6 +13,7 @@ import {
   getSubjectProgressService,
   getSingleSubjectProgressService,
   getSingleUnitProgressService,
+  getRecentLearningActivityService,
   getSingleTopicProgressService,
   getUnitProgressService,
 } from "../services/progress.service";
@@ -136,4 +137,11 @@ export async function getSingleUnitProgressAction(
     userId,
     unitId,
   );
+}
+
+
+export async function getRecentLearningActivityAction() {
+  const userId = await requireUserId();
+
+  return getRecentLearningActivityService(userId);
 }

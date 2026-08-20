@@ -588,6 +588,67 @@ export async function getSingleTopicProgressRepository(
 
 
 
+export async function getRecentLearningActivityRepository(
+  userId: string,
+) {
+  const rows = await db
+    .select({
+      progressId: progress.id,
+      contentId: contents.id,
+      contentTitle: contents.title,
+      completed: progress.completed,
+      completedAt: progress.completedAt,
+      updatedAt: progress.updatedAt,
+
+      subjectId: subjects.id,
+      subjectName: subjects.name,
+
+      unitId: units.id,
+      unitTitle: units.title,
+
+      topicId: topics.id,
+      topicTitle: topics.title,
+
+      subtopicId: subtopics.id,
+      subtopicTitle: subtopics.title,
+    })
+    .from(progress)
+    .innerJoin(
+      contents,
+      eq(progress.contentId, contents.id),
+    )
+    .innerJoin(
+      subtopics,
+      eq(contents.subtopicId, subtopics.id),
+    )
+    .innerJoin(
+      topics,
+      eq(subtopics.topicId, topics.id),
+    )
+    .innerJoin(
+      units,
+      eq(topics.unitId, units.id),
+    )
+    .innerJoin(
+      subjects,
+      eq(units.subjectId, subjects.id),
+    )
+    .where(
+      and(
+        eq(progress.userId, userId),
+        eq(contents.status, "active"),
+      ),
+    )
+    .orderBy(desc(progress.updatedAt))
+    .limit(10);
+
+  return rows;
+}
+
+
+
+
+
 
 
 
