@@ -6,12 +6,14 @@ import {
 import {
   getProgressSummaryAction,
   getSubjectProgressAction,
+  getUnitProgressAction,
 } from "@/src/features/progress";
 
 export default async function ProgressPage() {
-  const [summary, subjectProgress] = await Promise.all([
+  const [summary, subjectProgress, unitProgress] = await Promise.all([
     getProgressSummaryAction(),
     getSubjectProgressAction(),
+    getUnitProgressAction(),
   ]);
 
   const remaining = Math.max(
@@ -443,104 +445,193 @@ export default async function ProgressPage() {
                   </p>
                 </div>
               ) : (
-                subjectProgress.map((subject) => (
-                  <div
-                    key={subject.subjectId}
-                    className="
-                      px-7 py-6
-                      transition-colors duration-200
-                      hover:bg-slate-50/60
-                      md:px-8
-                    "
-                  >
+                subjectProgress.map((subject) => {
+                  const units = unitProgress.filter(
+                    (unit) => unit.subjectId === subject.subjectId,
+                  );
+
+                  return (
                     <div
+                      key={subject.subjectId}
                       className="
-                        flex flex-col gap-5
-                        md:flex-row md:items-center
-                        md:justify-between
-                      "
+        px-7 py-6
+        transition-colors duration-200
+        hover:bg-slate-50/60
+        md:px-8
+      "
                     >
-                      {/* Subject info */}
-                      <div className="min-w-0 md:max-w-[45%]">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="
-                              flex h-10 w-10 shrink-0
-                              items-center justify-center
-                              rounded-xl
-                              bg-slate-100
-                              text-sm font-semibold
-                              text-slate-700
-                            "
-                          >
-                            {subject.subjectName
-                              .trim()
-                              .charAt(0)
-                              .toUpperCase()}
+                      {/* Subject */}
+                      <div
+                        className="
+          flex flex-col gap-5
+          md:flex-row md:items-center
+          md:justify-between
+        "
+                      >
+                        {/* Subject info */}
+                        <div className="min-w-0 md:max-w-[45%]">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="
+                flex h-10 w-10 shrink-0
+                items-center justify-center
+                rounded-xl
+                bg-slate-100
+                text-sm font-semibold
+                text-slate-700
+              "
+                            >
+                              {subject.subjectName
+                                .trim()
+                                .charAt(0)
+                                .toUpperCase()}
+                            </div>
+
+                            <div className="min-w-0">
+                              <h4
+                                className="
+                  truncate text-sm
+                  font-semibold text-slate-900
+                "
+                              >
+                                {subject.subjectName}
+                              </h4>
+
+                              <p className="mt-1 text-xs text-slate-400">
+                                {subject.completed} of {subject.total} lessons completed
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Subject Progress */}
+                        <div className="w-full md:max-w-xl md:flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-medium text-slate-500">
+                              Progress
+                            </span>
+
+                            <span className="text-sm font-semibold text-slate-800">
+                              {subject.percentage}%
+                            </span>
                           </div>
 
-                          <div className="min-w-0">
-                            <h4
+                          <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-100">
+                            <div
                               className="
-                                truncate text-sm
-                                font-semibold text-slate-900
-                              "
-                            >
-                              {subject.subjectName}
-                            </h4>
+                h-full rounded-full
+                bg-gradient-to-r
+                from-slate-900
+                via-slate-700
+                to-slate-500
+                transition-all duration-700
+              "
+                              style={{
+                                width: `${subject.percentage}%`,
+                              }}
+                            />
+                          </div>
 
-                            <p className="mt-1 text-xs text-slate-400">
-                              {subject.completed} of {subject.total} lessons completed
+                          <div className="mt-2 flex justify-between">
+                            <span className="text-[11px] text-slate-400">
+                              {subject.completed} completed
+                            </span>
+
+                            <span className="text-[11px] text-slate-400">
+                              {Math.max(
+                                subject.total - subject.completed,
+                                0,
+                              )}{" "}
+                              remaining
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Units */}
+                      {units.length > 0 && (
+                        <div className="mt-6 border-t border-slate-100 pt-5">
+                          <div className="mb-3 flex items-center justify-between">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                              Units
+                            </p>
+
+                            <p className="text-xs text-slate-400">
+                              {units.length}{" "}
+                              {units.length === 1 ? "unit" : "units"}
                             </p>
                           </div>
+
+                          <div className="space-y-3">
+                            {units.map((unit) => (
+                              <div
+                                key={unit.unitId}
+                                className="
+                  rounded-2xl
+                  border border-slate-100
+                  bg-slate-50/70
+                  p-4
+                "
+                              >
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                  <div className="min-w-0">
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        className="
+                          shrink-0 rounded-lg
+                          bg-white px-2 py-1
+                          text-[11px] font-semibold
+                          text-slate-500
+                          shadow-sm
+                        "
+                                      >
+                                        Unit {unit.unitNumber}
+                                      </span>
+
+                                      <h5 className="truncate text-sm font-semibold text-slate-800">
+                                        {unit.unitTitle}
+                                      </h5>
+                                    </div>
+
+                                    <p className="mt-2 text-xs text-slate-400">
+                                      {unit.completed} of {unit.total} lessons completed
+                                    </p>
+                                  </div>
+
+                                  <div className="w-full sm:max-w-xs">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[11px] font-medium text-slate-500">
+                                        Progress
+                                      </span>
+
+                                      <span className="text-xs font-semibold text-slate-700">
+                                        {unit.percentage}%
+                                      </span>
+                                    </div>
+
+                                    <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white">
+                                      <div
+                                        className="
+                          h-full rounded-full
+                          bg-slate-800
+                          transition-all duration-700
+                        "
+                                        style={{
+                                          width: `${unit.percentage}%`,
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-
-                      {/* Progress */}
-                      <div className="w-full md:max-w-xl md:flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-medium text-slate-500">
-                            Progress
-                          </span>
-
-                          <span className="text-sm font-semibold text-slate-800">
-                            {subject.percentage}%
-                          </span>
-                        </div>
-
-                        <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-100">
-                          <div
-                            className="
-                              h-full rounded-full
-                              bg-gradient-to-r
-                              from-slate-900
-                              via-slate-700
-                              to-slate-500
-                              transition-all duration-700
-                            "
-                            style={{
-                              width: `${subject.percentage}%`,
-                            }}
-                          />
-                        </div>
-
-                        <div className="mt-2 flex justify-between">
-                          <span className="text-[11px] text-slate-400">
-                            {subject.completed} completed
-                          </span>
-
-                          <span className="text-[11px] text-slate-400">
-                            {Math.max(
-                              subject.total - subject.completed,
-                              0,
-                            )}{" "}
-                            remaining
-                          </span>
-                        </div>
-                      </div>
+                      )}
                     </div>
-                  </div>
-                ))
+                  );
+                })
+              
               )}
             </div>
 

@@ -1,20 +1,39 @@
-import {
-  getSubjectProgressRepository,
-  getSingleSubjectProgressRepository,
-  getSingleUnitProgressRepository,
-} from "../repositories/progress.repository";
+// import {
+//   getSubjectProgressRepository,
+//   getSingleSubjectProgressRepository,
+//   getSingleUnitProgressRepository,
+// } from "../repositories/progress.repository";
+
+// import {
+//   getProgressByUserRepository,
+//   getProgressByUserAndContentRepository,
+//   getProgressSummaryRepository,
+//   markContentCompleteRepository,
+//   markContentIncompleteRepository,
+//   getSubtopicProgressRepository,
+// } from "../repositories/progress.repository";
+
+
 
 import {
   getProgressByUserRepository,
   getProgressByUserAndContentRepository,
   getProgressSummaryRepository,
+  getSubtopicProgressRepository,
+  getSubjectProgressRepository,
+  getSingleSubjectProgressRepository,
+  getSingleUnitProgressRepository,
+  getUnitProgressRepository,
   markContentCompleteRepository,
   markContentIncompleteRepository,
-  getSubtopicProgressRepository,
 } from "../repositories/progress.repository";
 
 
-
+export async function getUnitProgressService(
+  userId: string,
+) {
+  return getUnitProgressRepository(userId);
+}
 
 export async function getSubjectProgressService(
   userId: string,

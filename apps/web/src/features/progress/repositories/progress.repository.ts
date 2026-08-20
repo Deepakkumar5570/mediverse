@@ -9,6 +9,7 @@ import {
 } from "@mediverse/database";
 import {
   and,
+  asc,
   count,
   eq,
   desc,
@@ -438,3 +439,86 @@ export async function getSingleUnitProgressRepository(
           ),
   };
 }
+
+
+
+export async function getUnitProgressRepository(
+  userId: string,
+) {
+  const rows = await db
+    .select({
+      subjectId: subjects.id,
+      unitId: units.id,
+      unitTitle: units.title,
+      unitNumber: units.unitNumber,
+      total: count(contents.id),
+      completed: count(progress.id),
+    })
+    .from(subjects)
+    .innerJoin(
+      units,
+      eq(units.subjectId, subjects.id),
+    )
+    .leftJoin(
+      topics,
+      eq(topics.unitId, units.id),
+    )
+    .leftJoin(
+      subtopics,
+      eq(subtopics.topicId, topics.id),
+    )
+    .leftJoin(
+      contents,
+      and(
+        eq(contents.subtopicId, subtopics.id),
+        eq(contents.status, "active"),
+      ),
+    )
+    .leftJoin(
+      progress,
+      and(
+        eq(progress.contentId, contents.id),
+        eq(progress.userId, userId),
+        eq(progress.completed, true),
+      ),
+    )
+    .where(eq(subjects.status, "active"))
+    .groupBy(
+      subjects.id,
+      units.id,
+      units.title,
+      units.unitNumber,
+    )
+    .orderBy(
+      asc(units.unitNumber),
+    );
+
+  return rows.map((row) => {
+    const total = Number(row.total);
+    const completed = Number(row.completed);
+
+    return {
+      subjectId: row.subjectId,
+      unitId: row.unitId,
+      unitTitle: row.unitTitle,
+      unitNumber: row.unitNumber,
+      total,
+      completed,
+      percentage:
+        total === 0
+          ? 0
+          : Math.round(
+              (completed / total) * 100,
+            ),
+    };
+  });
+}
+
+
+
+
+
+
+
+
+

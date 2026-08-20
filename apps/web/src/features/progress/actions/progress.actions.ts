@@ -11,9 +11,12 @@ import {
   getSubjectProgressService,
   getSingleSubjectProgressService,
   getSingleUnitProgressService,
+  getUnitProgressService,
 } from "../services/progress.service";
 
-async function requireUserId() {
+
+
+export async function requireUserId() {
     const { userId } = await auth();
 
     if (!userId) {
@@ -21,6 +24,12 @@ async function requireUserId() {
     }
 
     return userId;
+}
+
+export async function getUnitProgressAction() {
+  const userId = await requireUserId();
+
+  return getUnitProgressService(userId);
 }
 
 export async function getUserProgressAction() {
