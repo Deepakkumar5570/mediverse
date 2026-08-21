@@ -896,6 +896,7 @@ import {
 } from "@/src/components/learn";
 
 import {
+  getContinueLearningAction,
   getProgressSummaryAction,
   getSubjectProgressAction,
   getUnitProgressAction,
@@ -908,11 +909,13 @@ export default async function ProgressPage() {
     subjectProgress,
     unitProgress,
     recentActivity,
+    continueLearning,
   ] = await Promise.all([
     getProgressSummaryAction(),
     getSubjectProgressAction(),
     getUnitProgressAction(),
     getRecentLearningActivityAction(),
+    getContinueLearningAction(),
   ]);
 
   const remaining = Math.max(
@@ -938,6 +941,10 @@ export default async function ProgressPage() {
         {
           label: "Overview",
           href: "#overview",
+        },
+        {
+          label: "Continue Learning",
+          href: "#continue-learning",
         },
         {
           label: "Progress",
@@ -1027,6 +1034,85 @@ export default async function ProgressPage() {
             "
           />
         </section>
+
+        {/* ─────────────────────────────────────────────
+    CONTINUE LEARNING
+───────────────────────────────────────────── */}
+
+        <Section
+          title="Continue Learning"
+          id="continue-learning"
+        >
+          {continueLearning ? (
+            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+              <div className="p-7 md:p-8">
+                <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                      Next lesson
+                    </p>
+
+                    <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
+                      {continueLearning.contentTitle}
+                    </h3>
+
+                    <p className="mt-2 text-sm text-slate-500">
+                      {continueLearning.subjectName}
+                      {" • "}
+                      {continueLearning.unitTitle}
+                      {" • "}
+                      {continueLearning.topicTitle}
+                    </p>
+
+                    {continueLearning.contentSummary && (
+                      <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-500">
+                        {continueLearning.contentSummary}
+                      </p>
+                    )}
+
+                    <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                      <span>
+                        Subtopic {continueLearning.subtopicNumber}
+                      </span>
+
+                      <span>•</span>
+
+                      <span>
+                        {continueLearning.readingTime} min read
+                      </span>
+                    </div>
+                  </div>
+
+                  <a
+                    href={`/learn/subtopics/${continueLearning.subtopicId}`}
+                    className="
+              inline-flex shrink-0 items-center justify-center
+              rounded-xl bg-slate-900
+              px-5 py-3
+              text-sm font-semibold text-white
+              transition-colors
+              hover:bg-slate-700
+            "
+                  >
+                    Continue Learning →
+                  </a>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+              <div className="text-3xl">🎉</div>
+
+              <h3 className="mt-4 text-lg font-semibold text-slate-900">
+                You're all caught up!
+              </h3>
+
+              <p className="mt-2 text-sm text-slate-500">
+                You've completed all available lessons in your learning path.
+              </p>
+            </div>
+          )}
+        </Section>
 
         {/* ─────────────────────────────────────────────
             OVERVIEW

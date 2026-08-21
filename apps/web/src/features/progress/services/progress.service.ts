@@ -26,6 +26,7 @@ import {
   getSingleTopicProgressRepository,
   getUnitProgressRepository,
   getRecentLearningActivityRepository,
+  getContinueLearningRepository,
   markContentCompleteRepository,
   markContentIncompleteRepository,
 } from "../repositories/progress.repository";
@@ -140,4 +141,12 @@ export async function getRecentLearningActivityService(
   userId: string,
 ) {
   return getRecentLearningActivityRepository(userId);
+}
+
+
+
+export async function getContinueLearningService(
+  userId: string,
+) {
+  return getContinueLearningRepository(userId);
 }

@@ -7,12 +7,16 @@ import {
   topics,
   subtopics,
 } from "@mediverse/database";
+
+
 import {
   and,
   asc,
   count,
-  eq,
   desc,
+  eq,
+  isNull,
+  or,
 } from "drizzle-orm";
 
 export async function getProgressByUserRepository(
@@ -643,6 +647,78 @@ export async function getRecentLearningActivityRepository(
     .limit(10);
 
   return rows;
+}
+
+
+
+
+export async function getContinueLearningRepository(
+  userId: string,
+) {
+  const rows = await db
+    .select({
+      contentId: contents.id,
+      contentTitle: contents.title,
+      contentSummary: contents.summary,
+      readingTime: contents.readingTime,
+
+      subjectId: subjects.id,
+      subjectName: subjects.name,
+
+      unitId: units.id,
+      unitTitle: units.title,
+      unitNumber: units.unitNumber,
+
+      topicId: topics.id,
+      topicTitle: topics.title,
+
+      subtopicId: subtopics.id,
+      subtopicTitle: subtopics.title,
+      subtopicNumber: subtopics.subtopicNumber,
+    })
+    .from(contents)
+    .innerJoin(
+      subtopics,
+      eq(contents.subtopicId, subtopics.id),
+    )
+    .innerJoin(
+      topics,
+      eq(subtopics.topicId, topics.id),
+    )
+    .innerJoin(
+      units,
+      eq(topics.unitId, units.id),
+    )
+    .innerJoin(
+      subjects,
+      eq(units.subjectId, subjects.id),
+    )
+    .leftJoin(
+      progress,
+      and(
+        eq(progress.contentId, contents.id),
+        eq(progress.userId, userId),
+      ),
+    )
+    .where(
+      and(
+        eq(contents.status, "active"),
+        eq(subjects.status, "active"),
+        or(
+          isNull(progress.id),
+          eq(progress.completed, false),
+        ),
+      ),
+    )
+    .orderBy(
+      asc(subjects.name),
+      asc(units.unitNumber),
+      asc(topics.id),
+      asc(subtopics.subtopicNumber),
+    )
+    .limit(1);
+
+  return rows[0] ?? null;
 }
 
 

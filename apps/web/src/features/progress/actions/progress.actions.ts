@@ -13,6 +13,7 @@ import {
   getSubjectProgressService,
   getSingleSubjectProgressService,
   getSingleUnitProgressService,
+  getContinueLearningService,
   getRecentLearningActivityService,
   getSingleTopicProgressService,
   getUnitProgressService,
@@ -144,4 +145,12 @@ export async function getRecentLearningActivityAction() {
   const userId = await requireUserId();
 
   return getRecentLearningActivityService(userId);
+}
+
+
+
+export async function getContinueLearningAction() {
+  const userId = await requireUserId();
+
+  return getContinueLearningService(userId);
 }
