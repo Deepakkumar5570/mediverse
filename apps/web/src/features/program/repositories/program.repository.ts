@@ -43,3 +43,34 @@ export async function createProgramRepository(
     throw error;
   }
 }
+
+
+
+export async function updateProgramRepository(
+  id: string,
+  data: CreateProgramInput,
+) {
+  const result = await db
+    .update(programs)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(programs.id, id))
+    .returning();
+
+  return result[0] ?? null;
+}
+
+export async function getProgramByIdRepository(
+  id: string,
+) {
+  const result = await db
+    .select()
+    .from(programs)
+    .where(eq(programs.id, id))
+    .limit(1);
+
+  return result[0] ?? null;
+}
+
