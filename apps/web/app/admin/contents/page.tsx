@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import {
+  getContentStatsAction,
   getContentsByStatusAction,
   getPaginatedContentsAction,
   searchContentsAction,
@@ -25,10 +26,13 @@ export default async function ContentsPage({
 
   const currentPage = Math.max(Number(page) || 1, 1);
 
-  const pagination = await getPaginatedContentsAction(
-    currentPage,
-    10
-  );
+  const [pagination, stats] = await Promise.all([
+    getPaginatedContentsAction(
+      currentPage,
+      10
+    ),
+    getContentStatsAction(),
+  ]);
 
   let contents = pagination.items;
 
@@ -38,7 +42,9 @@ export default async function ContentsPage({
       status
     );
   } else if (status) {
-    contents = await getContentsByStatusAction(status);
+    contents = await getContentsByStatusAction(
+      status
+    );
   }
 
   const isSearching = search.trim().length > 0;
@@ -69,22 +75,9 @@ export default async function ContentsPage({
       : "/admin/contents";
   }
 
-  /*
-   * These counts currently represent the loaded page.
-   * Later we can replace them with a dedicated content-stats
-   * repository/action without changing this UI.
-   */
-  const activeCount = pagination.items.filter(
-    (item) => item.status === "active"
-  ).length;
-
-  const draftCount = pagination.items.filter(
-    (item) => item.status === "draft"
-  ).length;
-
-  const archivedCount = pagination.items.filter(
-    (item) => item.status === "archived"
-  ).length;
+  const activeCount = stats.active;
+  const draftCount = stats.draft;
+  const archivedCount = stats.archived;
 
   return (
     <main className="min-h-screen bg-slate-50/70">
@@ -131,7 +124,7 @@ export default async function ContentsPage({
                 </p>
 
                 <p className="mt-2 text-3xl font-bold text-slate-900">
-                  {pagination.total}
+                  {stats.total}
                 </p>
               </div>
 

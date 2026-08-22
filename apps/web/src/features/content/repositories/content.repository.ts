@@ -199,3 +199,35 @@ export async function getContentsByStatusRepository(
     .where(eq(contents.status, status))
     .orderBy(desc(contents.createdAt));
 }
+
+
+
+export async function getContentStatsRepository() {
+  const [result] = await db
+    .select({
+      total: sql<number>`count(*)`,
+      active: sql<number>`
+        count(*) filter (
+          where ${contents.status} = 'active'
+        )
+      `,
+      draft: sql<number>`
+        count(*) filter (
+          where ${contents.status} = 'draft'
+        )
+      `,
+      archived: sql<number>`
+        count(*) filter (
+          where ${contents.status} = 'archived'
+        )
+      `,
+    })
+    .from(contents);
+
+  return {
+    total: Number(result.total),
+    active: Number(result.active),
+    draft: Number(result.draft),
+    archived: Number(result.archived),
+  };
+}
