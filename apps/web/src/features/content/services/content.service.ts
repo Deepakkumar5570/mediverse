@@ -1,13 +1,14 @@
 import {
   createContentRepository,
   deleteContentRepository,
+  getContentByIdWithHierarchyRepository,
   getContentBySlugRepository,
-  getContentsBySubtopicRepository,
   getContentsByStatusRepository,
+  getContentsBySubtopicRepository,
   getContentsRepository,
+  getContentStatsRepository,
   getPaginatedContentsRepository,
   getPaginatedContentsWithHierarchyRepository,
-  getContentStatsRepository,
   searchContentsRepository,
   updateContentRepository,
 } from "../repositories";
@@ -109,4 +110,12 @@ export async function getPaginatedContentsWithHierarchyService(
     search,
     status
   );
+}
+
+
+
+export async function getContentByIdWithHierarchyService(
+  id: string
+) {
+  return getContentByIdWithHierarchyRepository(id);
 }

@@ -7,3 +7,4 @@ export * from "./get-paginated-contents";
 export * from "./get-contents-by-status";
 export * from "./get-content-stats";
 export * from "./get-contents-with-hierarchy";
+export * from "./get-content-by-id";

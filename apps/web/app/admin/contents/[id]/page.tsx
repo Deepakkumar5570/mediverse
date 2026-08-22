@@ -1,10 +1,11 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { eq } from "drizzle-orm";
 
-import { db, contents } from "@mediverse/database";
+import {
+  deleteContentAction,
+  getContentByIdWithHierarchyAction,
+} from "../../../../src/features/content/actions";
 
-import { deleteContentAction } from "../../../../src/features/content/actions";
 import {
   DeleteContentButton,
 } from "../../../../src/features/content/components";
@@ -30,14 +31,22 @@ export default async function ContentDetailsPage({
 }: Props) {
   const { id } = await params;
 
-  const [content] = await db
-    .select()
-    .from(contents)
-    .where(eq(contents.id, id));
+  const result =
+    await getContentByIdWithHierarchyAction(id);
 
-  if (!content) {
+  if (!result) {
     notFound();
   }
+
+  const {
+    content,
+    subtopic,
+    topic,
+    unit,
+    subject,
+    semester,
+    program,
+  } = result;
 
   return (
     <main className="min-h-screen bg-slate-50/70">
@@ -82,6 +91,8 @@ export default async function ContentDetailsPage({
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-violet-50" />
 
           <div className="relative px-6 py-8 sm:px-10 sm:py-10">
+
+            {/* STATUS + READING TIME */}
             <div className="mb-5 flex flex-wrap items-center gap-2">
               <span
                 className={`rounded-full px-3 py-1 text-xs font-bold ${
@@ -97,6 +108,53 @@ export default async function ContentDetailsPage({
 
               <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">
                 📖 {content.readingTime} min read
+              </span>
+            </div>
+
+            {/* CURRICULUM BREADCRUMB */}
+            <div className="mb-6 flex flex-wrap items-center gap-2 text-xs">
+              <span className="rounded-lg bg-indigo-50 px-2.5 py-1.5 font-semibold text-indigo-700">
+                {program.name}
+              </span>
+
+              <span className="text-slate-300">
+                →
+              </span>
+
+              <span className="rounded-lg bg-violet-50 px-2.5 py-1.5 font-semibold text-violet-700">
+                {semester.name}
+              </span>
+
+              <span className="text-slate-300">
+                →
+              </span>
+
+              <span className="rounded-lg bg-blue-50 px-2.5 py-1.5 font-semibold text-blue-700">
+                {subject.name}
+              </span>
+
+              <span className="text-slate-300">
+                →
+              </span>
+
+              <span className="rounded-lg bg-amber-50 px-2.5 py-1.5 font-semibold text-amber-700">
+                {unit.title}
+              </span>
+
+              <span className="text-slate-300">
+                →
+              </span>
+
+              <span className="rounded-lg bg-emerald-50 px-2.5 py-1.5 font-semibold text-emerald-700">
+                {topic.title}
+              </span>
+
+              <span className="text-slate-300">
+                →
+              </span>
+
+              <span className="rounded-lg bg-pink-50 px-2.5 py-1.5 font-semibold text-pink-700">
+                {subtopic.title}
               </span>
             </div>
 
@@ -160,16 +218,19 @@ export default async function ContentDetailsPage({
           {/* SIDE INFO */}
           <aside className="space-y-4">
 
+            {/* CONTENT INFO */}
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                 Content Info
               </p>
 
               <div className="mt-4 space-y-4">
+
                 <div>
                   <p className="text-xs text-slate-400">
                     Status
                   </p>
+
                   <p className="mt-1 text-sm font-semibold capitalize text-slate-800">
                     {content.status}
                   </p>
@@ -179,6 +240,7 @@ export default async function ContentDetailsPage({
                   <p className="text-xs text-slate-400">
                     Reading time
                   </p>
+
                   <p className="mt-1 text-sm font-semibold text-slate-800">
                     {content.readingTime} minutes
                   </p>
@@ -188,6 +250,7 @@ export default async function ContentDetailsPage({
                   <p className="text-xs text-slate-400">
                     Slug
                   </p>
+
                   <p className="mt-1 break-all font-mono text-xs text-slate-600">
                     {content.slug}
                   </p>
@@ -195,6 +258,78 @@ export default async function ContentDetailsPage({
               </div>
             </div>
 
+            {/* CURRICULUM */}
+            <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5">
+              <p className="text-xs font-bold uppercase tracking-wider text-indigo-600">
+                Curriculum
+              </p>
+
+              <div className="mt-4 space-y-3">
+
+                <div>
+                  <p className="text-[11px] text-indigo-500">
+                    Program
+                  </p>
+
+                  <p className="mt-0.5 text-sm font-semibold text-slate-800">
+                    {program.name}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[11px] text-indigo-500">
+                    Semester
+                  </p>
+
+                  <p className="mt-0.5 text-sm font-semibold text-slate-800">
+                    {semester.name}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[11px] text-indigo-500">
+                    Subject
+                  </p>
+
+                  <p className="mt-0.5 text-sm font-semibold text-slate-800">
+                    {subject.name}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[11px] text-indigo-500">
+                    Unit
+                  </p>
+
+                  <p className="mt-0.5 text-sm font-semibold text-slate-800">
+                    {unit.title}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[11px] text-indigo-500">
+                    Topic
+                  </p>
+
+                  <p className="mt-0.5 text-sm font-semibold text-slate-800">
+                    {topic.title}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[11px] text-indigo-500">
+                    Subtopic
+                  </p>
+
+                  <p className="mt-0.5 text-sm font-semibold text-slate-800">
+                    {subtopic.title}
+                  </p>
+                </div>
+
+              </div>
+            </div>
+
+            {/* SEO */}
             {(content.seoTitle ||
               content.seoDescription) && (
               <div className="rounded-2xl border border-violet-100 bg-violet-50/60 p-5">

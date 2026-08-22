@@ -340,3 +340,82 @@ export async function getPaginatedContentsWithHierarchyRepository(
     ),
   };
 }
+
+
+
+export async function getContentByIdWithHierarchyRepository(
+  id: string
+) {
+  const [result] = await db
+    .select({
+      content: contents,
+
+      subtopic: subtopics,
+
+      topic: topics,
+
+      unit: units,
+
+      subject: subjects,
+
+      semester: semesters,
+
+      program: programs,
+    })
+    .from(contents)
+
+    .innerJoin(
+      subtopics,
+      eq(
+        contents.subtopicId,
+        subtopics.id
+      )
+    )
+
+    .innerJoin(
+      topics,
+      eq(
+        subtopics.topicId,
+        topics.id
+      )
+    )
+
+    .innerJoin(
+      units,
+      eq(
+        topics.unitId,
+        units.id
+      )
+    )
+
+    .innerJoin(
+      subjects,
+      eq(
+        units.subjectId,
+        subjects.id
+      )
+    )
+
+    .innerJoin(
+      semesters,
+      eq(
+        subjects.semesterId,
+        semesters.id
+      )
+    )
+
+    .innerJoin(
+      programs,
+      eq(
+        semesters.programId,
+        programs.id
+      )
+    )
+
+    .where(
+      eq(contents.id, id)
+    )
+    .limit(1);
+
+  return result ?? null;
+}
