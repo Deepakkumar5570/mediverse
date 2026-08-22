@@ -3,6 +3,7 @@ import {
   getTopicByIdRepository,
   getTopicsByUnitRepository,
   getTopicsRepository,
+  updateTopicRepository,
 } from "../repositories";
 
 import type { CreateTopicInput } from "../validations";
@@ -27,4 +28,13 @@ export async function getTopicsByUnitService(
   unitId: string
 ) {
   return getTopicsByUnitRepository(unitId);
+}
+
+
+
+export async function updateTopicService(
+  id: string,
+  data: CreateTopicInput,
+) {
+  return updateTopicRepository(id, data);
 }

@@ -18,23 +18,31 @@ export default async function NewTopicPage() {
   ]);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">
-          Create Topic
-        </h1>
+    <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-3xl space-y-8">
+        {/* Page Header */}
+        <div>
+          <p className="text-sm font-medium text-muted-foreground">
+            Administration
+          </p>
 
-        <p className="text-muted-foreground">
-          Add a new topic to a unit.
-        </p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight">
+            Create Topic
+          </h1>
+
+          <p className="mt-2 text-sm text-muted-foreground">
+            Add a new topic to a unit.
+          </p>
+        </div>
+
+        {/* Topic Form */}
+        <TopicForm
+          programs={programs}
+          semesters={semesters}
+          subjects={subjects}
+          units={units}
+        />
       </div>
-
-      <TopicForm
-        programs={programs}
-        semesters={semesters}
-        subjects={subjects}
-        units={units}
-      />
-    </div>
+    </main>
   );
 }

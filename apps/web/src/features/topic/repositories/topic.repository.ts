@@ -43,3 +43,20 @@ export async function getTopicsByUnitRepository(
     .where(eq(topics.unitId, unitId))
     .orderBy(asc(topics.topicNumber));
 }
+
+
+export async function updateTopicRepository(
+  id: string,
+  data: CreateTopicInput,
+) {
+  const [topic] = await db
+    .update(topics)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(topics.id, id))
+    .returning();
+
+  return topic ?? null;
+}
