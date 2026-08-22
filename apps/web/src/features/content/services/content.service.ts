@@ -6,8 +6,9 @@ import {
   getContentsByStatusRepository,
   getContentsRepository,
   getPaginatedContentsRepository,
-  searchContentsRepository,
+  getPaginatedContentsWithHierarchyRepository,
   getContentStatsRepository,
+  searchContentsRepository,
   updateContentRepository,
 } from "../repositories";
 
@@ -92,4 +93,20 @@ export async function getContentsByStatusService(
 
 export async function getContentStatsService() {
   return getContentStatsRepository();
+}
+
+
+
+export async function getPaginatedContentsWithHierarchyService(
+  page: number,
+  limit: number,
+  search?: string,
+  status?: "draft" | "active" | "archived"
+) {
+  return getPaginatedContentsWithHierarchyRepository(
+    page,
+    limit,
+    search,
+    status
+  );
 }

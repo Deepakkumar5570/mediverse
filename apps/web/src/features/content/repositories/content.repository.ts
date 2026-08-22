@@ -1,4 +1,14 @@
-import { db, contents } from "@mediverse/database";
+import {
+  contents,
+  db,
+  programs,
+  semesters,
+  subjects,
+  subtopics,
+  topics,
+  units,
+} from "@mediverse/database";
+
 import {
   and,
   asc,
@@ -101,34 +111,6 @@ export async function searchContentsRepository(
 
 //  "feat(content): add content search"
 
-// export async function getPaginatedContentsRepository(
-//   page: number,
-//   limit: number
-// ) {
-//   const offset = (page - 1) * limit;
-
-//   const items = await db
-//     .select()
-//     .from(contents)
-//     .orderBy(desc(contents.createdAt))
-//     .limit(limit)
-//     .offset(offset);
-
-//   const [{ count }] = await db
-//     .select({
-//       count: sql<number>`count(*)`,
-//     })
-//     .from(contents);
-
-//   return {
-//     items,
-//     total: Number(count),
-//     page,
-//     limit,
-//     totalPages: Math.ceil(Number(count) / limit),
-//   };
-// }
-
 
 
 
@@ -229,5 +211,132 @@ export async function getContentStatsRepository() {
     active: Number(result.active),
     draft: Number(result.draft),
     archived: Number(result.archived),
+  };
+}
+
+
+
+export async function getPaginatedContentsWithHierarchyRepository(
+  page: number,
+  limit: number,
+  search?: string,
+  status?: "draft" | "active" | "archived"
+) {
+  const offset = (page - 1) * limit;
+
+  const conditions = [];
+
+  if (search?.trim()) {
+    conditions.push(
+      or(
+        ilike(contents.title, `%${search.trim()}%`),
+        ilike(contents.slug, `%${search.trim()}%`)
+      )
+    );
+  }
+
+  if (status) {
+    conditions.push(
+      eq(contents.status, status)
+    );
+  }
+
+  const whereClause =
+    conditions.length > 0
+      ? and(...conditions)
+      : undefined;
+
+  const items = await db
+    .select({
+      content: contents,
+
+      subtopic: subtopics,
+
+      topic: topics,
+
+      unit: units,
+
+      subject: subjects,
+
+      semester: semesters,
+
+      program: programs,
+    })
+    .from(contents)
+
+    .innerJoin(
+      subtopics,
+      eq(
+        contents.subtopicId,
+        subtopics.id
+      )
+    )
+
+    .innerJoin(
+      topics,
+      eq(
+        subtopics.topicId,
+        topics.id
+      )
+    )
+
+    .innerJoin(
+      units,
+      eq(
+        topics.unitId,
+        units.id
+      )
+    )
+
+    .innerJoin(
+      subjects,
+      eq(
+        units.subjectId,
+        subjects.id
+      )
+    )
+
+    .innerJoin(
+      semesters,
+      eq(
+        subjects.semesterId,
+        semesters.id
+      )
+    )
+
+    .innerJoin(
+      programs,
+      eq(
+        semesters.programId,
+        programs.id
+      )
+    )
+
+    .where(whereClause)
+
+    .orderBy(
+      desc(contents.createdAt)
+    )
+
+    .limit(limit)
+    .offset(offset);
+
+  const [{ count }] = await db
+    .select({
+      count: sql<number>`count(*)`,
+    })
+    .from(contents)
+    .where(whereClause);
+
+  const total = Number(count);
+
+  return {
+    items,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(
+      total / limit
+    ),
   };
 }

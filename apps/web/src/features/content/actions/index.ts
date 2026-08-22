@@ -6,3 +6,4 @@ export * from "./search-contents";
 export * from "./get-paginated-contents";
 export * from "./get-contents-by-status";
 export * from "./get-content-stats";
+export * from "./get-contents-with-hierarchy";

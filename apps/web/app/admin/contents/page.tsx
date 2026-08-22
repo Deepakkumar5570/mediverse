@@ -2,9 +2,7 @@ import Link from "next/link";
 
 import {
   getContentStatsAction,
-  getContentsByStatusAction,
-  getPaginatedContentsAction,
-  searchContentsAction,
+  getPaginatedContentsWithHierarchyAction,
 } from "@/src/features/content/actions";
 
 type Props = {
@@ -24,30 +22,25 @@ export default async function ContentsPage({
     status,
   } = await searchParams;
 
-  const currentPage = Math.max(Number(page) || 1, 1);
+  const currentPage = Math.max(
+    Number(page) || 1,
+    1
+  );
 
   const [pagination, stats] = await Promise.all([
-    getPaginatedContentsAction(
+    getPaginatedContentsWithHierarchyAction(
       currentPage,
-      10
+      10,
+      search.trim() || undefined,
+      status
     ),
     getContentStatsAction(),
   ]);
 
-  let contents = pagination.items;
+  const contents = pagination.items;
 
-  if (search.trim()) {
-    contents = await searchContentsAction(
-      search.trim(),
-      status
-    );
-  } else if (status) {
-    contents = await getContentsByStatusAction(
-      status
-    );
-  }
-
-  const isSearching = search.trim().length > 0;
+  const isSearching =
+    search.trim().length > 0;
 
   const totalPages = pagination.totalPages;
   const hasPrevious = currentPage > 1;
@@ -57,15 +50,24 @@ export default async function ContentsPage({
     const params = new URLSearchParams();
 
     if (search.trim()) {
-      params.set("search", search.trim());
+      params.set(
+        "search",
+        search.trim()
+      );
     }
 
     if (status) {
       params.set("status", status);
     }
 
-    if (nextPage && nextPage > 1) {
-      params.set("page", String(nextPage));
+    if (
+      nextPage &&
+      nextPage > 1
+    ) {
+      params.set(
+        "page",
+        String(nextPage)
+      );
     }
 
     const query = params.toString();
@@ -99,8 +101,8 @@ export default async function ContentsPage({
               </h1>
 
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                Create, manage and publish educational content
-                across your MediVerse curriculum.
+                Create, manage and publish educational
+                content across your MediVerse curriculum.
               </p>
             </div>
 
@@ -108,7 +110,9 @@ export default async function ContentsPage({
               href="/admin/contents/new"
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-950/10 transition hover:-translate-y-0.5 hover:bg-indigo-600"
             >
-              <span className="text-lg leading-none">+</span>
+              <span className="text-lg leading-none">
+                +
+              </span>
               New Content
             </Link>
           </div>
@@ -116,6 +120,7 @@ export default async function ContentsPage({
 
         {/* STATS */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {/* TOTAL */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
@@ -138,6 +143,7 @@ export default async function ContentsPage({
             </p>
           </div>
 
+          {/* ACTIVE */}
           <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
@@ -160,6 +166,7 @@ export default async function ContentsPage({
             </p>
           </div>
 
+          {/* DRAFT */}
           <div className="rounded-2xl border border-amber-100 bg-amber-50/70 p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
@@ -182,6 +189,7 @@ export default async function ContentsPage({
             </p>
           </div>
 
+          {/* ARCHIVED */}
           <div className="rounded-2xl border border-slate-200 bg-slate-100/70 p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
@@ -293,7 +301,7 @@ export default async function ContentsPage({
               className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
                 status === "draft"
                   ? "bg-amber-500 text-white shadow-sm"
-                  : "border border-slate-200 bg-white text-slate-600 hover:bg-amber-50"
+                  : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
               }`}
             >
               Draft
@@ -317,9 +325,17 @@ export default async function ContentsPage({
           <div className="rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3">
             <p className="text-sm text-indigo-700">
               Found{" "}
-              <strong>{contents.length}</strong>{" "}
-              result{contents.length !== 1 ? "s" : ""} for{" "}
-              <strong>“{search.trim()}”</strong>
+              <strong>
+                {contents.length}
+              </strong>{" "}
+              result
+              {contents.length !== 1
+                ? "s"
+                : ""}{" "}
+              for{" "}
+              <strong>
+                “{search.trim()}”
+              </strong>
             </p>
           </div>
         )}
@@ -334,12 +350,16 @@ export default async function ContentsPage({
 
               <p className="mt-1 text-xs text-slate-500">
                 {contents.length} item
-                {contents.length !== 1 ? "s" : ""} displayed
+                {contents.length !== 1
+                  ? "s"
+                  : ""}{" "}
+                displayed
               </p>
             </div>
 
             <div className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-500">
-              Page {currentPage} of {totalPages || 1}
+              Page {currentPage} of{" "}
+              {totalPages || 1}
             </div>
           </div>
 
@@ -372,11 +392,11 @@ export default async function ContentsPage({
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[850px]">
+              <table className="w-full min-w-[1050px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/80">
                     <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                      Content
+                      Content & Hierarchy
                     </th>
 
                     <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-slate-400">
@@ -398,80 +418,140 @@ export default async function ContentsPage({
                 </thead>
 
                 <tbody>
-                  {contents.map((content) => (
-                    <tr
-                      key={content.id}
-                      className="group border-b border-slate-100 last:border-0 transition hover:bg-indigo-50/30"
-                    >
-                      <td className="px-5 py-4">
-                        <div className="flex items-start gap-3">
-                          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-sm">
-                            📖
-                          </div>
+                  {contents.map((item) => {
+                    const content = item.content;
 
-                          <div className="min-w-0 max-w-[360px]">
+                    return (
+                      <tr
+                        key={content.id}
+                        className="group border-b border-slate-100 last:border-0 transition hover:bg-indigo-50/30"
+                      >
+                        {/* CONTENT + HIERARCHY */}
+                        <td className="px-5 py-4">
+                          <div className="flex items-start gap-3">
+                            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-sm">
+                              📖
+                            </div>
+
+                            <div className="min-w-0 max-w-[520px]">
+                              <Link
+                                href={`/admin/contents/${content.id}`}
+                                className="block truncate font-semibold text-slate-900 transition group-hover:text-indigo-600"
+                              >
+                                {content.title}
+                              </Link>
+
+                              {content.summary && (
+                                <p className="mt-1 truncate text-xs text-slate-500">
+                                  {content.summary}
+                                </p>
+                              )}
+
+                              {/* HIERARCHY */}
+                              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                                <span className="rounded-md bg-indigo-50 px-2 py-1 text-[10px] font-semibold text-indigo-700">
+                                  {item.program.name}
+                                </span>
+
+                                <span className="text-[10px] text-slate-300">
+                                  →
+                                </span>
+
+                                <span className="rounded-md bg-violet-50 px-2 py-1 text-[10px] font-semibold text-violet-700">
+                                  {item.semester.name}
+                                </span>
+
+                                <span className="text-[10px] text-slate-300">
+                                  →
+                                </span>
+
+                                <span className="rounded-md bg-blue-50 px-2 py-1 text-[10px] font-semibold text-blue-700">
+                                  {item.subject.name}
+                                </span>
+
+                                <span className="text-[10px] text-slate-300">
+                                  →
+                                </span>
+
+                                <span className="rounded-md bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-700">
+                                  {item.unit.title}
+                                </span>
+
+                                <span className="text-[10px] text-slate-300">
+                                  →
+                                </span>
+
+                                <span className="rounded-md bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700">
+                                  {item.topic.title}
+                                </span>
+
+                                <span className="text-[10px] text-slate-300">
+                                  →
+                                </span>
+
+                                <span className="rounded-md bg-pink-50 px-2 py-1 text-[10px] font-semibold text-pink-700">
+                                  {item.subtopic.title}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* SLUG */}
+                        <td className="px-5 py-4">
+                          <span className="inline-flex max-w-[220px] truncate rounded-lg bg-slate-100 px-2.5 py-1.5 font-mono text-[11px] text-slate-500">
+                            {content.slug}
+                          </span>
+                        </td>
+
+                        {/* READING */}
+                        <td className="px-5 py-4">
+                          <span className="inline-flex items-center rounded-lg bg-violet-50 px-2.5 py-1.5 text-xs font-semibold text-violet-700">
+                            {content.readingTime}{" "}
+                            min
+                          </span>
+                        </td>
+
+                        {/* STATUS */}
+                        <td className="px-5 py-4">
+                          <span
+                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
+                              content.status ===
+                              "active"
+                                ? "bg-emerald-50 text-emerald-700"
+                                : content.status ===
+                                    "draft"
+                                  ? "bg-amber-50 text-amber-700"
+                                  : "bg-slate-100 text-slate-600"
+                            }`}
+                          >
+                            <span className="h-1.5 w-1.5 rounded-full bg-current" />
+
+                            {content.status}
+                          </span>
+                        </td>
+
+                        {/* ACTIONS */}
+                        <td className="px-5 py-4 text-right">
+                          <div className="flex justify-end gap-2">
                             <Link
                               href={`/admin/contents/${content.id}`}
-                              className="block truncate font-semibold text-slate-900 transition group-hover:text-indigo-600"
+                              className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
                             >
-                              {content.title}
+                              View
                             </Link>
 
-                            {content.summary && (
-                              <p className="mt-1 truncate text-xs text-slate-500">
-                                {content.summary}
-                              </p>
-                            )}
+                            <Link
+                              href={`/admin/contents/${content.id}/edit`}
+                              className="rounded-lg bg-slate-950 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-600"
+                            >
+                              Edit
+                            </Link>
                           </div>
-                        </div>
-                      </td>
-
-                      <td className="px-5 py-4">
-                        <span className="inline-flex max-w-[220px] truncate rounded-lg bg-slate-100 px-2.5 py-1.5 font-mono text-[11px] text-slate-500">
-                          {content.slug}
-                        </span>
-                      </td>
-
-                      <td className="px-5 py-4">
-                        <span className="inline-flex items-center rounded-lg bg-violet-50 px-2.5 py-1.5 text-xs font-semibold text-violet-700">
-                          {content.readingTime} min
-                        </span>
-                      </td>
-
-                      <td className="px-5 py-4">
-                        <span
-                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                            content.status === "active"
-                              ? "bg-emerald-50 text-emerald-700"
-                              : content.status === "draft"
-                                ? "bg-amber-50 text-amber-700"
-                                : "bg-slate-100 text-slate-600"
-                          }`}
-                        >
-                          <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                          {content.status}
-                        </span>
-                      </td>
-
-                      <td className="px-5 py-4 text-right">
-                        <div className="flex justify-end gap-2">
-                          <Link
-                            href={`/admin/contents/${content.id}`}
-                            className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
-                          >
-                            View
-                          </Link>
-
-                          <Link
-                            href={`/admin/contents/${content.id}/edit`}
-                            className="rounded-lg bg-slate-950 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-600"
-                          >
-                            Edit
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -479,44 +559,49 @@ export default async function ContentsPage({
         </section>
 
         {/* PAGINATION */}
-        {!isSearching && totalPages > 1 && (
-          <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
-            <Link
-              href={buildUrl(currentPage - 1)}
-              aria-disabled={!hasPrevious}
-              className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
-                hasPrevious
-                  ? "border-slate-200 text-slate-600 hover:bg-slate-50"
-                  : "pointer-events-none border-slate-100 text-slate-300"
-              }`}
-            >
-              ← Previous
-            </Link>
+        {!isSearching &&
+          totalPages > 1 && (
+            <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+              <Link
+                href={buildUrl(
+                  currentPage - 1
+                )}
+                aria-disabled={!hasPrevious}
+                className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
+                  hasPrevious
+                    ? "border-slate-200 text-slate-600 hover:bg-slate-50"
+                    : "pointer-events-none border-slate-100 text-slate-300"
+                }`}
+              >
+                ← Previous
+              </Link>
 
-            <span className="text-sm text-slate-500">
-              Page{" "}
-              <strong className="text-slate-900">
-                {currentPage}
-              </strong>{" "}
-              of{" "}
-              <strong className="text-slate-900">
-                {totalPages}
-              </strong>
-            </span>
+              <span className="text-sm text-slate-500">
+                Page{" "}
+                <strong className="text-slate-900">
+                  {currentPage}
+                </strong>{" "}
+                of{" "}
+                <strong className="text-slate-900">
+                  {totalPages}
+                </strong>
+              </span>
 
-            <Link
-              href={buildUrl(currentPage + 1)}
-              aria-disabled={!hasNext}
-              className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
-                hasNext
-                  ? "border-slate-200 text-slate-600 hover:bg-slate-50"
-                  : "pointer-events-none border-slate-100 text-slate-300"
-              }`}
-            >
-              Next →
-            </Link>
-          </div>
-        )}
+              <Link
+                href={buildUrl(
+                  currentPage + 1
+                )}
+                aria-disabled={!hasNext}
+                className={`rounded-xl border px-4 py-2 text-sm font-semibold transition ${
+                  hasNext
+                    ? "border-slate-200 text-slate-600 hover:bg-slate-50"
+                    : "pointer-events-none border-slate-100 text-slate-300"
+                }`}
+              >
+                Next →
+              </Link>
+            </div>
+          )}
       </div>
     </main>
   );
