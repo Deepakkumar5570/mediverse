@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import type { CreateUnitInput } from "../validations";
 
 export async function createUnitRepository(
-  data: CreateUnitInput
+  data: CreateUnitInput,
 ) {
   const [unit] = await db
     .insert(units)
@@ -20,11 +20,51 @@ export async function getUnitsRepository() {
     .from(units);
 }
 
+export async function getUnitByIdRepository(
+  id: string,
+) {
+  const [unit] = await db
+    .select()
+    .from(units)
+    .where(eq(units.id, id))
+    .limit(1);
+
+  return unit ?? null;
+}
+
+export async function getUnitBySlugRepository(
+  slug: string,
+) {
+  const [unit] = await db
+    .select()
+    .from(units)
+    .where(eq(units.slug, slug))
+    .limit(1);
+
+  return unit ?? null;
+}
+
 export async function getUnitsBySubjectRepository(
-  subjectId: string
+  subjectId: string,
 ) {
   return db
     .select()
     .from(units)
     .where(eq(units.subjectId, subjectId));
+}
+
+export async function updateUnitRepository(
+  id: string,
+  data: CreateUnitInput,
+) {
+  const [unit] = await db
+    .update(units)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(units.id, id))
+    .returning();
+
+  return unit ?? null;
 }
