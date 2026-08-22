@@ -2,101 +2,186 @@ import { notFound } from "next/navigation";
 import { asc, eq } from "drizzle-orm";
 
 import {
-    contents,
-    db,
-    programs,
-    semesters,
-    subjects,
-    subtopics,
-    topics,
-    units,
+  contents,
+  db,
+  programs,
+  semesters,
+  subjects,
+  subtopics,
+  topics,
+  units,
 } from "@mediverse/database";
 
 import { ContentForm } from "../../../../../src/features/content/components/content-form";
 
 type Props = {
-    params: Promise<{
-        id: string;
-    }>;
+  params: Promise<{
+    id: string;
+  }>;
 };
 
 export default async function EditContentPage({
-    params,
+  params,
 }: Props) {
-    const { id } = await params;
+  const { id } = await params;
 
-    const [content] = await db
-        .select()
-        .from(contents)
-        .where(eq(contents.id, id));
+  const [content] = await db
+    .select()
+    .from(contents)
+    .where(eq(contents.id, id));
 
-    if (!content) {
-        notFound();
-    }
+  if (!content) {
+    notFound();
+  }
 
-    const [
-        programList,
-        semesterList,
-        subjectList,
-        unitList,
-        topicList,
-        subtopicList,
-    ] = await Promise.all([
-        db.select().from(programs).orderBy(asc(programs.name)),
-        db.select().from(semesters).orderBy(asc(semesters.number)),
-        db.select().from(subjects).orderBy(asc(subjects.name)),
-        db.select().from(units).orderBy(asc(units.unitNumber)),
-        db.select().from(topics).orderBy(asc(topics.topicNumber)),
-        db.select().from(subtopics).orderBy(asc(subtopics.subtopicNumber)),
-    ]);
+  const [
+    programList,
+    semesterList,
+    subjectList,
+    unitList,
+    topicList,
+    subtopicList,
+  ] = await Promise.all([
+    db
+      .select()
+      .from(programs)
+      .orderBy(asc(programs.name)),
 
-    return (
-        <main className="mx-auto max-w-6xl space-y-6 p-6">
-            <div>
-                <h1 className="text-3xl font-bold">
-                    Edit Content
-                </h1>
+    db
+      .select()
+      .from(semesters)
+      .orderBy(asc(semesters.number)),
 
-                <p className="text-gray-500">
-                    Update existing content.
-                </p>
-            </div>
+    db
+      .select()
+      .from(subjects)
+      .orderBy(asc(subjects.name)),
 
-            <ContentForm
-                programs={programList}
-                semesters={semesterList}
-                subjects={subjectList}
-                units={unitList}
-                topics={topicList}
-                subtopics={subtopicList}
-                initialData={{
-                    id: content.id,
+    db
+      .select()
+      .from(units)
+      .orderBy(asc(units.unitNumber)),
 
-                    programId: "",
-                    semesterId: "",
-                    subjectId: "",
-                    unitId: "",
-                    topicId: "",
+    db
+      .select()
+      .from(topics)
+      .orderBy(asc(topics.topicNumber)),
 
-                    subtopicId: content.subtopicId,
+    db
+      .select()
+      .from(subtopics)
+      .orderBy(asc(subtopics.subtopicNumber)),
+  ]);
 
-                    title: content.title,
-                    slug: content.slug,
-                    summary: content.summary ?? "",
-                    content: content.content,
+  // Reconstruct the complete hierarchy:
+  // Content → Subtopic → Topic → Unit → Subject → Semester → Program
 
-                    readingTime: content.readingTime,
+  const selectedSubtopic = subtopicList.find(
+    (subtopic) =>
+      subtopic.id === content.subtopicId
+  );
 
-                    seoTitle: content.seoTitle ?? "",
-                    seoDescription:
-                        content.seoDescription ?? "",
+  const selectedTopic = selectedSubtopic
+    ? topicList.find(
+        (topic) =>
+          topic.id === selectedSubtopic.topicId
+      )
+    : undefined;
 
-                    status: content.status as
-                        | "draft"
-                        | "active"
-                        | "archived",
-                }}
-            />
-        </main>
-    );
+  const selectedUnit = selectedTopic
+    ? unitList.find(
+        (unit) =>
+          unit.id === selectedTopic.unitId
+      )
+    : undefined;
+
+  const selectedSubject = selectedUnit
+    ? subjectList.find(
+        (subject) =>
+          subject.id === selectedUnit.subjectId
+      )
+    : undefined;
+
+  const selectedSemester = selectedSubject
+    ? semesterList.find(
+        (semester) =>
+          semester.id === selectedSubject.semesterId
+      )
+    : undefined;
+
+  const selectedProgram = selectedSemester
+    ? programList.find(
+        (program) =>
+          program.id === selectedSemester.programId
+      )
+    : undefined;
+
+  return (
+    <main className="mx-auto max-w-6xl space-y-6 p-6">
+      <div>
+        <h1 className="text-3xl font-bold">
+          Edit Content
+        </h1>
+
+        <p className="text-gray-500">
+          Update existing content.
+        </p>
+      </div>
+
+      <ContentForm
+        programs={programList}
+        semesters={semesterList}
+        subjects={subjectList}
+        units={unitList}
+        topics={topicList}
+        subtopics={subtopicList}
+        initialData={{
+          id: content.id,
+
+          programId:
+            selectedProgram?.id ?? "",
+
+          semesterId:
+            selectedSemester?.id ?? "",
+
+          subjectId:
+            selectedSubject?.id ?? "",
+
+          unitId:
+            selectedUnit?.id ?? "",
+
+          topicId:
+            selectedTopic?.id ?? "",
+
+          subtopicId:
+            content.subtopicId,
+
+          title: content.title,
+
+          slug: content.slug,
+
+          summary:
+            content.summary ?? "",
+
+          content:
+            content.content,
+
+          readingTime:
+            content.readingTime,
+
+          seoTitle:
+            content.seoTitle ?? "",
+
+          seoDescription:
+            content.seoDescription ?? "",
+
+          status:
+            content.status as
+              | "draft"
+              | "active"
+              | "archived",
+        }}
+      />
+    </main>
+  );
 }
