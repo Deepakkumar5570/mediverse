@@ -1,5 +1,6 @@
 import {
   createTopicRepository,
+  getTopicByIdRepository,
   getTopicsByUnitRepository,
   getTopicsRepository,
 } from "../repositories";
@@ -14,6 +15,12 @@ export async function createTopicService(
 
 export async function getTopicsService() {
   return getTopicsRepository();
+}
+
+export async function getTopicByIdService(
+  id: string
+) {
+  return getTopicByIdRepository(id);
 }
 
 export async function getTopicsByUnitService(

@@ -21,6 +21,19 @@ export async function getTopicsRepository() {
     .orderBy(asc(topics.topicNumber));
 }
 
+
+export async function getTopicByIdRepository(
+  id: string
+) {
+  const [topic] = await db
+    .select()
+    .from(topics)
+    .where(eq(topics.id, id))
+    .limit(1);
+
+  return topic ?? null;
+}
+
 export async function getTopicsByUnitRepository(
   unitId: string
 ) {
