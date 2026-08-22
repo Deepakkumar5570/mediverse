@@ -95,13 +95,12 @@ export default async function ContentDetailsPage({
             {/* STATUS + READING TIME */}
             <div className="mb-5 flex flex-wrap items-center gap-2">
               <span
-                className={`rounded-full px-3 py-1 text-xs font-bold ${
-                  content.status === "active"
-                    ? "bg-emerald-50 text-emerald-700"
-                    : content.status === "draft"
-                      ? "bg-amber-50 text-amber-700"
-                      : "bg-slate-100 text-slate-600"
-                }`}
+                className={`rounded-full px-3 py-1 text-xs font-bold ${content.status === "active"
+                  ? "bg-emerald-50 text-emerald-700"
+                  : content.status === "draft"
+                    ? "bg-amber-50 text-amber-700"
+                    : "bg-slate-100 text-slate-600"
+                  }`}
               >
                 ● {content.status}
               </span>
@@ -186,28 +185,87 @@ export default async function ContentDetailsPage({
             <div className="px-6 py-8 sm:px-10 sm:py-10">
               <div
                 className="
-                  prose prose-slate max-w-none
-                  prose-headings:font-bold
-                  prose-headings:tracking-tight
-                  prose-h2:mt-10
-                  prose-h2:text-2xl
-                  prose-h3:mt-8
-                  prose-h3:text-xl
-                  prose-p:text-[16px]
-                  prose-p:leading-8
-                  prose-a:text-indigo-600
-                  prose-a:no-underline
-                  hover:prose-a:underline
-                  prose-strong:text-slate-900
-                  prose-li:leading-7
-                  prose-blockquote:border-indigo-400
-                  prose-blockquote:bg-indigo-50/50
-                  prose-blockquote:rounded-xl
-                  prose-blockquote:px-5
-                  prose-code:rounded
-                  prose-code:bg-slate-100
-                  prose-code:px-1.5
-                "
+  max-w-none
+
+  [&_p]:my-3
+  [&_p]:leading-8
+  [&_p]:text-slate-700
+
+  [&_h1]:mt-10
+  [&_h1]:mb-5
+  [&_h1]:text-4xl
+  [&_h1]:font-black
+  [&_h1]:leading-tight
+  [&_h1]:tracking-tight
+  [&_h1]:text-slate-950
+
+  [&_h2]:mt-9
+  [&_h2]:mb-4
+  [&_h2]:text-3xl
+  [&_h2]:font-bold
+  [&_h2]:leading-tight
+  [&_h2]:tracking-tight
+  [&_h2]:text-slate-900
+
+  [&_h3]:mt-7
+  [&_h3]:mb-3
+  [&_h3]:text-2xl
+  [&_h3]:font-bold
+  [&_h3]:text-slate-900
+
+  [&_ul]:my-5
+  [&_ul]:list-disc
+  [&_ul]:pl-7
+
+  [&_ol]:my-5
+  [&_ol]:list-decimal
+  [&_ol]:pl-7
+
+  [&_li]:my-1.5
+  [&_li]:leading-7
+  [&_li]:text-slate-700
+
+  [&_blockquote]:my-6
+  [&_blockquote]:rounded-r-2xl
+  [&_blockquote]:border-l-4
+  [&_blockquote]:border-indigo-500
+  [&_blockquote]:bg-indigo-50
+  [&_blockquote]:px-6
+  [&_blockquote]:py-4
+  [&_blockquote]:italic
+  [&_blockquote]:text-slate-700
+
+  [&_pre]:my-6
+  [&_pre]:overflow-x-auto
+  [&_pre]:rounded-2xl
+  [&_pre]:bg-slate-950
+  [&_pre]:px-5
+  [&_pre]:py-4
+  [&_pre]:shadow-lg
+
+  [&_pre_code]:bg-transparent
+  [&_pre_code]:p-0
+  [&_pre_code]:font-mono
+  [&_pre_code]:text-sm
+  [&_pre_code]:text-slate-100
+
+  [&_code]:rounded
+  [&_code]:bg-slate-100
+  [&_code]:px-1.5
+  [&_code]:py-0.5
+  [&_code]:font-mono
+  [&_code]:text-sm
+  [&_code]:text-slate-800
+
+  [&_hr]:my-8
+  [&_hr]:border-0
+  [&_hr]:border-t
+  [&_hr]:border-slate-300
+
+  [&_a]:font-medium
+  [&_a]:text-indigo-600
+  [&_a]:underline
+"
                 dangerouslySetInnerHTML={{
                   __html: content.content,
                 }}
@@ -332,36 +390,36 @@ export default async function ContentDetailsPage({
             {/* SEO */}
             {(content.seoTitle ||
               content.seoDescription) && (
-              <div className="rounded-2xl border border-violet-100 bg-violet-50/60 p-5">
-                <p className="text-xs font-bold uppercase tracking-wider text-violet-600">
-                  SEO
-                </p>
+                <div className="rounded-2xl border border-violet-100 bg-violet-50/60 p-5">
+                  <p className="text-xs font-bold uppercase tracking-wider text-violet-600">
+                    SEO
+                  </p>
 
-                {content.seoTitle && (
-                  <div className="mt-4">
-                    <p className="text-xs text-violet-500">
-                      SEO Title
-                    </p>
+                  {content.seoTitle && (
+                    <div className="mt-4">
+                      <p className="text-xs text-violet-500">
+                        SEO Title
+                      </p>
 
-                    <p className="mt-1 text-sm font-semibold text-slate-800">
-                      {content.seoTitle}
-                    </p>
-                  </div>
-                )}
+                      <p className="mt-1 text-sm font-semibold text-slate-800">
+                        {content.seoTitle}
+                      </p>
+                    </div>
+                  )}
 
-                {content.seoDescription && (
-                  <div className="mt-4">
-                    <p className="text-xs text-violet-500">
-                      Description
-                    </p>
+                  {content.seoDescription && (
+                    <div className="mt-4">
+                      <p className="text-xs text-violet-500">
+                        Description
+                      </p>
 
-                    <p className="mt-1 text-sm leading-6 text-slate-600">
-                      {content.seoDescription}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
+                      <p className="mt-1 text-sm leading-6 text-slate-600">
+                        {content.seoDescription}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
 
           </aside>
         </div>
