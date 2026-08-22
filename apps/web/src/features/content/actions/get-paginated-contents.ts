@@ -4,12 +4,14 @@ import { getPaginatedContentsService } from "../services";
 
 export async function getPaginatedContentsAction(
   page: number,
-  limit = 10
+  limit: number,
+  search?: string,
+  status?: "draft" | "active" | "archived"
 ) {
-  const currentPage = Math.max(1, page);
-
   return getPaginatedContentsService(
-    currentPage,
-    limit
+    page,
+    limit,
+    search,
+    status
   );
 }

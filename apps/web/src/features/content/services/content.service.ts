@@ -55,13 +55,28 @@ export async function searchContentsService(
 }
 
 
+// export async function getPaginatedContentsService(
+//   page: number,
+//   limit: number
+// ) {
+//   return getPaginatedContentsRepository(
+//     page,
+//     limit
+//   );
+// }
+
+
 export async function getPaginatedContentsService(
   page: number,
-  limit: number
+  limit: number,
+  search?: string,
+  status?: "draft" | "active" | "archived"
 ) {
   return getPaginatedContentsRepository(
     page,
-    limit
+    limit,
+    search,
+    status
   );
 }
 

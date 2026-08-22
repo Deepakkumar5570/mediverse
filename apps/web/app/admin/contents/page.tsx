@@ -69,6 +69,11 @@ export default async function ContentsPage({
       : "/admin/contents";
   }
 
+  /*
+   * These counts currently represent the loaded page.
+   * Later we can replace them with a dedicated content-stats
+   * repository/action without changing this UI.
+   */
   const activeCount = pagination.items.filter(
     (item) => item.status === "active"
   ).length;
@@ -124,6 +129,7 @@ export default async function ContentsPage({
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Total
                 </p>
+
                 <p className="mt-2 text-3xl font-bold text-slate-900">
                   {pagination.total}
                 </p>
@@ -145,6 +151,7 @@ export default async function ContentsPage({
                 <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
                   Active
                 </p>
+
                 <p className="mt-2 text-3xl font-bold text-emerald-900">
                   {activeCount}
                 </p>
@@ -166,6 +173,7 @@ export default async function ContentsPage({
                 <p className="text-xs font-semibold uppercase tracking-wider text-amber-600">
                   Drafts
                 </p>
+
                 <p className="mt-2 text-3xl font-bold text-amber-900">
                   {draftCount}
                 </p>
@@ -187,6 +195,7 @@ export default async function ContentsPage({
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                   Archived
                 </p>
+
                 <p className="mt-2 text-3xl font-bold text-slate-800">
                   {archivedCount}
                 </p>
@@ -209,6 +218,7 @@ export default async function ContentsPage({
             <p className="text-sm font-semibold text-slate-900">
               Find content
             </p>
+
             <p className="mt-1 text-xs text-slate-500">
               Search by title or slug and filter by publishing status.
             </p>

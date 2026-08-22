@@ -101,15 +101,69 @@ export async function searchContentsRepository(
 
 //  "feat(content): add content search"
 
+// export async function getPaginatedContentsRepository(
+//   page: number,
+//   limit: number
+// ) {
+//   const offset = (page - 1) * limit;
+
+//   const items = await db
+//     .select()
+//     .from(contents)
+//     .orderBy(desc(contents.createdAt))
+//     .limit(limit)
+//     .offset(offset);
+
+//   const [{ count }] = await db
+//     .select({
+//       count: sql<number>`count(*)`,
+//     })
+//     .from(contents);
+
+//   return {
+//     items,
+//     total: Number(count),
+//     page,
+//     limit,
+//     totalPages: Math.ceil(Number(count) / limit),
+//   };
+// }
+
+
+
+
 export async function getPaginatedContentsRepository(
   page: number,
-  limit: number
+  limit: number,
+  search?: string,
+  status?: "draft" | "active" | "archived"
 ) {
   const offset = (page - 1) * limit;
+
+  const conditions = [];
+
+  if (search?.trim()) {
+    conditions.push(
+      or(
+        ilike(contents.title, `%${search.trim()}%`),
+        ilike(contents.slug, `%${search.trim()}%`)
+      )
+    );
+  }
+
+  if (status) {
+    conditions.push(eq(contents.status, status));
+  }
+
+  const whereClause =
+    conditions.length > 0
+      ? and(...conditions)
+      : undefined;
 
   const items = await db
     .select()
     .from(contents)
+    .where(whereClause)
     .orderBy(desc(contents.createdAt))
     .limit(limit)
     .offset(offset);
@@ -118,14 +172,17 @@ export async function getPaginatedContentsRepository(
     .select({
       count: sql<number>`count(*)`,
     })
-    .from(contents);
+    .from(contents)
+    .where(whereClause);
+
+  const total = Number(count);
 
   return {
     items,
-    total: Number(count),
+    total,
     page,
     limit,
-    totalPages: Math.ceil(Number(count) / limit),
+    totalPages: Math.ceil(total / limit),
   };
 }
 
