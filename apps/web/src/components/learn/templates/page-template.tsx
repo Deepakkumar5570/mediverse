@@ -20,6 +20,10 @@ type Props = {
   sidebar: SidebarItem[];
 
   children: ReactNode;
+
+  showHeader?: boolean;
+
+  wide?: boolean;
 };
 
 export function PageTemplate({
@@ -29,25 +33,43 @@ export function PageTemplate({
   sidebarTitle = "Learn",
   sidebar,
   children,
+  showHeader = true,
+  wide = false,
 }: Props) {
   return (
     <LearnLayout>
-      <Breadcrumb items={breadcrumbs} />
+      {showHeader && (
+        <>
+          <Breadcrumb items={breadcrumbs} />
 
-      <PageHeader
-        title={title}
-        description={description}
-      />
-
-      <div className="mt-10 grid gap-8 lg:grid-cols-12">
-        <aside className="lg:col-span-3">
-          <Sidebar
-            title={sidebarTitle}
-            items={sidebar}
+          <PageHeader
+            title={title}
+            description={description}
           />
+        </>
+      )}
+
+      <div
+        className={`mt-10 grid gap-8 lg:grid-cols-12 lg:items-start ${
+          wide ? "lg:gap-6" : ""
+        }`}
+      >
+        {/* Sidebar */}
+        <aside className="lg:col-span-2">
+          <div className="lg:sticky lg:top-24">
+            <Sidebar
+              title={sidebarTitle}
+              items={sidebar}
+            />
+          </div>
         </aside>
 
-        <section className="lg:col-span-9">
+        {/* Main Content */}
+        <section
+          className={`min-w-0 ${
+            wide ? "lg:col-span-10" : "lg:col-span-10"
+          }`}
+        >
           {children}
         </section>
       </div>
