@@ -1,3 +1,9 @@
+
+
+
+
+
+
 import { notFound } from "next/navigation";
 
 import {
@@ -19,6 +25,11 @@ import {
     FlashcardDeck,
     getFlashcardsByContentAction,
 } from "@/src/features/learn/flashcards";
+
+import {
+    MCQPractice,
+    getMcqsBySubtopicAction,
+} from "@/src/features/learn/mcqs";
 
 import {
     getContentProgressAction,
@@ -63,6 +74,12 @@ export default async function SubtopicDetailsPage({
         )
         : [];
 
+    // Fetch MCQs for this subtopic
+    const mcqs =
+        await getMcqsBySubtopicAction(
+            subtopicId,
+        );
+
     const subtopicProgress =
         await getSubtopicProgressAction(
             subtopicId,
@@ -93,7 +110,6 @@ export default async function SubtopicDetailsPage({
 
     return (
         <PageTemplate
-
             wide
             showHeader={false}
             title={subtopic.title}
@@ -145,6 +161,10 @@ export default async function SubtopicDetailsPage({
                     label: "Flashcards",
                     href: "#flashcards",
                 },
+                {
+                    label: "MCQ Practice",
+                    href: "#mcq-practice",
+                },
             ]}
         >
             <div className="space-y-8">
@@ -184,6 +204,7 @@ export default async function SubtopicDetailsPage({
                                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                                     Lessons
                                 </p>
+
                                 <p className="mt-1 text-xl font-black text-slate-950">
                                     {subtopicProgress.total}
                                 </p>
@@ -193,6 +214,7 @@ export default async function SubtopicDetailsPage({
                                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                                     Completed
                                 </p>
+
                                 <p className="mt-1 text-xl font-black text-slate-950">
                                     {subtopicProgress.completed}
                                 </p>
@@ -202,6 +224,7 @@ export default async function SubtopicDetailsPage({
                                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                                     Progress
                                 </p>
+
                                 <p className="mt-1 text-xl font-black text-violet-700">
                                     {percentage}%
                                 </p>
@@ -352,10 +375,11 @@ export default async function SubtopicDetailsPage({
 
                                         {lessonProgress && (
                                             <span
-                                                className={`rounded-full px-3 py-1.5 text-xs font-bold ${lessonProgress.completed
+                                                className={`rounded-full px-3 py-1.5 text-xs font-bold ${
+                                                    lessonProgress.completed
                                                         ? "bg-emerald-100 text-emerald-700"
                                                         : "bg-slate-100 text-slate-600"
-                                                    }`}
+                                                }`}
                                             >
                                                 {lessonProgress.completed
                                                     ? "✓ Completed"
@@ -432,6 +456,30 @@ export default async function SubtopicDetailsPage({
                             flashcards={flashcards}
                         />
                     </div>
+                </section>
+
+                {/* MCQ PRACTICE */}
+                <section
+                    id="mcq-practice"
+                    className="scroll-mt-24"
+                >
+                    <div className="mb-4">
+                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-600">
+                            Test yourself
+                        </p>
+
+                        <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950">
+                            Check your understanding.
+                        </h2>
+
+                        <p className="mt-1 text-sm text-slate-500">
+                            Practice with MCQs based on this subtopic.
+                        </p>
+                    </div>
+
+                    <MCQPractice
+                        mcqs={mcqs}
+                    />
                 </section>
             </div>
         </PageTemplate>

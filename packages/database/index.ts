@@ -8,3 +8,4 @@ export * from "./schema/subtopic.schema";
 export * from "./schema/content.schema";
 export * from "./schema/progress.schema";
 export * from "./schema/flashcard.schema";
+export * from "./schema/mcq.schema";

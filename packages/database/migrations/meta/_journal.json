@@ -71,6 +71,13 @@
       "when": 1786655110721,
       "tag": "0009_lonely_mandroid",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1787595503624,
+      "tag": "0010_solid_gideon",
+      "breakpoints": true
     }
   ]
 }
