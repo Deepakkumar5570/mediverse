@@ -93,7 +93,7 @@ export default async function MCQDetailsPage({
                                 "Unknown subtopic"}
                         </p>
                     </div>
-
+ok 
                     <div className="flex gap-2">
                         <Link
                             href="/admin/mcqs"

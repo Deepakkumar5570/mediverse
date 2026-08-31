@@ -2,102 +2,81 @@ type Props = {
   content: string;
 };
 
-export function MarkdownContent({
-  content,
-}: Props) {
+export function MarkdownContent({ content }: Props) {
   return (
-    <article
-      className="
-        prose prose-slate max-w-none
+    <article className="max-w-none">
+      <div
+        className="
+          [&_h1]:mb-6
+          [&_h1]:text-4xl
+          [&_h1]:font-bold
 
-        prose-headings:scroll-mt-24
-        prose-headings:font-bold
-        prose-headings:tracking-tight
-        prose-headings:text-slate-950
+          [&_h2]:mb-4
+          [&_h2]:mt-10
+          [&_h2]:border-b
+          [&_h2]:border-slate-200
+          [&_h2]:pb-2
+          [&_h2]:text-2xl
+          [&_h2]:font-bold
+          [&_h2]:text-slate-950
 
-        prose-h1:mb-6
-        prose-h1:text-3xl
-        prose-h1:leading-tight
-        md:prose-h1:text-4xl
+          [&_h3]:mb-3
+          [&_h3]:mt-8
+          [&_h3]:text-xl
+          [&_h3]:font-bold
 
-        prose-h2:mt-10
-        prose-h2:mb-4
-        prose-h2:border-b
-        prose-h2:border-slate-200
-        prose-h2:pb-2
-        prose-h2:text-2xl
+          [&_p]:my-5
+          [&_p]:text-base
+          [&_p]:leading-8
+          [&_p]:text-slate-700
 
-        prose-h3:mt-8
-        prose-h3:mb-3
-        prose-h3:text-xl
+          [&_ul]:my-5
+          [&_ul]:list-disc
+          [&_ul]:pl-6
 
-        prose-p:my-5
-        prose-p:text-[16px]
-        prose-p:leading-8
-        prose-p:text-slate-700
+          [&_ol]:my-5
+          [&_ol]:list-decimal
+          [&_ol]:pl-6
 
-        prose-a:font-medium
-        prose-a:text-violet-600
-        prose-a:no-underline
-        hover:prose-a:underline
+          [&_li]:my-2
+          [&_li]:leading-7
+          [&_li]:text-slate-700
 
-        prose-strong:font-bold
-        prose-strong:text-slate-900
+          [&_strong]:font-bold
+          [&_strong]:text-slate-950
 
-        prose-ul:my-5
-        prose-ol:my-5
+          [&_blockquote]:my-7
+          [&_blockquote]:border-l-4
+          [&_blockquote]:border-violet-400
+          [&_blockquote]:bg-violet-50
+          [&_blockquote]:px-5
+          [&_blockquote]:py-3
 
-        prose-li:my-2
-        prose-li:leading-7
-        prose-li:text-slate-700
+          [&_a]:font-medium
+          [&_a]:text-violet-600
+          [&_a]:underline
 
-        prose-blockquote:my-7
-        prose-blockquote:border-violet-400
-        prose-blockquote:bg-violet-50
-        prose-blockquote:px-5
-        prose-blockquote:py-3
-        prose-blockquote:text-slate-700
+          [&_hr]:my-10
+          [&_hr]:border-slate-200
 
-        prose-pre:my-7
-        prose-pre:overflow-x-auto
-        prose-pre:rounded-2xl
-        prose-pre:bg-slate-950
-        prose-pre:p-5
+          [&_table]:my-8
+          [&_table]:w-full
+          [&_table]:border-collapse
 
-        prose-code:text-violet-700
-        prose-code:before:content-none
-        prose-code:after:content-none
+          [&_th]:border
+          [&_th]:bg-slate-100
+          [&_th]:px-4
+          [&_th]:py-3
+          [&_th]:text-left
 
-        prose-table:my-8
-        prose-table:w-full
-
-        prose-th:bg-slate-100
-        prose-th:px-4
-        prose-th:py-3
-        prose-th:text-left
-        prose-th:text-sm
-        prose-th:font-semibold
-        prose-th:text-slate-900
-
-        prose-td:px-4
-        prose-td:py-3
-        prose-td:text-sm
-        prose-td:text-slate-700
-
-        prose-img:my-8
-        prose-img:mx-auto
-        prose-img:max-w-full
-        prose-img:rounded-2xl
-        prose-img:border
-        prose-img:border-slate-200
-        prose-img:shadow-sm
-
-        prose-hr:my-10
-        prose-hr:border-slate-200
-      "
-      dangerouslySetInnerHTML={{
-        __html: content,
-      }}
-    />
+          [&_td]:border
+          [&_td]:px-4
+          [&_td]:py-3
+        "
+        dangerouslySetInnerHTML={{
+          __html: content,
+        }}
+      />
+    </article>
   );
 }
