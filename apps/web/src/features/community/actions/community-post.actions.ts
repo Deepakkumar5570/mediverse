@@ -10,6 +10,7 @@ import {
   getCommunityPostByIdService,
   getCommunityPostsByAuthorService,
   updateCommunityPostService,
+  deleteCommunityPostService,
 } from "../services";
 
 import {
@@ -74,6 +75,31 @@ export async function updateCommunityPostAction(
   if (!post) {
     throw new Error(
       "Post not found or you are not allowed to edit this post.",
+    );
+  }
+
+  revalidatePath("/learn/community");
+  revalidatePath(`/learn/community/${postId}`);
+
+  return post;
+}
+
+
+
+export async function deleteCommunityPostAction(
+  postId: string,
+) {
+  const userId = await requireUserId();
+
+  const post =
+    await deleteCommunityPostService(
+      postId,
+      userId,
+    );
+
+  if (!post) {
+    throw new Error(
+      "Post not found or you are not allowed to delete this post.",
     );
   }
 

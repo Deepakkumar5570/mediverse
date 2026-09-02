@@ -17,6 +17,7 @@ import {
   CommunityComments,
   CommunityPostLikeButton,
   CreateCommentForm,
+  DeleteCommunityPostButton,
 } from "@/src/features/community/components";
 
 type Props = {
@@ -150,13 +151,17 @@ export default async function CommunityPostPage({
             </div>
 
             {userId === post.authorId && (
-              <div className="flex justify-end">
+              <div className="flex flex-col justify-end gap-2 sm:flex-row">
                 <Link
                   href={`/learn/community/${post.id}/edit`}
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
                 >
                   ✏️ Edit Post
                 </Link>
+
+                <DeleteCommunityPostButton
+                  postId={post.id}
+                />
               </div>
             )}
           </div>

@@ -90,3 +90,21 @@ export async function updateCommunityPostRepository(
 
   return post ?? null;
 }
+
+
+export async function deleteCommunityPostRepository(
+  postId: string,
+  authorId: string,
+) {
+  const [post] = await db
+    .delete(communityPosts)
+    .where(
+      and(
+        eq(communityPosts.id, postId),
+        eq(communityPosts.authorId, authorId),
+      ),
+    )
+    .returning();
+
+  return post ?? null;
+}

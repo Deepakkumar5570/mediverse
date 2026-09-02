@@ -4,6 +4,7 @@ import {
   getCommunityPostByIdRepository,
   getCommunityPostsByAuthorRepository,
   updateCommunityPostRepository,
+  deleteCommunityPostRepository,
 } from "../repositories";
 
 type CreateCommunityPostInput = {
@@ -52,5 +53,15 @@ export async function updateCommunityPostService(
     postId,
     authorId,
     input,
+  );
+}
+
+export async function deleteCommunityPostService(
+  postId: string,
+  authorId: string,
+) {
+  return deleteCommunityPostRepository(
+    postId,
+    authorId,
   );
 }
