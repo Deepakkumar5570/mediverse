@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
+import type { CommunityAuthor } from "../services";
+
 import {
   deleteCommunityCommentAction,
   updateCommunityCommentAction,
@@ -29,6 +31,7 @@ type Props = {
   postId: string;
   comments: Comment[];
   likeData: Record<string, CommentLikeData>;
+  authors: Record<string, CommunityAuthor>;
   isAuthenticated: boolean;
   currentUserId: string | null;
 };
@@ -37,6 +40,7 @@ export function CommunityComments({
   postId,
   comments,
   likeData,
+  authors,
   isAuthenticated,
   currentUserId,
 }: Props) {
@@ -140,6 +144,10 @@ export function CommunityComments({
     });
   }
 
+  function formatDate(date: Date) {
+    return date.toISOString().slice(0, 10);
+  }
+
   return (
     <section>
       <div className="mb-5 flex items-end justify-between gap-3">
@@ -184,6 +192,9 @@ export function CommunityComments({
                 likeCount: 0,
               };
 
+            const author =
+              authors[comment.authorId];
+
             const isEditing =
               editingId === comment.id;
 
@@ -196,27 +207,39 @@ export function CommunityComments({
                 className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
               >
                 <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-black text-indigo-700">
-                    U
+                  {/* Author Avatar */}
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-sm font-black text-indigo-700">
+                    {author?.imageUrl ? (
+                      <img
+                        src={author.imageUrl}
+                        alt={author.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      (
+                        author?.name?.[0] ?? "M"
+                      ).toUpperCase()
+                    )}
                   </div>
 
                   <div className="min-w-0 flex-1">
                     {/* Header */}
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-sm font-bold text-slate-900">
-                        Community Member
+                        {author?.name ??
+                          "MediVerse Member"}
                       </span>
 
                       <span className="text-xs text-slate-400">
-                        {comment.createdAt.toLocaleDateString()}
+                        {formatDate(comment.createdAt)}
                       </span>
 
                       {comment.updatedAt.getTime() !==
                         comment.createdAt.getTime() && (
-                          <span className="text-[11px] font-medium text-slate-400">
-                            Edited
-                          </span>
-                        )}
+                        <span className="text-[11px] font-medium text-slate-400">
+                          Edited
+                        </span>
+                      )}
                     </div>
 
                     {/* Content / Edit */}
@@ -279,9 +302,15 @@ export function CommunityComments({
                         <CommunityCommentLikeButton
                           postId={postId}
                           commentId={comment.id}
-                          initialLiked={commentLike.liked}
-                          initialLikeCount={commentLike.likeCount}
-                          isAuthenticated={isAuthenticated}
+                          initialLiked={
+                            commentLike.liked
+                          }
+                          initialLikeCount={
+                            commentLike.likeCount
+                          }
+                          isAuthenticated={
+                            isAuthenticated
+                          }
                         />
 
                         {isOwner && (
@@ -289,7 +318,9 @@ export function CommunityComments({
                             <button
                               type="button"
                               onClick={() =>
-                                startEditing(comment)
+                                startEditing(
+                                  comment,
+                                )
                               }
                               disabled={isPending}
                               className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-xs font-bold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 disabled:opacity-60"
@@ -301,7 +332,9 @@ export function CommunityComments({
                               type="button"
                               onClick={() => {
                                 setError("");
-                                setDeleteId(comment.id);
+                                setDeleteId(
+                                  comment.id,
+                                );
                               }}
                               disabled={isPending}
                               className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-3.5 text-xs font-bold text-red-600 transition hover:bg-red-50 disabled:opacity-60"
@@ -313,7 +346,7 @@ export function CommunityComments({
                       </div>
                     )}
 
-                    {/* Delete confirmation */}
+                    {/* Delete Confirmation */}
                     {isDeleting && (
                       <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4">
                         <p className="text-sm font-black text-red-900">
