@@ -3,6 +3,7 @@ import {
   getCommunityPostsRepository,
   getCommunityPostByIdRepository,
   getCommunityPostsByAuthorRepository,
+  updateCommunityPostRepository,
 } from "../repositories";
 
 type CreateCommunityPostInput = {
@@ -33,4 +34,23 @@ export async function getCommunityPostsByAuthorService(
   authorId: string,
 ) {
   return getCommunityPostsByAuthorRepository(authorId);
+}
+
+
+type UpdateCommunityPostInput = {
+  title: string;
+  content: string;
+  category: string;
+};
+
+export async function updateCommunityPostService(
+  postId: string,
+  authorId: string,
+  input: UpdateCommunityPostInput,
+) {
+  return updateCommunityPostRepository(
+    postId,
+    authorId,
+    input,
+  );
 }

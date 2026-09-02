@@ -9,7 +9,12 @@ import {
   getCommunityPostsService,
   getCommunityPostByIdService,
   getCommunityPostsByAuthorService,
+  updateCommunityPostService,
 } from "../services";
+
+import {
+  updateCommunityPostSchema,
+} from "../validations";
 
 type CreateCommunityPostInput = {
   title: string;
@@ -47,4 +52,33 @@ export async function getMyCommunityPostsAction() {
   const userId = await requireUserId();
 
   return getCommunityPostsByAuthorService(userId);
+}
+
+
+
+export async function updateCommunityPostAction(
+  postId: string,
+  input: unknown,
+) {
+  const userId = await requireUserId();
+
+  const data =
+    updateCommunityPostSchema.parse(input);
+
+  const post = await updateCommunityPostService(
+    postId,
+    userId,
+    data,
+  );
+
+  if (!post) {
+    throw new Error(
+      "Post not found or you are not allowed to edit this post.",
+    );
+  }
+
+  revalidatePath("/learn/community");
+  revalidatePath(`/learn/community/${postId}`);
+
+  return post;
 }

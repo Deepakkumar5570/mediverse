@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, and } from "drizzle-orm";
 
 import {
   db,
@@ -58,4 +58,35 @@ export async function getCommunityPostsByAuthorRepository(
     .from(communityPosts)
     .where(eq(communityPosts.authorId, authorId))
     .orderBy(desc(communityPosts.createdAt));
+}
+
+
+type UpdateCommunityPostInput = {
+  title: string;
+  content: string;
+  category: string;
+};
+
+export async function updateCommunityPostRepository(
+  postId: string,
+  authorId: string,
+  input: UpdateCommunityPostInput,
+) {
+  const [post] = await db
+    .update(communityPosts)
+    .set({
+      title: input.title,
+      content: input.content,
+      category: input.category,
+      updatedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(communityPosts.id, postId),
+        eq(communityPosts.authorId, authorId),
+      ),
+    )
+    .returning();
+
+  return post ?? null;
 }
