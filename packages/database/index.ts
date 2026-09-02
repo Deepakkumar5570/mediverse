@@ -9,3 +9,6 @@ export * from "./schema/content.schema";
 export * from "./schema/progress.schema";
 export * from "./schema/flashcard.schema";
 export * from "./schema/mcq.schema";
+// export * from "./schema/flashcard-progress.schema";
+export * from "./schema/community-post.schema";
+export * from "./schema/community-comment.schema";

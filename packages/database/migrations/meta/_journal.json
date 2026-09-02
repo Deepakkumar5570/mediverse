@@ -78,6 +78,20 @@
       "when": 1787595503624,
       "tag": "0010_solid_gideon",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1788165162888,
+      "tag": "0011_tan_patriot",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1788349704622,
+      "tag": "0012_public_micromacro",
+      "breakpoints": true
     }
   ]
 }

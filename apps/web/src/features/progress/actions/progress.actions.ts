@@ -1,7 +1,8 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+"use server";
 
+import { requireUserId } from "@/src/lib/auth/require-user-id";
 
 import {
   completeContentService,
@@ -20,16 +21,15 @@ import {
 } from "../services/progress.service";
 
 
+// export async function requireUserId() {
+//     const { userId } = await auth();
 
-export async function requireUserId() {
-    const { userId } = await auth();
+//     if (!userId) {
+//         throw new Error("Unauthorized");
+//     }
 
-    if (!userId) {
-        throw new Error("Unauthorized");
-    }
-
-    return userId;
-}
+//     return userId;
+// }
 
 
 
