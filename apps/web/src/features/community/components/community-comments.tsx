@@ -1,3 +1,7 @@
+"use client";
+
+import { CommunityCommentLikeButton } from "./community-comment-like-button";
+
 type Comment = {
   id: string;
   authorId: string;
@@ -5,12 +9,23 @@ type Comment = {
   createdAt: Date;
 };
 
+type CommentLikeData = {
+  liked: boolean;
+  likeCount: number;
+};
+
 type Props = {
+  postId: string;
   comments: Comment[];
+  likeData: Record<string, CommentLikeData>;
+  isAuthenticated: boolean;
 };
 
 export function CommunityComments({
+  postId,
   comments,
+  likeData,
+  isAuthenticated,
 }: Props) {
   return (
     <section>
@@ -46,34 +61,54 @@ export function CommunityComments({
         </div>
       ) : (
         <div className="space-y-4">
-          {comments.map((comment) => (
-            <article
-              key={comment.id}
-              className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
-            >
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-black text-indigo-700">
-                  U
-                </div>
+          {comments.map((comment) => {
+            const data = likeData[comment.id] ?? {
+              liked: false,
+              likeCount: 0,
+            };
 
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-bold text-slate-900">
-                      Community Member
-                    </span>
-
-                    <span className="text-xs text-slate-400">
-                      {comment.createdAt.toLocaleDateString()}
-                    </span>
+            return (
+              <article
+                key={comment.id}
+                className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-black text-indigo-700">
+                    U
                   </div>
 
-                  <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-600">
-                    {comment.content}
-                  </p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-bold text-slate-900">
+                        Community Member
+                      </span>
+
+                      <span className="text-xs text-slate-400">
+                        {comment.createdAt
+                          .toISOString()
+                          .slice(0, 10)
+                          .split("-")
+                          .reverse()
+                          .join("/")}
+                      </span>
+                    </div>
+
+                    <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-600">
+                      {comment.content}
+                    </p>
+
+                    <CommunityCommentLikeButton
+                      commentId={comment.id}
+                      postId={postId}
+                      initialLiked={data.liked}
+                      initialLikeCount={data.likeCount}
+                      isAuthenticated={isAuthenticated}
+                    />
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       )}
     </section>
