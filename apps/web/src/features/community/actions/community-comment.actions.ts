@@ -8,6 +8,8 @@ import {
   createCommunityCommentService,
   getCommunityCommentsByPostService,
   getCommunityCommentByIdService,
+  updateCommunityCommentService,
+  deleteCommunityCommentService,
 } from "../services";
 
 type CreateCommunityCommentInput = {
@@ -41,4 +43,48 @@ export async function getCommunityCommentByIdAction(
   commentId: string,
 ) {
   return getCommunityCommentByIdService(commentId);
+}
+
+type UpdateCommunityCommentInput = {
+  commentId: string;
+  content: string;
+};
+
+export async function updateCommunityCommentAction(
+  input: UpdateCommunityCommentInput,
+) {
+  const userId = await requireUserId();
+
+  const comment =
+    await updateCommunityCommentService(
+      input.commentId,
+      userId,
+      {
+        content: input.content,
+      },
+    );
+
+  revalidatePath(
+    `/learn/community/${comment.postId}`,
+  );
+
+  return comment;
+}
+
+export async function deleteCommunityCommentAction(
+  commentId: string,
+) {
+  const userId = await requireUserId();
+
+  const comment =
+    await deleteCommunityCommentService(
+      commentId,
+      userId,
+    );
+
+  revalidatePath(
+    `/learn/community/${comment.postId}`,
+  );
+
+  return comment;
 }

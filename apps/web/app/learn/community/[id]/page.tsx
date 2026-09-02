@@ -179,6 +179,7 @@ export default async function CommunityPostPage({
             comments={comments}
             likeData={likeData}
             isAuthenticated={Boolean(userId)}
+            currentUserId={userId}
           />
         </div>
       </div>

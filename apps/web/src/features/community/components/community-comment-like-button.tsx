@@ -60,7 +60,7 @@ export function CommunityCommentLikeButton({
           ? "Sign in to like this answer"
           : undefined
       }
-      className={`mt-4 inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-bold transition ${
+      className={`inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border px-3.5 text-xs font-bold transition ${
         liked
           ? "border-rose-200 bg-rose-50 text-rose-600"
           : "border-slate-200 bg-white text-slate-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
@@ -70,7 +70,7 @@ export function CommunityCommentLikeButton({
           : ""
       }`}
     >
-      <span>
+      <span className="text-sm">
         {liked ? "❤️" : "🤍"}
       </span>
 
