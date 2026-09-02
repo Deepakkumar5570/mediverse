@@ -42,6 +42,17 @@ type UpdateCommunityCommentInput = {
   content: string;
 };
 
+
+export async function getCommunityCommentsByAuthorRepository(
+  authorId: string,
+) {
+  return db
+    .select()
+    .from(communityComments)
+    .where(eq(communityComments.authorId, authorId))
+    .orderBy(desc(communityComments.createdAt));
+}
+
 export async function updateCommunityCommentRepository(
   commentId: string,
   authorId: string,

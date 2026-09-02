@@ -1,6 +1,7 @@
 import {
   createCommunityCommentRepository,
   getCommunityCommentsByPostRepository,
+  getCommunityCommentsByAuthorRepository,
   getCommunityCommentByIdRepository,
   updateCommunityCommentRepository,
   deleteCommunityCommentRepository,
@@ -39,6 +40,15 @@ export async function getCommunityCommentsByPostService(
   postId: string,
 ) {
   return getCommunityCommentsByPostRepository(postId);
+}
+
+
+export async function getCommunityCommentsByAuthorService(
+  authorId: string,
+) {
+  return getCommunityCommentsByAuthorRepository(
+    authorId,
+  );
 }
 
 export async function getCommunityCommentByIdService(
