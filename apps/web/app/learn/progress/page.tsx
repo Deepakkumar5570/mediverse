@@ -115,7 +115,7 @@ export default async function ProgressPage() {
               Keep going.
               <br />
               <span className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-700 bg-clip-text text-transparent">
-                You're making progress.
+                You&apos;re making progress.
               </span>
             </h2>
 
@@ -218,11 +218,11 @@ export default async function ProgressPage() {
               <div className="text-3xl">🎉</div>
 
               <h3 className="mt-4 text-lg font-semibold text-slate-900">
-                You're all caught up!
+                You&apos;re all caught up!
               </h3>
 
               <p className="mt-2 text-sm text-slate-500">
-                You've completed all available lessons in your learning path.
+                You&apos;ve completed all available lessons in your learning path.
               </p>
             </div>
           )}
@@ -305,7 +305,7 @@ export default async function ProgressPage() {
               </div>
 
               <p className="mt-4 text-xs font-medium text-emerald-600/70">
-                Lessons you've completed
+                Lessons you&apos;ve completed
               </p>
             </div>
 
@@ -456,11 +456,11 @@ export default async function ProgressPage() {
 
                 <p className="text-sm font-medium text-slate-600">
                   {summary.percentage === 100
-                    ? "Amazing. You've completed your entire learning path."
+                    ? "Amazing. You&apos;ve completed your entire learning path."
                     : summary.percentage >= 75
-                      ? "You're almost there. Keep the momentum going."
+                      ? "You&apos;re almost there. Keep the momentum going."
                       : summary.percentage >= 50
-                        ? "You're halfway there. Keep building your streak."
+                        ? "You&apos;re halfway there. Keep building your streak."
                         : summary.percentage > 0
                           ? "A great start. Keep learning one lesson at a time."
                           : "Your journey starts here. Complete your first lesson."}
@@ -506,7 +506,7 @@ export default async function ProgressPage() {
                   </h3>
 
                   <p className="mt-1 text-sm text-slate-500">
-                    See how you're progressing through each subject.
+                    See how you&apos;re progressing through each subject.
                   </p>
                 </div>
 
@@ -808,7 +808,7 @@ export default async function ProgressPage() {
                   </h3>
 
                   <p className="mt-1 text-sm text-slate-500">
-                    A quick look at what you've worked on recently.
+                    A quick look at what you&apos;ve worked on recently.
                   </p>
                 </div>
 

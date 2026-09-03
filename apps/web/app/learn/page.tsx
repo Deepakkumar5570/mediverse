@@ -136,7 +136,7 @@ export default async function LearnPage() {
           </p>
 
           <p className="mt-3 text-xs text-slate-400">
-            Lessons you've completed
+            Lessons you&apos;ve completed
           </p>
         </div>
 
@@ -323,7 +323,7 @@ export default async function LearnPage() {
         ) : (
           <div className="p-8 text-center">
             <p className="text-sm font-medium text-slate-700">
-              You're all caught up.
+              You&apos;re all caught up.
             </p>
 
             <p className="mt-1 text-sm text-slate-500">

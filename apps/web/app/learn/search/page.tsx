@@ -1,11 +1,6 @@
-import {
-    PageTemplate,
-    Section,
-} from "@/src/components/learn";
-
-import {
-    LearnSearch,
-} from "@/src/features/learn/search";
+import { Suspense } from "react";
+import { PageTemplate, Section } from "@/src/components/learn";
+import { LearnSearch } from "@/src/features/learn/search";
 
 export default function LearnSearchPage() {
     return (
@@ -30,11 +25,10 @@ export default function LearnSearchPage() {
                 },
             ]}
         >
-            <Section
-                id="search"
-                title="Search MediVerse"
-            >
-                <LearnSearch />
+            <Section id="search" title="Search MediVerse">
+                <Suspense fallback={<div>Loading search...</div>}>
+                    <LearnSearch />
+                </Suspense>
             </Section>
         </PageTemplate>
     );

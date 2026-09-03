@@ -51,11 +51,11 @@ export default async function UnitDetailsPage({
 
     const progressMessage =
         unitProgress.percentage === 100
-            ? "You've completed this entire unit."
+            ? "You&apos;ve completed this entire unit."
             : unitProgress.percentage >= 75
-                ? "You're almost done. Keep going."
+                ? "You&apos;re almost done. Keep going."
                 : unitProgress.percentage >= 50
-                    ? "You're more than halfway through. Keep the momentum going."
+                    ? "You&apos;re more than halfway through. Keep the momentum going."
                     : unitProgress.percentage > 0
                         ? "Good progress. Keep learning one topic at a time."
                         : "Start your journey by exploring the first topic.";
@@ -155,7 +155,7 @@ export default async function UnitDetailsPage({
                     </p>
 
                     <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
-                        Understand what you'll learn.
+                        Understand what you&apos;ll learn.
                     </h2>
 
                     <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">

@@ -29,17 +29,17 @@ export async function createProgramRepository(
       .returning();
 
     return result[0];
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("========== DATABASE ERROR ==========");
-    console.error("Name:", error?.name);
-    console.error("Message:", error?.message);
-    console.error("Code:", error?.code);
-    console.error("Detail:", error?.detail);
-    console.error("Constraint:", error?.constraint);
-    console.error("Column:", error?.column);
-    console.error("Table:", error?.table);
-    console.error("Schema:", error?.schema);
+
+    if (error instanceof Error) {
+      console.error("Name:", error.name);
+      console.error("Message:", error.message);
+      console.error("Stack:", error.stack);
+    }
+
     console.error(error);
+
     throw error;
   }
 }

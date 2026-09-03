@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+// import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { createContentAction } from "../actions/create-content";
@@ -117,30 +118,30 @@ export function ContentForm({
     status: initialData?.status ?? "draft",
   });
 
-  useEffect(() => {
-    if (!initialData) return;
+  // useEffect(() => {
+  //   if (!initialData) return;
 
-    setForm({
-      programId: initialData.programId,
-      semesterId: initialData.semesterId,
-      subjectId: initialData.subjectId,
-      unitId: initialData.unitId,
-      topicId: initialData.topicId,
-      subtopicId: initialData.subtopicId,
+  //   setForm({
+  //     programId: initialData.programId,
+  //     semesterId: initialData.semesterId,
+  //     subjectId: initialData.subjectId,
+  //     unitId: initialData.unitId,
+  //     topicId: initialData.topicId,
+  //     subtopicId: initialData.subtopicId,
 
-      title: initialData.title,
-      slug: initialData.slug,
-      summary: initialData.summary,
-      content: initialData.content,
+  //     title: initialData.title,
+  //     slug: initialData.slug,
+  //     summary: initialData.summary,
+  //     content: initialData.content,
 
-      readingTime: initialData.readingTime,
+  //     readingTime: initialData.readingTime,
 
-      seoTitle: initialData.seoTitle,
-      seoDescription: initialData.seoDescription,
+  //     seoTitle: initialData.seoTitle,
+  //     seoDescription: initialData.seoDescription,
 
-      status: initialData.status,
-    });
-  }, [initialData]);
+  //     status: initialData.status,
+  //   });
+  // }, [initialData]);
 
   const filteredSemesters = useMemo(() => {
     return semesters.filter(

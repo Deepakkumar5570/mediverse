@@ -485,7 +485,7 @@ export default async function HomePage() {
 
                     <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
                       Select your academic program and MediVerse takes
-                      you through the curriculum step by step. You don't
+                      you through the curriculum step by step. You don&apos;t
                       need to figure out where every subject or topic
                       belongs.
                     </p>

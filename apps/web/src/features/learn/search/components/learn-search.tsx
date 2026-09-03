@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { searchLearnAction } from "../actions";
 
@@ -26,8 +26,11 @@ type SearchResult = {
 
 export function LearnSearch() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [query, setQuery] = useState("");
+  const initialQuery = searchParams.get("q")?.trim() ?? "";
+
+  const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -76,17 +79,16 @@ export function LearnSearch() {
    * 3. displays the results
    */
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const initialQuery = params.get("q")?.trim() ?? "";
-
     if (!initialQuery) {
       return;
     }
 
-    setQuery(initialQuery);
+    const timer = window.setTimeout(() => {
+      void runSearch(initialQuery);
+    }, 0);
 
-    void runSearch(initialQuery);
-  }, [runSearch]);
+    return () => window.clearTimeout(timer);
+  }, [initialQuery, runSearch]);
 
   async function handleSearch() {
     const value = query.trim();
@@ -313,9 +315,8 @@ export function LearnSearch() {
 
             <h3 className="mt-1 text-xl font-semibold tracking-tight text-slate-900">
               {results.length > 0
-                ? `${results.length} result${
-                    results.length === 1 ? "" : "s"
-                  } found`
+                ? `${results.length} result${results.length === 1 ? "" : "s"
+                } found`
                 : "No results found"}
             </h3>
 
@@ -323,7 +324,7 @@ export function LearnSearch() {
               <p className="mt-1 text-sm text-slate-500">
                 Results for{" "}
                 <span className="font-medium text-slate-700">
-                  "{query.trim()}"
+                  &quot;{query.trim()}&quot;
                 </span>
               </p>
             )}
