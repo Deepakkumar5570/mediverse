@@ -1,7 +1,8 @@
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 
 import {
   communityCommentLikes,
+  communityComments,
   db,
 } from "@mediverse/database";
 
@@ -85,4 +86,29 @@ export async function getCommunityCommentLikeCountRepository(
     );
 
   return result?.count ?? 0;
+}
+
+export async function getCommunityCommentLikeCountByAuthorRepository(
+  authorId: string,
+) {
+  const result = await db
+    .select({
+      count: sql<number>`count(*)`,
+    })
+    .from(communityCommentLikes)
+    .innerJoin(
+      communityComments,
+      eq(
+        communityCommentLikes.commentId,
+        communityComments.id,
+      ),
+    )
+    .where(
+      eq(
+        communityComments.authorId,
+        authorId,
+      ),
+    );
+
+  return Number(result[0]?.count ?? 0);
 }

@@ -1,5 +1,7 @@
 "use client";
 
+
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
@@ -207,28 +209,35 @@ export function CommunityComments({
                 className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
               >
                 <div className="flex items-start gap-3">
-                  {/* Author Avatar */}
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-sm font-black text-indigo-700">
-                    {author?.imageUrl ? (
-                      <img
-                        src={author.imageUrl}
-                        alt={author.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      (
-                        author?.name?.[0] ?? "M"
-                      ).toUpperCase()
-                    )}
-                  </div>
+                  <Link
+                    href={`/learn/community/profile/${comment.authorId}`}
+                    className="shrink-0"
+                    aria-label={`View ${author?.name ?? "MediVerse Member"} profile`}
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-sm font-black text-indigo-700 transition hover:ring-2 hover:ring-indigo-200 hover:ring-offset-2">
+                      {author?.imageUrl ? (
+                        <img
+                          src={author.imageUrl}
+                          alt={author.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        (
+                          author?.name?.[0] ?? "M"
+                        ).toUpperCase()
+                      )}
+                    </div>
+                  </Link>
 
                   <div className="min-w-0 flex-1">
                     {/* Header */}
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm font-bold text-slate-900">
-                        {author?.name ??
-                          "MediVerse Member"}
-                      </span>
+                      <Link
+                        href={`/learn/community/profile/${comment.authorId}`}
+                        className="text-sm font-bold text-slate-900 transition hover:text-indigo-600"
+                      >
+                        {author?.name ?? "MediVerse Member"}
+                      </Link>
 
                       <span className="text-xs text-slate-400">
                         {formatDate(comment.createdAt)}
@@ -236,10 +245,10 @@ export function CommunityComments({
 
                       {comment.updatedAt.getTime() !==
                         comment.createdAt.getTime() && (
-                        <span className="text-[11px] font-medium text-slate-400">
-                          Edited
-                        </span>
-                      )}
+                          <span className="text-[11px] font-medium text-slate-400">
+                            Edited
+                          </span>
+                        )}
                     </div>
 
                     {/* Content / Edit */}

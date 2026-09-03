@@ -3,6 +3,7 @@ import {
   deleteCommunityCommentLikeRepository,
   getCommunityCommentLikeCountRepository,
   getCommunityCommentLikeRepository,
+  getCommunityCommentLikeCountByAuthorRepository,
 } from "../repositories";
 
 export async function toggleCommunityCommentLikeService(
@@ -69,5 +70,13 @@ export async function getCommunityCommentLikeCountService(
 ) {
   return getCommunityCommentLikeCountRepository(
     commentId,
+  );
+}
+
+export async function getCommunityCommentLikeCountByAuthorService(
+  authorId: string,
+) {
+  return getCommunityCommentLikeCountByAuthorRepository(
+    authorId,
   );
 }

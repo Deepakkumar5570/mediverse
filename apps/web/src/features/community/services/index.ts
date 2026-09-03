@@ -7,3 +7,7 @@ export {
   getCommunityAuthors,
   type CommunityAuthor,
 } from "./community-author.service";
+
+export {
+  getCommunityProfileActivity,
+} from "./community-profile.service";

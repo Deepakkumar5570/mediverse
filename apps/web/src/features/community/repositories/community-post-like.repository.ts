@@ -1,7 +1,8 @@
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 
 import {
   communityPostLikes,
+  communityPosts,
   db,
 } from "@mediverse/database";
 
@@ -16,8 +17,14 @@ export async function getCommunityPostLikeRepository(
     .from(communityPostLikes)
     .where(
       and(
-        eq(communityPostLikes.postId, postId),
-        eq(communityPostLikes.userId, userId),
+        eq(
+          communityPostLikes.postId,
+          postId,
+        ),
+        eq(
+          communityPostLikes.userId,
+          userId,
+        ),
       ),
     )
     .limit(1);
@@ -48,8 +55,14 @@ export async function deleteCommunityPostLikeRepository(
     .delete(communityPostLikes)
     .where(
       and(
-        eq(communityPostLikes.postId, postId),
-        eq(communityPostLikes.userId, userId),
+        eq(
+          communityPostLikes.postId,
+          postId,
+        ),
+        eq(
+          communityPostLikes.userId,
+          userId,
+        ),
       ),
     )
     .returning();
@@ -65,7 +78,37 @@ export async function getCommunityPostLikeCountRepository(
       count: count(communityPostLikes.id),
     })
     .from(communityPostLikes)
-    .where(eq(communityPostLikes.postId, postId));
+    .where(
+      eq(
+        communityPostLikes.postId,
+        postId,
+      ),
+    );
 
   return result?.count ?? 0;
+}
+
+export async function getCommunityPostLikeCountByAuthorRepository(
+  authorId: string,
+) {
+  const result = await db
+    .select({
+      count: sql<number>`count(*)`,
+    })
+    .from(communityPostLikes)
+    .innerJoin(
+      communityPosts,
+      eq(
+        communityPostLikes.postId,
+        communityPosts.id,
+      ),
+    )
+    .where(
+      eq(
+        communityPosts.authorId,
+        authorId,
+      ),
+    );
+
+  return Number(result[0]?.count ?? 0);
 }

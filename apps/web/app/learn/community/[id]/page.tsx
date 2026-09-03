@@ -17,6 +17,7 @@ import {
 import {
   CommunityComments,
   CommunityPostLikeButton,
+  CommunityPostOwnerActions,
   CreateCommentForm,
 } from "@/src/features/community/components";
 
@@ -79,8 +80,8 @@ export default async function CommunityPostPage({
             ),
             userId
               ? getCommunityCommentLikeStatusAction(
-                  comment.id,
-                )
+                comment.id,
+              )
               : Promise.resolve(null),
           ]);
 
@@ -102,6 +103,9 @@ export default async function CommunityPostPage({
   const postAuthor =
     authors[post.authorId];
 
+  const isPostOwner =
+    userId === post.authorId;
+
   return (
     <LearnLayout>
       <div className="mx-auto w-full max-w-4xl">
@@ -115,7 +119,7 @@ export default async function CommunityPostPage({
 
         {/* Post */}
         <article className="mt-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
-          {/* Category */}
+          {/* Category + Date */}
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-indigo-700">
               {post.category}
@@ -133,9 +137,11 @@ export default async function CommunityPostPage({
             {post.title}
           </h1>
 
-          {/* Author */}
-          <div className="mt-6 flex items-center gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-sm font-black text-indigo-700">
+          <Link
+            href={`/learn/community/profile/${post.authorId}`}
+            className="mt-6 flex items-center gap-3 group"
+          >
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-sm font-black text-indigo-700 transition group-hover:ring-2 group-hover:ring-indigo-200 group-hover:ring-offset-2">
               {postAuthor?.imageUrl ? (
                 <img
                   src={postAuthor.imageUrl}
@@ -151,7 +157,7 @@ export default async function CommunityPostPage({
             </div>
 
             <div className="min-w-0">
-              <p className="text-sm font-bold text-slate-900">
+              <p className="text-sm font-bold text-slate-900 transition group-hover:text-indigo-600">
                 {postAuthor?.name ??
                   "MediVerse Member"}
               </p>
@@ -160,29 +166,35 @@ export default async function CommunityPostPage({
                 MediVerse contributor
               </p>
             </div>
-          </div>
+          </Link>
 
-          {/* Content */}
-          <div className="mt-7">
-            <p className="whitespace-pre-wrap text-sm leading-8 text-slate-600 sm:text-base">
-              {post.content}
-            </p>
-          </div>
-
-          {/* Post Like */}
+          {/* Post Actions */}
           <div className="mt-7 border-t border-slate-100 pt-6">
-            <CommunityPostLikeButton
-              postId={post.id}
-              initialLiked={
-                likeStatus?.liked ?? false
-              }
-              initialLikeCount={
-                likeStatus?.likeCount ?? likeCount
-              }
-              isAuthenticated={Boolean(
-                userId,
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Like */}
+              <CommunityPostLikeButton
+                postId={post.id}
+                initialLiked={
+                  likeStatus?.liked ?? false
+                }
+                initialLikeCount={
+                  likeStatus?.likeCount ?? likeCount
+                }
+                isAuthenticated={Boolean(
+                  userId,
+                )}
+              />
+
+              {/* Owner Actions */}
+              {isPostOwner && (
+                <CommunityPostOwnerActions
+                  postId={post.id}
+                  initialTitle={post.title}
+                  initialContent={post.content}
+                  initialCategory={post.category}
+                />
               )}
-            />
+            </div>
           </div>
         </article>
 

@@ -166,10 +166,9 @@ export default async function CommunityPage() {
               const author = authors[post.authorId];
 
               return (
-                <Link
+                <article
                   key={post.id}
-                  href={`/learn/community/${post.id}`}
-                  className="group block rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md sm:p-7"
+                  className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md sm:p-7"
                 >
                   <div className="flex flex-col gap-5">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -186,15 +185,26 @@ export default async function CommunityPage() {
                           </span>
                         </div>
 
-                        <h3 className="mt-3 text-xl font-black tracking-tight text-slate-950 transition group-hover:text-indigo-700">
-                          {post.title}
-                        </h3>
+                        <Link
+                          href={`/learn/community/${post.id}`}
+                          className="block"
+                        >
+                          <h3 className="mt-3 text-xl font-black tracking-tight text-slate-950 transition hover:text-indigo-700">
+                            {post.title}
+                          </h3>
+                        </Link>
                       </div>
                     </div>
 
                     {/* Author */}
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-sm font-black text-indigo-700">
+                    <Link
+                      href={`/learn/community/profile/${post.authorId}`}
+                      className="group/author flex w-fit items-center gap-3 rounded-2xl -m-2 p-2 transition hover:bg-indigo-50/70"
+                      aria-label={`View ${
+                        author?.name ?? "MediVerse Member"
+                      } profile`}
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-sm font-black text-indigo-700 transition group-hover/author:ring-2 group-hover/author:ring-indigo-200 group-hover/author:ring-offset-2">
                         {author?.imageUrl ? (
                           <img
                             src={author.imageUrl}
@@ -209,7 +219,7 @@ export default async function CommunityPage() {
                       </div>
 
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-bold text-slate-900">
+                        <p className="truncate text-sm font-bold text-slate-900 transition group-hover/author:text-indigo-600">
                           {author?.name ??
                             "MediVerse Member"}
                         </p>
@@ -218,23 +228,28 @@ export default async function CommunityPage() {
                           MediVerse contributor
                         </p>
                       </div>
-                    </div>
+                    </Link>
 
-                    <p className="whitespace-pre-wrap text-sm leading-7 text-slate-600">
-                      {post.content}
-                    </p>
+                    <Link
+                      href={`/learn/community/${post.id}`}
+                      className="block"
+                    >
+                      <p className="whitespace-pre-wrap text-sm leading-7 text-slate-600">
+                        {post.content}
+                      </p>
 
-                    <div className="flex items-center justify-between border-t border-slate-100 pt-4">
-                      <span className="text-xs font-semibold text-slate-400">
-                        View discussion
-                      </span>
+                      <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+                        <span className="text-xs font-semibold text-slate-400">
+                          View discussion
+                        </span>
 
-                      <span className="text-sm font-bold text-indigo-600 transition group-hover:translate-x-1">
-                        →
-                      </span>
-                    </div>
+                        <span className="text-sm font-bold text-indigo-600 transition group-hover:translate-x-1">
+                          →
+                        </span>
+                      </div>
+                    </Link>
                   </div>
-                </Link>
+                </article>
               );
             })}
           </div>
