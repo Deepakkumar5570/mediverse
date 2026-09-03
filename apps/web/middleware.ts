@@ -1,3 +1,38 @@
+// import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+
+// const isProtectedRoute = createRouteMatcher([
+//   "/dashboard(.*)",
+//   "/admin(.*)",
+//   "/learn/progress(.*)",
+// ]);
+
+// export default clerkMiddleware(
+//   async (auth, req) => {
+//     if (isProtectedRoute(req)) {
+//       await auth.protect();
+//     }
+//   },
+//   {
+//     frontendApiProxy: {
+//       enabled: true,
+//       path: "/_clerk",
+//     },
+//   },
+// );
+
+// export const config = {
+//   matcher: [
+//     "/((?!_next|.*\\..*).*)",
+//     "/",
+//     "/(api|trpc)(.*)",
+//     "/_clerk/(.*)",
+//   ],
+// };
+
+
+
+
+
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isProtectedRoute = createRouteMatcher([
