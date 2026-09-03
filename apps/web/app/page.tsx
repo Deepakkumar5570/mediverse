@@ -1,9 +1,6 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
-import {
-  SignInButton,
-  SignUpButton,
-} from "@clerk/nextjs";
+
 
 /* =========================================================
    EXPLORE CARDS
@@ -708,27 +705,19 @@ export default async function HomePage() {
 
                 <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
 
-                  <SignUpButton mode="modal">
+                  <Link
+                    href="/sign-up"
+                    className="rounded-xl bg-white px-6 py-3 text-center text-sm font-bold text-indigo-700 transition hover:bg-indigo-50"
+                  >
+                    Create Free Account
+                  </Link>
 
-                    <button
-                      type="button"
-                      className="rounded-xl bg-white px-6 py-3 text-sm font-bold text-indigo-700 transition hover:bg-indigo-50"
-                    >
-                      Create Free Account
-                    </button>
-
-                  </SignUpButton>
-
-                  <SignInButton mode="modal">
-
-                    <button
-                      type="button"
-                      className="rounded-xl border border-white/30 bg-white/10 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/20"
-                    >
-                      Sign In
-                    </button>
-
-                  </SignInButton>
+                  <Link
+                    href="/sign-in"
+                    className="rounded-xl border border-white/30 bg-white/10 px-6 py-3 text-center text-sm font-bold text-white transition hover:bg-white/20"
+                  >
+                    Sign In
+                  </Link>
 
                 </div>
 

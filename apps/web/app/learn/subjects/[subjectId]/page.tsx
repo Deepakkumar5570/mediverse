@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 
 import {
     ExplorerGrid,
@@ -42,10 +43,21 @@ export default async function SubjectDetailsPage({
         subjectId,
     );
 
-    const subjectProgress =
-        await getSingleSubjectProgressAction(
-            subjectId,
-        );
+    /*
+     * Progress is personalized data.
+     *
+     * The subject page itself must remain publicly accessible
+     * for logged-out users and SEO.
+     *
+     * Therefore:
+     * - Logged-in user → fetch actual progress
+     * - Logged-out user → don't call the protected progress action
+     */
+    const { userId } = await auth();
+
+    const subjectProgress = userId
+        ? await getSingleSubjectProgressAction(subjectId)
+        : null;
 
     const {
         subject,
@@ -53,10 +65,12 @@ export default async function SubjectDetailsPage({
         program,
     } = details;
 
-    const progress = Math.min(
-        100,
-        Math.max(0, subjectProgress.percentage),
-    );
+    const progress = subjectProgress
+        ? Math.min(
+              100,
+              Math.max(0, subjectProgress.percentage),
+          )
+        : 0;
 
     return (
         <LearnLayout>
@@ -216,8 +230,9 @@ export default async function SubjectDetailsPage({
                     </div>
 
                     <span className="text-sm font-semibold text-slate-400">
-                        {subjectProgress.completed} of{" "}
-                        {subjectProgress.total} lessons completed
+                        {subjectProgress
+                            ? `${subjectProgress.completed} of ${subjectProgress.total} lessons completed`
+                            : "Sign in to track your progress"}
                     </span>
                 </div>
 
@@ -240,11 +255,13 @@ export default async function SubjectDetailsPage({
                                     </p>
 
                                     <p className="mt-1 text-xs leading-5 text-slate-500">
-                                        {progress === 100
-                                            ? "You completed this subject."
-                                            : progress > 0
-                                                ? "Keep learning one lesson at a time."
-                                                : "Start your first lesson to begin."}
+                                        {!subjectProgress
+                                            ? "Sign in to save your learning progress."
+                                            : progress === 100
+                                                ? "You completed this subject."
+                                                : progress > 0
+                                                    ? "Keep learning one lesson at a time."
+                                                    : "Start your first lesson to begin."}
                                     </p>
                                 </div>
                             </div>
