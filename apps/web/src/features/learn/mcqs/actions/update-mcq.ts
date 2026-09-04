@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import { requireAdmin } from "@/src/lib/auth/require-admin";
+
 import { updateMcqService } from "../services";
 import {
   createMcqSchema,
@@ -12,6 +14,8 @@ export async function updateMcqAction(
   id: string,
   input: CreateMcqInput,
 ) {
+  await requireAdmin();
+
   const data = createMcqSchema.parse(input);
 
   const mcq = await updateMcqService(

@@ -3,15 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { requireAdmin } from "@/src/lib/auth/require-admin";
+
 import { createProgramService } from "../services/program.service";
 import { CreateProgramSchema } from "../validations/program.schema";
 
 export async function createProgramAction(formData: FormData) {
-  console.log("FORM DATA");
-
-  for (const [key, value] of formData.entries()) {
-    console.log(key, value);
-  }
+  await requireAdmin();
 
   const data = CreateProgramSchema.parse({
     name: formData.get("name"),
@@ -29,6 +27,5 @@ export async function createProgramAction(formData: FormData) {
   await createProgramService(data);
 
   revalidatePath("/admin/programs");
-
   redirect("/admin/programs");
 }

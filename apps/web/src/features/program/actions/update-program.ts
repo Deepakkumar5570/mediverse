@@ -3,12 +3,16 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { requireAdmin } from "@/src/lib/auth/require-admin";
+
 import { updateProgramService } from "../services/program.service";
 import { CreateProgramSchema } from "../validations/program.schema";
 
 export async function updateProgramAction(
   formData: FormData,
 ) {
+  await requireAdmin();
+
   const id = String(formData.get("id"));
 
   if (!id) {
@@ -33,6 +37,5 @@ export async function updateProgramAction(
   await updateProgramService(id, data);
 
   revalidatePath("/admin/programs");
-
   redirect("/admin/programs");
 }

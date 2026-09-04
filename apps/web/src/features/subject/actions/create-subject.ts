@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import { requireAdmin } from "@/src/lib/auth/require-admin";
+
 import { createSubjectService } from "../services";
 import {
   CreateSubjectSchema,
@@ -9,8 +11,10 @@ import {
 } from "../validations/subject.schema";
 
 export async function createSubjectAction(
-  input: CreateSubjectInput
+  input: CreateSubjectInput,
 ) {
+  await requireAdmin();
+
   const data = CreateSubjectSchema.parse(input);
 
   await createSubjectService(data);

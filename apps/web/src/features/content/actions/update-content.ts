@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 
-import { updateContentService } from "../services";
+import { requireAdmin } from "@/src/lib/auth/require-admin";
 
+import { updateContentService } from "../services";
 import {
   createContentSchema,
   type CreateContentInput,
@@ -13,6 +14,8 @@ export async function updateContentAction(
   id: string,
   input: CreateContentInput
 ) {
+  await requireAdmin();
+
   const data = createContentSchema.parse(input);
 
   await updateContentService(id, data);

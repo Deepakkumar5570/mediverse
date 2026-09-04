@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import { requireAdmin } from "@/src/lib/auth/require-admin";
+
 import { createSubtopicService } from "../services";
 import {
   createSubtopicSchema,
@@ -9,8 +11,10 @@ import {
 } from "../validations";
 
 export async function createSubtopicAction(
-  input: CreateSubtopicInput
+  input: CreateSubtopicInput,
 ) {
+  await requireAdmin();
+
   const data = createSubtopicSchema.parse(input);
 
   await createSubtopicService(data);

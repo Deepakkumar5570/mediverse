@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import { requireAdmin } from "@/src/lib/auth/require-admin";
+
 import { createUnitService } from "../services";
 import {
   CreateUnitSchema,
@@ -9,8 +11,10 @@ import {
 } from "../validations";
 
 export async function createUnitAction(
-  input: CreateUnitInput
+  input: CreateUnitInput,
 ) {
+  await requireAdmin();
+
   const data = CreateUnitSchema.parse(input);
 
   await createUnitService(data);
