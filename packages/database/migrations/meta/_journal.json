@@ -127,6 +127,13 @@
       "when": 1788888558615,
       "tag": "0017_special_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1788893423790,
+      "tag": "0018_nervous_namora",
+      "breakpoints": true
     }
   ]
 }

@@ -1,63 +1,64 @@
-type ProfileStatsProps = {
-  totalLessons: number;
-  completedLessons: number;
-  percentage: number;
+type Props = {
+  summary: {
+    total: number;
+    completed: number;
+    remaining: number;
+    percentage: number;
+  };
+
+  mcqStats: {
+    attempted: number;
+    correct: number;
+    wrong: number;
+    accuracy: number;
+  };
 };
 
 export function ProfileStats({
-  totalLessons,
-  completedLessons,
-  percentage,
-}: ProfileStatsProps) {
-  const remaining = Math.max(totalLessons - completedLessons, 0);
-
-  const stats = [
-    {
-      label: "Total Lessons",
-      value: totalLessons,
-      icon: "📚",
-    },
-    {
-      label: "Completed",
-      value: completedLessons,
-      icon: "✓",
-    },
-    {
-      label: "Remaining",
-      value: remaining,
-      icon: "🌱",
-    },
-    {
-      label: "MCQs Attempted",
-      value: "—",
-      icon: "🧠",
-    },
-  ];
-
+  summary,
+  mcqStats,
+}: Props) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {stats.map((stat) => (
-        <div
-          key={stat.label}
-          className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-        >
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                {stat.label}
-              </p>
+      <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <p className="text-sm font-semibold text-slate-500">
+          Total Lessons
+        </p>
 
-              <p className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-                {stat.value}
-              </p>
-            </div>
+        <p className="mt-2 text-3xl font-black text-slate-950">
+          {summary.total}
+        </p>
+      </div>
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100">
-              {stat.icon}
-            </div>
-          </div>
-        </div>
-      ))}
+      <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <p className="text-sm font-semibold text-slate-500">
+          Completed
+        </p>
+
+        <p className="mt-2 text-3xl font-black text-emerald-600">
+          {summary.completed}
+        </p>
+      </div>
+
+      <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <p className="text-sm font-semibold text-slate-500">
+          Remaining
+        </p>
+
+        <p className="mt-2 text-3xl font-black text-orange-600">
+          {summary.remaining}
+        </p>
+      </div>
+
+      <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <p className="text-sm font-semibold text-slate-500">
+          MCQs Attempted
+        </p>
+
+        <p className="mt-2 text-3xl font-black text-indigo-600">
+          {mcqStats.attempted}
+        </p>
+      </div>
     </div>
   );
 }

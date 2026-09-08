@@ -13,7 +13,13 @@
 //   getSubtopicProgressRepository,
 // } from "../repositories/progress.repository";
 
+import {
+  awardXpService,
+} from "@/src/features/gamification/points/xp.service";
 
+import {
+  XP_REWARDS,
+} from "@/src/features/gamification/points/xp-rules";
 
 import {
   getProgressByUserRepository,
@@ -97,13 +103,32 @@ export async function getContentProgressService(
 }
 
 export async function completeContentService(
-    userId: string,
-    contentId: string
+  userId: string,
+  contentId: string,
 ) {
-    return markContentCompleteRepository(
-        userId,
-        contentId
+  const progress =
+    await markContentCompleteRepository(
+      userId,
+      contentId,
     );
+
+  try {
+    await awardXpService(userId, {
+      eventKey: `lesson:completed:${contentId}`,
+      eventType: "lesson_completed",
+      points:
+        XP_REWARDS.LESSON_COMPLETED,
+      referenceType: "content",
+      referenceId: contentId,
+    });
+  } catch (error) {
+    console.error(
+      "Failed to award lesson XP:",
+      error,
+    );
+  }
+
+  return progress;
 }
 
 export async function incompleteContentService(

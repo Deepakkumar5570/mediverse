@@ -3,6 +3,10 @@ import { currentUser } from "@clerk/nextjs/server";
 import { LearnLayout } from "@/src/components/learn";
 
 import {
+  getGamificationStatsAction,
+} from "@/src/features/gamification";
+
+import {
   getContinueLearningAction,
   getProgressSummaryAction,
 } from "@/src/features/progress";
@@ -14,8 +18,6 @@ import {
   getProfileAction,
   ProfileDashboard,
 } from "@/src/features/profile";
-
-
 
 export default async function ProfilePage() {
   const user = await currentUser();
@@ -30,12 +32,14 @@ export default async function ProfilePage() {
     continueLearning,
     mcqStats,
     activityStats,
+    gamificationStats,
   ] = await Promise.all([
     getProfileAction(),
     getProgressSummaryAction(),
     getContinueLearningAction(),
     getMcqStatsAction(),
     getActivityStatsAction(),
+    getGamificationStatsAction(),
   ]);
 
   const name =
@@ -58,8 +62,8 @@ export default async function ProfilePage() {
           </h1>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-            Your learning, practice, activity, and achievements — all in one
-            place.
+            Your learning, practice, activity, and
+            achievements — all in one place.
           </p>
         </div>
 
@@ -73,6 +77,7 @@ export default async function ProfilePage() {
           continueLearning={continueLearning}
           mcqStats={mcqStats}
           activityStats={activityStats}
+          gamificationStats={gamificationStats}
         />
       </main>
     </LearnLayout>

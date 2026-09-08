@@ -19,3 +19,6 @@ export * from "./schema/profile.schema";
 
 export * from "./schema/practice-session.schema";
 export * from "./schema/mcq-attempt.schema";
+
+export * from "./schema/user-gamification.schema";
+export * from "./schema/xp-event.schema";
