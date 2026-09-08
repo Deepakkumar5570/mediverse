@@ -14,3 +14,5 @@ export * from "./schema/community-post.schema";
 export * from "./schema/community-comment.schema";
 export * from "./schema/community-post-like.schema";
 export * from "./schema/community-comment-like.schema";
+
+export * from "./schema/profile.schema";
