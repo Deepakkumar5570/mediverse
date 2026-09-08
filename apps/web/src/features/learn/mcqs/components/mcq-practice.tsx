@@ -1,8 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { submitMcqAnswerAction } from "../actions";
+
+import {
+  completePracticeSessionAction,
+  createPracticeSessionAction,
+  recordMcqAttemptAction,
+} from "@/src/features/learn/practice/practice-analytics.actions";
 
 type MCQ = {
   id: string;
@@ -18,6 +24,7 @@ type MCQ = {
 
 type Props = {
   mcqs: MCQ[];
+  practiceMode?: "quick" | "topic" | "random";
 };
 
 type Result = {
@@ -32,15 +39,63 @@ const options = [
   { key: 4, label: "D" },
 ] as const;
 
-export function MCQPractice({ mcqs }: Props) {
+export function MCQPractice({
+  mcqs,
+  practiceMode = "topic",
+}: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
+
   const [selectedOption, setSelectedOption] =
     useState<number | null>(null);
+
   const [result, setResult] =
     useState<Result | null>(null);
+
   const [submitting, setSubmitting] =
     useState(false);
+
   const [score, setScore] = useState(0);
+
+  const [sessionId, setSessionId] =
+    useState<string | null>(null);
+
+  const [sessionCreating, setSessionCreating] =
+    useState(true);
+
+  const [questionStartedAt, setQuestionStartedAt] =
+    useState(() => Date.now());
+
+  const [practiceRun, setPracticeRun] =
+    useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function createSession() {
+      try {
+        const session =
+          await createPracticeSessionAction(
+            practiceMode,
+          );
+
+        if (!cancelled) {
+          setSessionId(session.id);
+        }
+      } catch {
+        // Guest users can still practice.
+      } finally {
+        if (!cancelled) {
+          setSessionCreating(false);
+        }
+      }
+    }
+
+    void createSession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [practiceMode, practiceRun]);
 
   if (mcqs.length === 0) {
     return (
@@ -73,7 +128,8 @@ export function MCQPractice({ mcqs }: Props) {
     if (
       selectedOption === null ||
       submitting ||
-      result
+      result ||
+      sessionCreating
     ) {
       return;
     }
@@ -93,8 +149,53 @@ export function MCQPractice({ mcqs }: Props) {
 
       setResult(response);
 
+      const newScore =
+        score + (response.correct ? 1 : 0);
+
       if (response.correct) {
         setScore((previous) => previous + 1);
+      }
+
+      if (sessionId) {
+        const timeTaken = Math.max(
+          0,
+          Math.round(
+            (Date.now() - questionStartedAt) /
+              1000,
+          ),
+        );
+
+        try {
+          await recordMcqAttemptAction({
+            sessionId,
+            mcqId: current.id,
+            selectedOption,
+            correct: response.correct,
+            timeTaken,
+          });
+        } catch (error) {
+          console.error(
+            "Failed to record MCQ attempt:",
+            error,
+          );
+        }
+
+        if (isLastQuestion) {
+          try {
+            await completePracticeSessionAction({
+              sessionId,
+              totalQuestions: mcqs.length,
+              correctAnswers: newScore,
+              wrongAnswers:
+                mcqs.length - newScore,
+            });
+          } catch (error) {
+            console.error(
+              "Failed to complete practice session:",
+              error,
+            );
+          }
+        }
       }
     } finally {
       setSubmitting(false);
@@ -112,6 +213,7 @@ export function MCQPractice({ mcqs }: Props) {
 
     setSelectedOption(null);
     setResult(null);
+    setQuestionStartedAt(Date.now());
   }
 
   function handleRestart() {
@@ -119,6 +221,15 @@ export function MCQPractice({ mcqs }: Props) {
     setSelectedOption(null);
     setResult(null);
     setScore(0);
+
+    setSessionId(null);
+    setSessionCreating(true);
+
+    setQuestionStartedAt(Date.now());
+
+    setPracticeRun(
+      (previous) => previous + 1,
+    );
   }
 
   if (currentIndex >= mcqs.length) {
@@ -303,14 +414,17 @@ export function MCQPractice({ mcqs }: Props) {
               type="button"
               disabled={
                 selectedOption === null ||
-                submitting
+                submitting ||
+                sessionCreating
               }
               onClick={handleSubmit}
               className="rounded-xl bg-slate-950 px-6 py-3 text-sm font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {submitting
-                ? "Checking..."
-                : "Check Answer"}
+              {sessionCreating
+                ? "Starting..."
+                : submitting
+                  ? "Checking..."
+                  : "Check Answer"}
             </button>
           ) : isLastQuestion ? (
             <button

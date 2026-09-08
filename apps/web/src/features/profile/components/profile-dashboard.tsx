@@ -8,17 +8,20 @@ type ProfileDashboardProps = {
     name: string;
     imageUrl?: string | null;
   };
+
   profile: {
     username?: string | null;
     bio?: string | null;
     programName?: string | null;
     semesterName?: string | null;
   } | null;
+
   summary: {
     total: number;
     completed: number;
     percentage: number;
   };
+
   continueLearning: {
     contentTitle: string;
     subjectName: string;
@@ -26,6 +29,13 @@ type ProfileDashboardProps = {
     topicTitle: string;
     subtopicId: string;
   } | null;
+
+  mcqStats: {
+    attempted: number;
+    correct: number;
+    wrong: number;
+    accuracy: number;
+  };
 };
 
 export function ProfileDashboard({
@@ -33,9 +43,11 @@ export function ProfileDashboard({
   profile,
   summary,
   continueLearning,
+  mcqStats,
 }: ProfileDashboardProps) {
   return (
     <div className="space-y-8">
+      {/* Profile Header */}
       <ProfileHeader
         name={user.name}
         imageUrl={user.imageUrl}
@@ -45,12 +57,14 @@ export function ProfileDashboard({
         semesterName={profile?.semesterName}
       />
 
+      {/* Learning Stats */}
       <ProfileStats
         totalLessons={summary.total}
         completedLessons={summary.completed}
         percentage={summary.percentage}
       />
 
+      {/* Learning Progress */}
       <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="flex items-end justify-between gap-4">
           <div>
@@ -85,12 +99,15 @@ export function ProfileDashboard({
           <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-100">
             <div
               className="h-full rounded-full bg-gradient-to-r from-indigo-600 via-violet-600 to-emerald-500"
-              style={{ width: `${summary.percentage}%` }}
+              style={{
+                width: `${summary.percentage}%`,
+              }}
             />
           </div>
         </div>
       </section>
 
+      {/* Continue Learning */}
       <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="flex items-end justify-between gap-4">
           <div>
@@ -137,6 +154,7 @@ export function ProfileDashboard({
         ) : (
           <div className="mt-6 rounded-2xl bg-slate-50 p-6 text-center">
             <div className="text-3xl">🎉</div>
+
             <p className="mt-3 text-sm font-semibold text-slate-700">
               You&apos;re all caught up!
             </p>
@@ -144,7 +162,9 @@ export function ProfileDashboard({
         )}
       </section>
 
+      {/* Practice + Activity */}
       <div className="grid gap-6 lg:grid-cols-2">
+        {/* Practice */}
         <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
           <p className="text-xs font-bold uppercase tracking-wider text-violet-600">
             Practice
@@ -156,14 +176,40 @@ export function ProfileDashboard({
 
           <div className="mt-6 grid grid-cols-2 gap-3">
             <div className="rounded-2xl bg-slate-50 p-4">
-              <p className="text-2xl font-black text-slate-950">—</p>
+              <p className="text-2xl font-black text-slate-950">
+                {mcqStats.attempted}
+              </p>
+
               <p className="mt-1 text-xs text-slate-500">
                 Attempted
               </p>
             </div>
 
-            <div className="rounded-2xl bg-slate-50 p-4">
-              <p className="text-2xl font-black text-slate-950">—</p>
+            <div className="rounded-2xl bg-emerald-50 p-4">
+              <p className="text-2xl font-black text-emerald-700">
+                {mcqStats.correct}
+              </p>
+
+              <p className="mt-1 text-xs text-slate-500">
+                Correct
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-red-50 p-4">
+              <p className="text-2xl font-black text-red-700">
+                {mcqStats.wrong}
+              </p>
+
+              <p className="mt-1 text-xs text-slate-500">
+                Wrong
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-violet-50 p-4">
+              <p className="text-2xl font-black text-violet-700">
+                {mcqStats.accuracy}%
+              </p>
+
               <p className="mt-1 text-xs text-slate-500">
                 Accuracy
               </p>
@@ -178,6 +224,7 @@ export function ProfileDashboard({
           </Link>
         </section>
 
+        {/* Activity */}
         <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
           <p className="text-xs font-bold uppercase tracking-wider text-orange-600">
             Activity
@@ -189,14 +236,20 @@ export function ProfileDashboard({
 
           <div className="mt-6 grid grid-cols-2 gap-3">
             <div className="rounded-2xl bg-orange-50 p-4">
-              <p className="text-2xl font-black text-slate-950">—</p>
+              <p className="text-2xl font-black text-slate-950">
+                —
+              </p>
+
               <p className="mt-1 text-xs text-slate-500">
                 Current streak
               </p>
             </div>
 
             <div className="rounded-2xl bg-indigo-50 p-4">
-              <p className="text-2xl font-black text-slate-950">0</p>
+              <p className="text-2xl font-black text-slate-950">
+                0
+              </p>
+
               <p className="mt-1 text-xs text-slate-500">
                 Achievements
               </p>

@@ -7,6 +7,8 @@ import {
   getProgressSummaryAction,
 } from "@/src/features/progress";
 
+import { getMcqStatsAction } from "@/src/features/learn/practice/practice-analytics.actions";
+
 import {
   getProfileAction,
   ProfileDashboard,
@@ -19,14 +21,22 @@ export default async function ProfilePage() {
     return null;
   }
 
-  const [profile, summary, continueLearning] = await Promise.all([
+  const [
+    profile,
+    summary,
+    continueLearning,
+    mcqStats,
+  ] = await Promise.all([
     getProfileAction(),
     getProgressSummaryAction(),
     getContinueLearningAction(),
+    getMcqStatsAction(),
   ]);
 
   const name =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+    [user.firstName, user.lastName]
+      .filter(Boolean)
+      .join(" ") ||
     user.username ||
     "MediVerse Student";
 
@@ -56,6 +66,7 @@ export default async function ProfilePage() {
           profile={profile}
           summary={summary}
           continueLearning={continueLearning}
+          mcqStats={mcqStats}
         />
       </main>
     </LearnLayout>

@@ -16,3 +16,6 @@ export * from "./schema/community-post-like.schema";
 export * from "./schema/community-comment-like.schema";
 
 export * from "./schema/profile.schema";
+
+export * from "./schema/practice-session.schema";
+export * from "./schema/mcq-attempt.schema";
