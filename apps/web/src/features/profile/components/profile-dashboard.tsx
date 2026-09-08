@@ -1,7 +1,15 @@
 import Link from "next/link";
 
+import { ActivityCalendar } from "./activity-calendar";
 import { ProfileHeader } from "./profile-header";
 import { ProfileStats } from "./profile-stats";
+
+type ActivityDay = {
+  date: string;
+  count: number;
+  lessonCount: number;
+  mcqCount: number;
+};
 
 type ProfileDashboardProps = {
   user: {
@@ -36,6 +44,13 @@ type ProfileDashboardProps = {
     wrong: number;
     accuracy: number;
   };
+
+  activityStats: {
+    currentStreak: number;
+    longestStreak: number;
+    totalActiveDays: number;
+    activityDays: ActivityDay[];
+  };
 };
 
 export function ProfileDashboard({
@@ -44,6 +59,7 @@ export function ProfileDashboard({
   summary,
   continueLearning,
   mcqStats,
+  activityStats,
 }: ProfileDashboardProps) {
   return (
     <div className="space-y-8">
@@ -162,7 +178,7 @@ export function ProfileDashboard({
         )}
       </section>
 
-      {/* Practice + Activity */}
+      {/* Practice + Streak */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Practice */}
         <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
@@ -224,21 +240,27 @@ export function ProfileDashboard({
           </Link>
         </section>
 
-        {/* Activity */}
+        {/* Streak */}
         <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
           <p className="text-xs font-bold uppercase tracking-wider text-orange-600">
             Activity
           </p>
 
           <h2 className="mt-2 text-2xl font-black text-slate-950">
-            Streak & achievements
+            Streak & consistency
           </h2>
 
           <div className="mt-6 grid grid-cols-2 gap-3">
             <div className="rounded-2xl bg-orange-50 p-4">
-              <p className="text-2xl font-black text-slate-950">
-                —
-              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">
+                  🔥
+                </span>
+
+                <p className="text-2xl font-black text-slate-950">
+                  {activityStats.currentStreak}
+                </p>
+              </div>
 
               <p className="mt-1 text-xs text-slate-500">
                 Current streak
@@ -247,21 +269,49 @@ export function ProfileDashboard({
 
             <div className="rounded-2xl bg-indigo-50 p-4">
               <p className="text-2xl font-black text-slate-950">
-                0
+                {activityStats.longestStreak}
               </p>
 
               <p className="mt-1 text-xs text-slate-500">
-                Achievements
+                Longest streak
               </p>
             </div>
           </div>
 
           <p className="mt-5 text-sm leading-6 text-slate-500">
-            Keep learning and practicing. Your streak, activity history,
-            and achievements will appear here as you use MediVerse.
+            You have been active on{" "}
+            <span className="font-bold text-slate-700">
+              {activityStats.totalActiveDays}
+            </span>{" "}
+            different days.
           </p>
         </section>
       </div>
+
+      {/* Activity Calendar */}
+      <ActivityCalendar
+        activityDays={
+          activityStats.activityDays
+        }
+      />
+
+      {/* Activity Summary */}
+      <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-orange-600">
+            Keep going
+          </p>
+
+          <h2 className="mt-2 text-2xl font-black text-slate-950">
+            Build your learning habit
+          </h2>
+
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
+            Complete lessons and practice MCQs regularly to keep your
+            activity streak alive.
+          </p>
+        </div>
+      </section>
     </div>
   );
 }

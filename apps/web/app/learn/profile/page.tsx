@@ -10,9 +10,12 @@ import {
 import { getMcqStatsAction } from "@/src/features/learn/practice/practice-analytics.actions";
 
 import {
+  getActivityStatsAction,
   getProfileAction,
   ProfileDashboard,
 } from "@/src/features/profile";
+
+
 
 export default async function ProfilePage() {
   const user = await currentUser();
@@ -26,11 +29,13 @@ export default async function ProfilePage() {
     summary,
     continueLearning,
     mcqStats,
+    activityStats,
   ] = await Promise.all([
     getProfileAction(),
     getProgressSummaryAction(),
     getContinueLearningAction(),
     getMcqStatsAction(),
+    getActivityStatsAction(),
   ]);
 
   const name =
@@ -67,6 +72,7 @@ export default async function ProfilePage() {
           summary={summary}
           continueLearning={continueLearning}
           mcqStats={mcqStats}
+          activityStats={activityStats}
         />
       </main>
     </LearnLayout>
