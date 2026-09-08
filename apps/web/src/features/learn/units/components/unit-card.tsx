@@ -9,14 +9,16 @@ type Unit = {
 
 type Props = {
     unit: Unit;
+    hrefSuffix?: string;
 };
 
 export function UnitCard({
     unit,
+    hrefSuffix = "",
 }: Props) {
     return (
         <Link
-            href={`/learn/units/${unit.id}`}
+            href={`/learn/units/${unit.id}${hrefSuffix}`}
             className="group relative overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-violet-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-100/40"
         >
             <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-indigo-200/30 blur-2xl" />

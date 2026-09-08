@@ -8,14 +8,16 @@ type Topic = {
 
 type Props = {
     topic: Topic;
+    hrefSuffix?: string;
 };
 
 export function TopicCard({
     topic,
+    hrefSuffix = "",
 }: Props) {
     return (
         <Link
-            href={`/learn/topics/${topic.id}`}
+            href={`/learn/topics/${topic.id}${hrefSuffix}`}
             className="group relative overflow-hidden rounded-3xl border border-violet-100 bg-gradient-to-br from-violet-50 via-white to-indigo-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-violet-200 hover:shadow-xl hover:shadow-violet-100/40"
         >
             <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-violet-200/30 blur-2xl" />

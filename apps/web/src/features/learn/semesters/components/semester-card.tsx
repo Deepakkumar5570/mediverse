@@ -8,14 +8,16 @@ type Semester = {
 
 type Props = {
     semester: Semester;
+    hrefSuffix?: string;
 };
 
 export function SemesterCard({
     semester,
+    hrefSuffix = "",
 }: Props) {
     return (
         <ExplorerCard
-            href={`/learn/semesters/${semester.id}`}
+            href={`/learn/semesters/${semester.id}${hrefSuffix}`}
             title={semester.name}
             description={`Semester ${semester.number}`}
         />

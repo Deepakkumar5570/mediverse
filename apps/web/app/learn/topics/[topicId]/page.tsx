@@ -23,12 +23,19 @@ type Props = {
     params: Promise<{
         topicId: string;
     }>;
+    searchParams: Promise<{
+        mode?: string;
+    }>;
 };
 
 export default async function TopicDetailsPage({
     params,
+    searchParams,
 }: Props) {
     const { topicId } = await params;
+    const { mode } = await searchParams;
+
+    const isPracticeMode = mode === "practice";
 
     const details = await getTopicDetailsAction(topicId);
 
@@ -311,10 +318,11 @@ export default async function TopicDetailsPage({
                     ) : (
                         <ExplorerGrid>
                             {subtopics.map((subtopic) => (
-                                <SubtopicCard
-                                    key={subtopic.id}
-                                    subtopic={subtopic}
-                                />
+                               <SubtopicCard
+    key={subtopic.id}
+    subtopic={subtopic}
+    hrefSuffix={isPracticeMode ? "?mode=practice" : ""}
+/>
                             ))}
                         </ExplorerGrid>
                     )}

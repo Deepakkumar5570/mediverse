@@ -24,12 +24,19 @@ type Props = {
     params: Promise<{
         unitId: string;
     }>;
+    searchParams: Promise<{
+        mode?: string;
+    }>;
 };
 
 export default async function UnitDetailsPage({
     params,
+    searchParams,
 }: Props) {
     const { unitId } = await params;
+    const { mode } = await searchParams;
+
+    const isPracticeMode = mode === "practice";
 
     const details = await getUnitDetailsAction(unitId);
 
@@ -306,10 +313,11 @@ export default async function UnitDetailsPage({
                     ) : (
                         <ExplorerGrid>
                             {topics.map((topic) => (
-                                <TopicCard
-                                    key={topic.id}
-                                    topic={topic}
-                                />
+                               <TopicCard
+    key={topic.id}
+    topic={topic}
+    hrefSuffix={isPracticeMode ? "?mode=practice" : ""}
+/>
                             ))}
                         </ExplorerGrid>
                     )}

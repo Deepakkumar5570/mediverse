@@ -34,12 +34,19 @@ type Props = {
     params: Promise<{
         subtopicId: string;
     }>;
+    searchParams: Promise<{
+        mode?: string;
+    }>;
 };
 
 export default async function SubtopicDetailsPage({
     params,
+    searchParams,
 }: Props) {
     const { subtopicId } = await params;
+    const { mode } = await searchParams;
+
+    const isPracticeMode = mode === "practice";
 
     const details =
         await getSubtopicDetailsAction(
@@ -110,8 +117,16 @@ export default async function SubtopicDetailsPage({
         <PageTemplate
             wide
             showHeader={false}
-            title={subtopic.title}
-            description={`${topic.title} • Subtopic ${subtopic.subtopicNumber}`}
+            title={
+                isPracticeMode
+                    ? `Practice: ${subtopic.title}`
+                    : subtopic.title
+            }
+            description={
+                isPracticeMode
+                    ? `${topic.title} • MCQ Practice`
+                    : `${topic.title} • Subtopic ${subtopic.subtopicNumber}`
+            }
             sidebarTitle="Subtopic"
             breadcrumbs={[
                 {
@@ -413,8 +428,8 @@ export default async function SubtopicDetailsPage({
                                         {lessonProgress && (
                                             <span
                                                 className={`rounded-full px-3 py-1.5 text-xs font-bold ${lessonProgress.completed
-                                                        ? "bg-emerald-100 text-emerald-700"
-                                                        : "bg-slate-100 text-slate-600"
+                                                    ? "bg-emerald-100 text-emerald-700"
+                                                    : "bg-slate-100 text-slate-600"
                                                     }`}
                                             >
                                                 {lessonProgress.completed
@@ -526,7 +541,9 @@ export default async function SubtopicDetailsPage({
                         </h2>
 
                         <p className="mt-1 text-sm text-slate-500">
-                            Practice with MCQs based on this subtopic.
+                            {isPracticeMode
+                                ? "You are in practice mode. Test your understanding with MCQs from this subtopic."
+                                : "Practice with MCQs based on this subtopic."}
                         </p>
 
                     </div>

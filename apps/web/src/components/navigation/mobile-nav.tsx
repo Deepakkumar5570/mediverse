@@ -28,12 +28,19 @@ export function MobileNav({
   }
 
   const isHomeActive = pathname === "/";
-  const isCommunityActive = pathname.startsWith("/learn/community");
-  const isProgressActive = pathname.startsWith("/learn/progress");
+  const isCommunityActive =
+    pathname.startsWith("/learn/community");
+  const isProgressActive =
+    pathname.startsWith("/learn/progress");
+
   const isLearnActive =
     pathname === "/learn" ||
     pathname.startsWith("/learn/programs") ||
+    pathname.startsWith("/learn/practice") ||
     pathname.startsWith("/learn/search");
+
+  const isPracticeActive =
+    pathname.startsWith("/learn/practice");
 
   const itemClass = (active: boolean) =>
     `flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition ${
@@ -56,7 +63,11 @@ export function MobileNav({
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+        aria-label={
+          open
+            ? "Close navigation menu"
+            : "Open navigation menu"
+        }
         aria-expanded={open}
         className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-lg text-slate-700 shadow-sm transition hover:bg-slate-50"
       >
@@ -86,7 +97,9 @@ export function MobileNav({
                 <div>
                   <p className="text-base font-black tracking-tight text-slate-950">
                     Medi
-                    <span className="text-indigo-600">Verse</span>
+                    <span className="text-indigo-600">
+                      Verse
+                    </span>
                   </p>
 
                   <p className="text-xs text-slate-400">
@@ -113,17 +126,24 @@ export function MobileNav({
               <div>
                 <button
                   type="button"
-                  onClick={() => setLearnOpen((value) => !value)}
+                  onClick={() =>
+                    setLearnOpen((value) => !value)
+                  }
                   className={itemClass(isLearnActive)}
                 >
                   <span className="flex items-center gap-3">
-                    <span className="text-base">📚</span>
+                    <span className="text-base">
+                      📚
+                    </span>
+
                     Learn
                   </span>
 
                   <span
                     className={`ml-auto text-xs transition-transform ${
-                      learnOpen ? "rotate-180" : ""
+                      learnOpen
+                        ? "rotate-180"
+                        : ""
                     }`}
                   >
                     ▼
@@ -133,35 +153,56 @@ export function MobileNav({
                 {learnOpen && (
                   <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-3">
 
+                    {/* CONTINUE LEARNING */}
                     {isSignedIn && (
                       <Link
                         href="/learn"
                         onClick={closeMenu}
-                        className={subItemClass(pathname === "/learn")}
+                        className={subItemClass(
+                          pathname === "/learn",
+                        )}
                       >
                         🎯 Continue Learning
                       </Link>
                     )}
 
+                    {/* PROGRAMS */}
                     <Link
                       href="/learn/programs"
                       onClick={closeMenu}
                       className={subItemClass(
-                        pathname.startsWith("/learn/programs"),
+                        pathname.startsWith(
+                          "/learn/programs",
+                        ),
                       )}
                     >
                       📚 Programs
                     </Link>
 
+                    {/* PRACTICE */}
+                    <Link
+                      href="/learn/practice"
+                      onClick={closeMenu}
+                      className={subItemClass(
+                        isPracticeActive,
+                      )}
+                    >
+                      🧠 Practice
+                    </Link>
+
+                    {/* SEARCH */}
                     <Link
                       href="/learn/search"
                       onClick={closeMenu}
                       className={subItemClass(
-                        pathname.startsWith("/learn/search"),
+                        pathname.startsWith(
+                          "/learn/search",
+                        ),
                       )}
                     >
                       🔎 Search
                     </Link>
+
                   </div>
                 )}
               </div>
@@ -170,9 +211,14 @@ export function MobileNav({
               <Link
                 href="/learn/community"
                 onClick={closeMenu}
-                className={itemClass(isCommunityActive)}
+                className={itemClass(
+                  isCommunityActive,
+                )}
               >
-                <span className="text-base">👥</span>
+                <span className="text-base">
+                  👥
+                </span>
+
                 Community
               </Link>
 
@@ -181,9 +227,14 @@ export function MobileNav({
                 <Link
                   href="/learn/progress"
                   onClick={closeMenu}
-                  className={itemClass(isProgressActive)}
+                  className={itemClass(
+                    isProgressActive,
+                  )}
                 >
-                  <span className="text-base">📈</span>
+                  <span className="text-base">
+                    📈
+                  </span>
+
                   Progress
                 </Link>
               )}

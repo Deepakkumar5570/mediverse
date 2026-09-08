@@ -20,16 +20,24 @@ import {
     getSingleSubjectProgressAction,
 } from "@/src/features/progress";
 
+
 type Props = {
     params: Promise<{
         subjectId: string;
+    }>;
+    searchParams: Promise<{
+        mode?: string;
     }>;
 };
 
 export default async function SubjectDetailsPage({
     params,
+    searchParams,
 }: Props) {
     const { subjectId } = await params;
+    const { mode } = await searchParams;
+
+    const isPracticeMode = mode === "practice";
 
     const details = await getSubjectDetailsAction(
         subjectId,
@@ -67,9 +75,9 @@ export default async function SubjectDetailsPage({
 
     const progress = subjectProgress
         ? Math.min(
-              100,
-              Math.max(0, subjectProgress.percentage),
-          )
+            100,
+            Math.max(0, subjectProgress.percentage),
+        )
         : 0;
 
     return (
@@ -341,6 +349,7 @@ export default async function SubjectDetailsPage({
                                 <UnitCard
                                     key={unit.id}
                                     unit={unit}
+                                    hrefSuffix={isPracticeMode ? "?mode=practice" : ""}
                                 />
                             ))}
                         </ExplorerGrid>

@@ -9,6 +9,7 @@ type Program = {
 
 type Props = {
     program: Program;
+    hrefSuffix?: string;
 };
 
 function getProgramTheme(slug: string) {
@@ -91,13 +92,16 @@ function getProgramIcon(name: string) {
     return "🎓";
 }
 
-export function ProgramCard({ program }: Props) {
+export function ProgramCard({
+    program,
+    hrefSuffix = "",
+}: Props) {
     const theme = getProgramTheme(program.slug);
     const icon = getProgramIcon(program.name);
 
     return (
         <Link
-            href={`/learn/programs/${program.slug}`}
+            href={`/learn/programs/${program.slug}${hrefSuffix}`}
             className="group relative block h-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-slate-300 hover:shadow-xl hover:shadow-slate-200/70"
         >
             {/* Decorative glow */}

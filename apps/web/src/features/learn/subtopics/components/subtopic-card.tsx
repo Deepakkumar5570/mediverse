@@ -8,14 +8,23 @@ type Subtopic = {
 
 type Props = {
     subtopic: Subtopic;
+    hrefSuffix?: string;
 };
 
 export function SubtopicCard({
     subtopic,
+    hrefSuffix = "",
 }: Props) {
+    const isPracticeMode =
+        hrefSuffix === "?mode=practice";
+
+    const href = isPracticeMode
+        ? `/learn/subtopics/${subtopic.id}?mode=practice#mcq-practice`
+        : `/learn/subtopics/${subtopic.id}`;
+
     return (
         <Link
-            href={`/learn/subtopics/${subtopic.id}`}
+            href={href}
             className="group relative overflow-hidden rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-teal-50 p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-xl hover:shadow-emerald-100/40"
         >
             <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-emerald-200/30 blur-2xl" />
@@ -29,7 +38,9 @@ export function SubtopicCard({
                     </div>
 
                     <span className="rounded-full border border-emerald-100 bg-white/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-600">
-                        Subtopic
+                        {isPracticeMode
+                            ? "MCQ Practice"
+                            : "Subtopic"}
                     </span>
                 </div>
 
@@ -43,7 +54,9 @@ export function SubtopicCard({
 
                 <div className="mt-6 flex items-center justify-between border-t border-emerald-100 pt-4">
                     <span className="text-xs font-bold uppercase tracking-wider text-emerald-600">
-                        Explore subtopic
+                        {isPracticeMode
+                            ? "Practice MCQs"
+                            : "Explore subtopic"}
                     </span>
 
                     <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white transition-all group-hover:translate-x-1 group-hover:bg-teal-600">

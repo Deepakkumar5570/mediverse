@@ -19,12 +19,19 @@ type Props = {
     params: Promise<{
         semesterId: string;
     }>;
+    searchParams: Promise<{
+        mode?: string;
+    }>;
 };
 
 export default async function SemesterDetailsPage({
     params,
+    searchParams,
 }: Props) {
     const { semesterId } = await params;
+    const { mode } = await searchParams;
+
+    const isPracticeMode = mode === "practice";
 
     const details = await getSemesterDetailsAction(
         semesterId,
@@ -286,6 +293,7 @@ export default async function SemesterDetailsPage({
                                 <SubjectCard
                                     key={subject.id}
                                     subject={subject}
+                                    hrefSuffix={isPracticeMode ? "?mode=practice" : ""}
                                 />
                             ))}
                         </ExplorerGrid>
