@@ -1,5 +1,10 @@
 import { db, mcqs } from "@mediverse/database";
-import { asc, eq } from "drizzle-orm";
+
+import {
+  and,
+  asc,
+  eq,
+} from "drizzle-orm";
 
 export async function getMcqsBySubtopicRepository(
   subtopicId: string,
@@ -18,7 +23,10 @@ export async function getMcqsBySubtopicRepository(
     })
     .from(mcqs)
     .where(
-      eq(mcqs.subtopicId, subtopicId),
+      and(
+        eq(mcqs.subtopicId, subtopicId),
+        eq(mcqs.status, "active"),
+      ),
     )
     .orderBy(
       asc(mcqs.questionNumber),

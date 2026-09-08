@@ -1,38 +1,45 @@
 import Link from "next/link";
 
-import { LearnLayout, ExplorerGrid } from "@/src/components/learn";
-import { getProgramsAction } from "@/src/features/learn/programs";
+import {
+  ExplorerGrid,
+  LearnLayout,
+} from "@/src/components/learn";
+
+import {
+  getProgramsAction,
+  ProgramCard,
+} from "@/src/features/learn/programs";
 
 const practiceModes = [
   {
     title: "Quick Practice",
     description:
-      "Start a focused practice session with a short set of questions from your curriculum.",
+      "Know what you want to practice? Search a topic or subtopic and jump straight into 10 MCQs.",
     icon: "⚡",
-    badge: "Coming Soon",
+    badge: "Search & Practice",
+    href: "/learn/practice/quick",
     tone: "bg-amber-50 border-amber-100",
     iconTone: "bg-amber-100 text-amber-700",
-    href: null,
   },
   {
     title: "Topic Practice",
     description:
-      "Choose your academic program and move through the curriculum to practice a specific topic.",
+      "Follow your curriculum from program to topic and practice questions focused on one area.",
     icon: "🎯",
     badge: "Topic Based",
+    href: "/learn/programs?mode=practice",
     tone: "bg-sky-50 border-sky-100",
     iconTone: "bg-sky-100 text-sky-700",
-    href: "#curriculum",
   },
   {
     title: "Random Practice",
     description:
-      "Explore your curriculum and prepare for mixed-question practice across different topics.",
+      "Choose a program and semester and get a mixed set of questions from that entire semester.",
     icon: "🔀",
-    badge: "Mixed Questions",
+    badge: "Semester Based",
+    href: "/learn/practice/random",
     tone: "bg-violet-50 border-violet-100",
     iconTone: "bg-violet-100 text-violet-700",
-    href: "#curriculum",
   },
 ];
 
@@ -54,13 +61,11 @@ export default async function PracticePage() {
 
           <div className="relative px-6 py-10 sm:px-10 sm:py-12 lg:px-12">
             <div className="max-w-3xl">
-              {/* BADGE */}
               <div className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-700">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 MediVerse Practice
               </div>
 
-              {/* TITLE */}
               <h1 className="mt-5 text-4xl font-black tracking-[-0.04em] text-slate-950 sm:text-5xl lg:text-6xl">
                 Learn it.
                 <br />
@@ -69,33 +74,44 @@ export default async function PracticePage() {
                 </span>
               </h1>
 
-              {/* DESCRIPTION */}
               <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
-                Strengthen your medical knowledge with curriculum-based
-                practice. Choose a program, find a topic, and test what you
-                know.
+                Practice medical concepts without getting lost.
+                Choose exactly how you want to practice and
+                MediVerse will keep the questions inside the
+                curriculum you selected.
               </p>
 
-              {/* ACTIONS */}
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
-                  href="#practice-modes"
+                  href="/learn/practice/quick"
                   className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-indigo-600"
                 >
-                  Start Practicing
+                  Quick Practice →
                 </Link>
 
                 <Link
-                  href="#curriculum"
+                  href="/learn/practice/random"
                   className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
                 >
-                  Browse Curriculum
+                  Random Practice
                 </Link>
               </div>
             </div>
 
-            {/* HERO HIGHLIGHTS */}
             <div className="mt-10 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
+                <div className="text-xl">🧭</div>
+
+                <p className="mt-3 text-sm font-black text-slate-950">
+                  Stay in context
+                </p>
+
+                <p className="mt-1 text-xs leading-5 text-slate-500">
+                  Questions stay connected to your selected
+                  program and curriculum.
+                </p>
+              </div>
+
               <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
                 <div className="text-xl">🧠</div>
 
@@ -104,32 +120,20 @@ export default async function PracticePage() {
                 </p>
 
                 <p className="mt-1 text-xs leading-5 text-slate-500">
-                  Test your understanding instead of only reading.
+                  Test what you know instead of only reading.
                 </p>
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
-                <div className="text-xl">🎯</div>
+                <div className="text-xl">⚡</div>
 
                 <p className="mt-3 text-sm font-black text-slate-950">
-                  Topic Focused
+                  Simple to start
                 </p>
 
                 <p className="mt-1 text-xs leading-5 text-slate-500">
-                  Practice around the curriculum you are studying.
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
-                <div className="text-xl">📈</div>
-
-                <p className="mt-3 text-sm font-black text-slate-950">
-                  Improve Over Time
-                </p>
-
-                <p className="mt-1 text-xs leading-5 text-slate-500">
-                  Your future practice history will power personalized
-                  learning.
+                  Pick a mode, make one choice and start
+                  practicing.
                 </p>
               </div>
             </div>
@@ -137,31 +141,34 @@ export default async function PracticePage() {
         </section>
 
         {/* PRACTICE MODES */}
-        <section id="practice-modes" className="scroll-mt-24">
+        <section
+          id="practice-modes"
+          className="scroll-mt-24"
+        >
           <div className="mb-6">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-600">
               Practice modes
             </p>
 
             <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
-              How do you want to practice?
+              Choose how you want to practice.
             </h2>
 
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-              Choose a practice style and continue into the MediVerse
-              curriculum.
+              Every mode has a clear purpose. You will always
+              know where your questions are coming from.
             </p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
-            {practiceModes.map((mode) => {
-              const card = (
+            {practiceModes.map((mode) => (
+              <Link
+                key={mode.title}
+                href={mode.href}
+                className="group block"
+              >
                 <div
-                  className={`h-full rounded-3xl border p-6 transition ${
-                    mode.href
-                      ? `${mode.tone} hover:-translate-y-1 hover:shadow-md`
-                      : `${mode.tone} cursor-default`
-                  }`}
+                  className={`h-full rounded-3xl border p-6 transition hover:-translate-y-1 hover:shadow-md ${mode.tone}`}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div
@@ -183,45 +190,31 @@ export default async function PracticePage() {
                     {mode.description}
                   </p>
 
-                  <div className="mt-5 text-sm font-bold text-slate-700">
-                    {mode.href
-                      ? "Choose curriculum →"
-                      : "Being built →"}
+                  <div className="mt-5 text-sm font-bold text-slate-700 transition group-hover:text-indigo-700">
+                    Start practicing →
                   </div>
                 </div>
-              );
-
-              if (!mode.href) {
-                return <div key={mode.title}>{card}</div>;
-              }
-
-              return (
-                <Link key={mode.title} href={mode.href}>
-                  {card}
-                </Link>
-              );
-            })}
+              </Link>
+            ))}
           </div>
         </section>
 
         {/* CURRICULUM */}
-        <section
-          id="curriculum"
-          className="scroll-mt-24"
-        >
+        <section id="curriculum">
           <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-600">
-                Choose your curriculum
+                Topic practice
               </p>
 
               <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
-                Practice by program.
+                Practice through your curriculum.
               </h2>
 
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                Select your academic program and move through the existing
-                MediVerse curriculum to reach the topics you want to practice.
+                Prefer a guided path? Choose a program and
+                move through semester, subject, unit and topic
+                until you reach the questions you want.
               </p>
             </div>
 
@@ -235,7 +228,6 @@ export default async function PracticePage() {
             )}
           </div>
 
-          {/* EMPTY STATE */}
           {activePrograms.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-2xl">
@@ -247,8 +239,8 @@ export default async function PracticePage() {
               </h2>
 
               <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
-                Practice will become available here as programs and their
-                curriculum are published through the MediVerse Admin CMS.
+                Practice will become available here as
+                programs and their curriculum are published.
               </p>
 
               <Link
@@ -261,68 +253,17 @@ export default async function PracticePage() {
           ) : (
             <ExplorerGrid>
               {activePrograms.map((program) => (
-                <Link
+                <ProgramCard
                   key={program.id}
-                  href={`/learn/programs/${program.slug}?mode=practice`}
-                  className="group block"
-                >
-                  <article className="relative h-full overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-100/30">
-                    {/* DECORATION */}
-                    <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-indigo-100/50 blur-3xl transition group-hover:bg-indigo-200/50" />
-
-                    <div className="relative">
-                      {/* TOP */}
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-xl shadow-sm ring-1 ring-indigo-100">
-                          🎓
-                        </div>
-
-                        <span className="rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-600">
-                          Practice
-                        </span>
-                      </div>
-
-                      {/* PROGRAM */}
-                      <h3 className="mt-6 text-xl font-black tracking-tight text-slate-950">
-                        {program.name}
-                      </h3>
-
-                      {program.code && (
-                        <p className="mt-1 text-xs font-bold uppercase tracking-wider text-indigo-500">
-                          {program.code}
-                        </p>
-                      )}
-
-                      <p className="mt-4 line-clamp-4 text-sm leading-6 text-slate-600">
-                        {program.description ||
-                          "Explore this program and practice questions from its curriculum."}
-                      </p>
-
-                      {/* FOOTER */}
-                      <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-5">
-                        <div>
-                          <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-                            Practice
-                          </p>
-
-                          <p className="mt-1 text-sm font-bold text-slate-700">
-                            Explore program
-                          </p>
-                        </div>
-
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white transition group-hover:translate-x-1 group-hover:bg-violet-600">
-                          →
-                        </div>
-                      </div>
-                    </div>
-                  </article>
-                </Link>
+                  program={program}
+                  hrefSuffix="?mode=practice"
+                />
               ))}
             </ExplorerGrid>
           )}
         </section>
 
-        {/* PRACTICE FLOW */}
+        {/* FLOW */}
         <section className="overflow-hidden rounded-[2rem] bg-slate-950 px-6 py-8 text-white shadow-xl sm:px-10 sm:py-10">
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
@@ -335,9 +276,10 @@ export default async function PracticePage() {
               </h2>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">
-                Practice is part of the learning system, not a separate
-                question bank. Your curriculum, questions, performance and
-                future recommendations will eventually work together.
+                Practice is connected to the same curriculum
+                you use for learning. Later, your performance
+                will power revision and personalized
+                recommendations.
               </p>
             </div>
 
