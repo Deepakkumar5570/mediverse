@@ -13,6 +13,15 @@ import {
   XP_REWARDS,
 } from "@/src/features/gamification/points/xp-rules";
 
+import {
+  checkMcqAchievementsService,
+  checkPerfectSessionAchievementService,
+} from "@/src/features/gamification/achievements/achievement.service";
+
+import {
+  checkUserStreakAchievementsService,
+} from "@/src/features/profile/services/activity.service";
+
 export async function createPracticeSessionService(
   userId: string,
   mode: "quick" | "topic" | "random",
@@ -51,7 +60,8 @@ export async function recordMcqAttemptService(
     const result =
       await awardXpService(userId, {
         eventKey: `mcq:first-attempt:${data.mcqId}`,
-        eventType: "mcq_first_attempt",
+        eventType:
+          "mcq_first_attempt",
         points:
           XP_REWARDS.MCQ_FIRST_ATTEMPT,
         referenceType: "mcq",
@@ -64,8 +74,6 @@ export async function recordMcqAttemptService(
     /**
      * Correct-answer XP is only awarded when
      * this was the user's first attempt.
-     *
-     * Therefore:
      *
      * First attempt wrong → +2 XP
      * Second attempt correct → +0 XP
@@ -94,7 +102,63 @@ export async function recordMcqAttemptService(
     );
   }
 
-  return attempt;
+  /*
+   * Check MCQ achievements after
+   * recording the attempt.
+   */
+  let unlockedAchievements: Awaited<
+    ReturnType<
+      typeof checkMcqAchievementsService
+    >
+  > = [];
+
+  try {
+    const stats =
+      await getMcqStatsRepository(
+        userId,
+      );
+
+    unlockedAchievements =
+      await checkMcqAchievementsService(
+        userId,
+        stats,
+      );
+  } catch (error) {
+    console.error(
+      "Failed to check MCQ achievements:",
+      error,
+    );
+  }
+
+  /*
+   * Check streak achievements after
+   * the MCQ attempt because an MCQ
+   * attempt counts as learning activity.
+   */
+  try {
+    const streakAchievements =
+      await checkUserStreakAchievementsService(
+        userId,
+      );
+
+    unlockedAchievements.push(
+      ...streakAchievements,
+    );
+  } catch (error) {
+    console.error(
+      "Failed to check streak achievements:",
+      error,
+    );
+  }
+
+  /*
+   * Keep all original attempt fields while
+   * exposing newly unlocked achievements.
+   */
+  return {
+    ...attempt,
+    unlockedAchievements,
+  };
 }
 
 export async function completePracticeSessionService(
@@ -116,6 +180,9 @@ export async function completePracticeSessionService(
       },
     );
 
+  /*
+   * Practice session completion XP.
+   */
   try {
     await awardXpService(userId, {
       eventKey: `practice-session:completed:${sessionId}`,
@@ -123,7 +190,8 @@ export async function completePracticeSessionService(
         "practice_session_completed",
       points:
         XP_REWARDS.PRACTICE_SESSION_COMPLETED,
-      referenceType: "practice_session",
+      referenceType:
+        "practice_session",
       referenceId: sessionId,
     });
   } catch (error) {
@@ -133,11 +201,67 @@ export async function completePracticeSessionService(
     );
   }
 
-  return session;
+  /*
+   * Check Perfect Session achievement.
+   */
+  let unlockedAchievements: Awaited<
+    ReturnType<
+      typeof checkPerfectSessionAchievementService
+    >
+  > = [];
+
+  try {
+    unlockedAchievements =
+      await checkPerfectSessionAchievementService(
+        userId,
+        data.totalQuestions,
+        data.correctAnswers,
+      );
+  } catch (error) {
+    console.error(
+      "Failed to check perfect session achievement:",
+      error,
+    );
+  }
+
+  /*
+   * Check streak achievements after
+   * completing a practice session.
+   *
+   * The activity itself was already recorded
+   * through the MCQ attempts, so this only
+   * evaluates the current streak.
+   */
+  try {
+    const streakAchievements =
+      await checkUserStreakAchievementsService(
+        userId,
+      );
+
+    unlockedAchievements.push(
+      ...streakAchievements,
+    );
+  } catch (error) {
+    console.error(
+      "Failed to check streak achievements:",
+      error,
+    );
+  }
+
+  /*
+   * Keep all original session fields while
+   * exposing newly unlocked achievements.
+   */
+  return {
+    ...session,
+    unlockedAchievements,
+  };
 }
 
 export async function getMcqStatsService(
   userId: string,
 ) {
-  return getMcqStatsRepository(userId);
+  return getMcqStatsRepository(
+    userId,
+  );
 }

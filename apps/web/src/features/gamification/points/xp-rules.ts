@@ -12,7 +12,8 @@ export type XpEventType =
   | "lesson_completed"
   | "mcq_first_attempt"
   | "mcq_first_attempt_correct"
-  | "practice_session_completed";
+  | "practice_session_completed"
+  | "achievement_unlocked";
 
 export const LEVELS = [
   {

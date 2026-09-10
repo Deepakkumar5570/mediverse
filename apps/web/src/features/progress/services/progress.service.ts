@@ -1,18 +1,3 @@
-// import {
-//   getSubjectProgressRepository,
-//   getSingleSubjectProgressRepository,
-//   getSingleUnitProgressRepository,
-// } from "../repositories/progress.repository";
-
-// import {
-//   getProgressByUserRepository,
-//   getProgressByUserAndContentRepository,
-//   getProgressSummaryRepository,
-//   markContentCompleteRepository,
-//   markContentIncompleteRepository,
-//   getSubtopicProgressRepository,
-// } from "../repositories/progress.repository";
-
 import {
   awardXpService,
 } from "@/src/features/gamification/points/xp.service";
@@ -20,6 +5,14 @@ import {
 import {
   XP_REWARDS,
 } from "@/src/features/gamification/points/xp-rules";
+
+import {
+  checkLessonAchievementsService,
+} from "@/src/features/gamification/achievements/achievement.service";
+
+import {
+  checkUserStreakAchievementsService,
+} from "@/src/features/profile/services/activity.service";
 
 import {
   getProgressByUserRepository,
@@ -37,8 +30,6 @@ import {
   markContentIncompleteRepository,
 } from "../repositories/progress.repository";
 
-
-
 export async function getSingleTopicProgressService(
   userId: string,
   topicId: string,
@@ -49,20 +40,21 @@ export async function getSingleTopicProgressService(
   );
 }
 
-
 export async function getUnitProgressService(
   userId: string,
 ) {
-  return getUnitProgressRepository(userId);
+  return getUnitProgressRepository(
+    userId,
+  );
 }
 
 export async function getSubjectProgressService(
   userId: string,
 ) {
-  return getSubjectProgressRepository(userId);
+  return getSubjectProgressRepository(
+    userId,
+  );
 }
-
-
 
 export async function getSingleSubjectProgressService(
   userId: string,
@@ -74,7 +66,6 @@ export async function getSingleSubjectProgressService(
   );
 }
 
-
 export async function getSingleUnitProgressService(
   userId: string,
   unitId: string,
@@ -85,21 +76,22 @@ export async function getSingleUnitProgressService(
   );
 }
 
-
 export async function getUserProgressService(
-    userId: string
+  userId: string,
 ) {
-    return getProgressByUserRepository(userId);
+  return getProgressByUserRepository(
+    userId,
+  );
 }
 
 export async function getContentProgressService(
-    userId: string,
-    contentId: string
+  userId: string,
+  contentId: string,
 ) {
-    return getProgressByUserAndContentRepository(
-        userId,
-        contentId
-    );
+  return getProgressByUserAndContentRepository(
+    userId,
+    contentId,
+  );
 }
 
 export async function completeContentService(
@@ -112,10 +104,14 @@ export async function completeContentService(
       contentId,
     );
 
+  /*
+   * Lesson completion XP.
+   */
   try {
     await awardXpService(userId, {
       eventKey: `lesson:completed:${contentId}`,
-      eventType: "lesson_completed",
+      eventType:
+        "lesson_completed",
       points:
         XP_REWARDS.LESSON_COMPLETED,
       referenceType: "content",
@@ -128,28 +124,76 @@ export async function completeContentService(
     );
   }
 
-  return progress;
+  /*
+   * Check lesson achievements.
+   */
+  let unlockedAchievements: Awaited<
+    ReturnType<
+      typeof checkLessonAchievementsService
+    >
+  > = [];
+
+  try {
+    const summary =
+      await getProgressSummaryRepository(
+        userId,
+      );
+
+    unlockedAchievements =
+      await checkLessonAchievementsService(
+        userId,
+        summary.completed,
+      );
+  } catch (error) {
+    console.error(
+      "Failed to check lesson achievements:",
+      error,
+    );
+  }
+
+  /*
+   * Check streak achievements after
+   * completing a lesson.
+   */
+  try {
+    const streakAchievements =
+      await checkUserStreakAchievementsService(
+        userId,
+      );
+
+    unlockedAchievements.push(
+      ...streakAchievements,
+    );
+  } catch (error) {
+    console.error(
+      "Failed to check streak achievements:",
+      error,
+    );
+  }
+
+  return {
+    ...progress,
+    unlockedAchievements,
+  };
 }
 
 export async function incompleteContentService(
-    userId: string,
-    contentId: string
+  userId: string,
+  contentId: string,
 ) {
-    return markContentIncompleteRepository(
-        userId,
-        contentId
-    );
+  return markContentIncompleteRepository(
+    userId,
+    contentId,
+  );
 }
-
-
 
 export async function getProgressSummaryService(
   userId: string,
 ) {
-  return getProgressSummaryRepository(userId);
+  return getProgressSummaryRepository(
+    userId,
+  );
 }
-
-
 
 export async function getSubtopicProgressService(
   userId: string,
@@ -161,17 +205,18 @@ export async function getSubtopicProgressService(
   );
 }
 
-
 export async function getRecentLearningActivityService(
   userId: string,
 ) {
-  return getRecentLearningActivityRepository(userId);
+  return getRecentLearningActivityRepository(
+    userId,
+  );
 }
-
-
 
 export async function getContinueLearningService(
   userId: string,
 ) {
-  return getContinueLearningRepository(userId);
+  return getContinueLearningRepository(
+    userId,
+  );
 }

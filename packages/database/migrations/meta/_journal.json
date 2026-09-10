@@ -134,6 +134,20 @@
       "when": 1788893423790,
       "tag": "0018_nervous_namora",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1789054280317,
+      "tag": "0019_purple_reaper",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1789054623275,
+      "tag": "0020_happy_havok",
+      "breakpoints": true
     }
   ]
 }

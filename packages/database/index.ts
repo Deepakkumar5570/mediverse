@@ -22,3 +22,5 @@ export * from "./schema/mcq-attempt.schema";
 
 export * from "./schema/user-gamification.schema";
 export * from "./schema/xp-event.schema";
+
+export * from "./schema/user-achievement.schema";

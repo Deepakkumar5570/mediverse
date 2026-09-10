@@ -1,6 +1,9 @@
 import Link from "next/link";
 
-import { XpCard } from "@/src/features/gamification";
+import {
+  AchievementList,
+  XpCard,
+} from "@/src/features/gamification";
 
 import { ActivityCalendar } from "./activity-calendar";
 import { ProfileHeader } from "./profile-header";
@@ -335,33 +338,9 @@ export function ProfileDashboard({
             />
 
             {/* Achievements */}
-            <section className="rounded-[2rem] border border-dashed border-indigo-200 bg-indigo-50/50 p-6 sm:p-8">
-                <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <p className="text-xs font-bold uppercase tracking-[0.16em] text-indigo-600">
-                            Achievements
-                        </p>
 
-                        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
-                            Your achievements are coming
-                        </h2>
-
-                        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                            Complete lessons, practice consistently,
-                            maintain streaks and unlock MediVerse
-                            badges.
-                        </p>
-                    </div>
-
-                    <div className="shrink-0 rounded-2xl bg-white px-5 py-4 text-center shadow-sm">
-                        <p className="text-2xl">🏆</p>
-
-                        <p className="mt-1 text-xs font-black uppercase tracking-wider text-slate-500">
-                            Coming next
-                        </p>
-                    </div>
-                </div>
-            </section>
+            <AchievementList
+             userName={user.name} />
         </div>
     );
 }

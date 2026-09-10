@@ -1,7 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import {
+  useState,
+  useTransition,
+} from "react";
+
+import {
+  AchievementUnlockModal,
+  type UnlockedAchievement,
+} from "@/src/features/gamification/achievements/components/achievement-unlock-modal";
 
 import {
   completeContentAction,
@@ -19,11 +27,22 @@ export function ProgressButton({
 }: ProgressButtonProps) {
   const router = useRouter();
 
-  const [completed, setCompleted] =
-    useState(initialCompleted);
+  const [
+    completed,
+    setCompleted,
+  ] = useState(initialCompleted);
 
-  const [isPending, startTransition] =
-    useTransition();
+  const [
+    isPending,
+    startTransition,
+  ] = useTransition();
+
+  const [
+    unlockedAchievements,
+    setUnlockedAchievements,
+  ] = useState<
+    UnlockedAchievement[]
+  >([]);
 
   function handleToggle() {
     startTransition(async () => {
@@ -35,11 +54,21 @@ export function ProgressButton({
 
           setCompleted(false);
         } else {
-          await completeContentAction(
-            contentId,
-          );
+          const response =
+            await completeContentAction(
+              contentId,
+            );
 
           setCompleted(true);
+
+          if (
+            response.unlockedAchievements
+              ?.length
+          ) {
+            setUnlockedAchievements(
+              response.unlockedAchievements as UnlockedAchievement[],
+            );
+          }
         }
 
         router.refresh();
@@ -53,21 +82,37 @@ export function ProgressButton({
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleToggle}
-      disabled={isPending}
-      className={`rounded-lg px-4 py-2 font-medium transition ${
-        completed
-          ? "bg-green-600 text-white"
-          : "bg-blue-600 text-white hover:bg-blue-700"
-      } disabled:cursor-not-allowed disabled:opacity-60`}
-    >
-      {isPending
-        ? "Updating..."
-        : completed
-          ? "✓ Completed"
-          : "Mark as Complete"}
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={handleToggle}
+        disabled={isPending}
+        className={`rounded-lg px-4 py-2 font-medium transition ${
+          completed
+            ? "bg-green-600 text-white"
+            : "bg-blue-600 text-white hover:bg-blue-700"
+        } disabled:cursor-not-allowed disabled:opacity-60`}
+      >
+        {isPending
+          ? "Updating..."
+          : completed
+            ? "✓ Completed"
+            : "Mark as Complete"}
+      </button>
+
+      {unlockedAchievements.length >
+        0 && (
+        <AchievementUnlockModal
+          achievements={
+            unlockedAchievements
+          }
+          onClose={() =>
+            setUnlockedAchievements(
+              [],
+            )
+          }
+        />
+      )}
+    </>
   );
 }
