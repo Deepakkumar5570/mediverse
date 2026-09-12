@@ -1,5 +1,6 @@
 import {
   createSubtopicRepository,
+  createSubtopicsRepository,
   getSubtopicByIdRepository,
   getSubtopicsByTopicRepository,
   getSubtopicsRepository,
@@ -35,4 +36,17 @@ export async function updateSubtopicService(
   data: CreateSubtopicInput,
 ) {
   return updateSubtopicRepository(id, data);
+}
+
+
+
+export async function createSubtopicsService(
+  topicId: string,
+  items: Array<{
+    title: string;
+    description?: string;
+    status: "active" | "inactive";
+  }>,
+) {
+  return createSubtopicsRepository(topicId, items);
 }

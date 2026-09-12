@@ -17,5 +17,24 @@ export const createSubtopicSchema = z.object({
   ]),
 });
 
+
+export const createSubtopicsSchema = z.object({
+  topicId: z.uuid(),
+
+  subtopics: z
+    .array(
+      z.object({
+        title: z.string().trim().min(2).max(200),
+        description: z.string().trim().max(1000).optional(),
+        status: z.enum(["active", "inactive"]).default("active"),
+      }),
+    )
+    .min(1),
+});
+
+export type CreateSubtopicsInput =
+  z.infer<typeof createSubtopicsSchema>;
+
+
 export type CreateSubtopicInput =
   z.infer<typeof createSubtopicSchema>;
