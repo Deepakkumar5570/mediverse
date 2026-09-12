@@ -6,18 +6,21 @@ import {
   getTopicsService,
 } from "../services";
 
+
 export async function getTopicsAction() {
   return getTopicsService();
 }
 
+
 export async function getTopicByIdAction(
-  id: string
+  id: string,
 ) {
   return getTopicByIdService(id);
 }
 
+
 export async function getTopicsByUnitAction(
-  unitId: string
+  unitId: string,
 ) {
   return getTopicsByUnitService(unitId);
 }
