@@ -6,7 +6,7 @@ import { requireAdmin } from "@/src/lib/auth/require-admin";
 
 import { updateUnitService } from "../services";
 import {
-  CreateUnitSchema,
+  createUnitSchema,
   type CreateUnitInput,
 } from "../validations";
 
@@ -16,7 +16,7 @@ export async function updateUnitAction(
 ) {
   await requireAdmin();
 
-  const data = CreateUnitSchema.parse(input);
+  const data = createUnitSchema.parse(input);
 
   await updateUnitService(id, data);
 

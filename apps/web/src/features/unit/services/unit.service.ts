@@ -1,5 +1,6 @@
 import {
   createUnitRepository,
+  createUnitsRepository,
   getUnitByIdRepository,
   getUnitBySlugRepository,
   getUnitsBySubjectRepository,
@@ -7,7 +8,10 @@ import {
   updateUnitRepository,
 } from "../repositories";
 
-import type { CreateUnitInput } from "../validations";
+import type {
+  CreateUnitInput,
+  CreateUnitsInput,
+} from "../validations";
 
 export async function createUnitService(
   data: CreateUnitInput,
@@ -21,6 +25,15 @@ export async function createUnitService(
   }
 
   return createUnitRepository(data);
+}
+
+export async function createUnitsService(
+  data: CreateUnitsInput,
+) {
+  return createUnitsRepository(
+    data.subjectId,
+    data.units,
+  );
 }
 
 export async function getUnitsService() {
