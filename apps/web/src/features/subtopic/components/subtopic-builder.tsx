@@ -90,7 +90,7 @@ function createDraft(): DraftSubtopic {
   };
 }
 
-export function ContentBuilder({
+export function SubtopicBuilder({
   programs,
   semesters,
   subjects,
@@ -170,12 +170,12 @@ export function ContentBuilder({
     setTopicId(value);
 
     if (!value) {
-      router.push("/admin/content-builder");
+      router.push("/admin/subtopic-builder");
       return;
     }
 
     router.push(
-      `/admin/content-builder?topicId=${encodeURIComponent(value)}`,
+      `/admin/subtopic-builder?topicId=${encodeURIComponent(value)}`,
     );
   }
 
@@ -409,7 +409,7 @@ export function ContentBuilder({
         <button
           type="button"
           onClick={() =>
-            router.push("/admin/content-builder")
+            router.push("/admin/subtopic-builder")
           }
           className="w-fit rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
         >
