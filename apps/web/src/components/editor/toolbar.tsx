@@ -4,6 +4,7 @@ import type { Editor } from "@tiptap/react";
 
 type Props = {
   editor: Editor | null;
+  onInsertImage: () => void;
 };
 
 type ToolbarButtonProps = {
@@ -36,9 +37,11 @@ function ToolbarButton({
         "rounded-lg border px-2.5",
         "text-xs font-semibold transition",
         "focus:outline-none focus:ring-2 focus:ring-indigo-500/30",
+
         active
           ? "border-indigo-200 bg-indigo-50 text-indigo-700"
           : "border-slate-200 bg-white text-slate-600 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700",
+
         disabled
           ? "cursor-not-allowed opacity-40"
           : "",
@@ -51,13 +54,13 @@ function ToolbarButton({
 
 export function Toolbar({
   editor,
+  onInsertImage,
 }: Props) {
   if (!editor) return null;
 
   return (
     <div className="border-b border-slate-200 bg-slate-50/80 px-3 py-3">
       <div className="flex flex-wrap items-center gap-1.5">
-
         {/* TEXT */}
         <div className="mr-1 flex items-center gap-1">
           <ToolbarButton
@@ -214,6 +217,17 @@ export function Toolbar({
                 .setHorizontalRule()
                 .run()
             }
+          />
+        </div>
+
+        <div className="mx-1 h-6 w-px bg-slate-200" />
+
+        {/* MEDIA */}
+        <div className="flex items-center gap-1">
+          <ToolbarButton
+            label="Image"
+            title="Insert image"
+            onClick={onInsertImage}
           />
         </div>
 

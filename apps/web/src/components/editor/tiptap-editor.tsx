@@ -1,9 +1,13 @@
 "use client";
 
+import { useState } from "react";
+
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Image from "@tiptap/extension-image";
 
 import { Toolbar } from "./toolbar";
+import { ImageDialog } from "./image-dialog";
 
 type Props = {
   value: string;
@@ -14,8 +18,18 @@ export function TiptapEditor({
   value,
   onChange,
 }: Props) {
+  const [isImageDialogOpen, setIsImageDialogOpen] =
+    useState(false);
+
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+
+      Image.configure({
+        inline: false,
+        allowBase64: false,
+      }),
+    ],
 
     content: value,
 
@@ -67,9 +81,9 @@ export function TiptapEditor({
 
           // Blockquote
           "[&_blockquote]:my-5",
+          "[&_blockquote]:rounded-r-xl",
           "[&_blockquote]:border-l-4",
           "[&_blockquote]:border-indigo-400",
-          "[&_blockquote]:rounded-r-xl",
           "[&_blockquote]:bg-indigo-50",
           "[&_blockquote]:px-5",
           "[&_blockquote]:py-3",
@@ -89,9 +103,9 @@ export function TiptapEditor({
           // Code inside code block
           "[&_pre_code]:bg-transparent",
           "[&_pre_code]:p-0",
-          "[&_pre_code]:text-slate-100",
           "[&_pre_code]:font-mono",
           "[&_pre_code]:text-sm",
+          "[&_pre_code]:text-slate-100",
 
           // Inline code
           "[&_code]:rounded",
@@ -110,6 +124,14 @@ export function TiptapEditor({
           // Links
           "[&_a]:text-indigo-600",
           "[&_a]:underline",
+
+          // Images
+          "[&_img]:my-6",
+          "[&_img]:max-w-full",
+          "[&_img]:rounded-xl",
+          "[&_img]:border",
+          "[&_img]:border-slate-200",
+          "[&_img]:object-contain",
         ].join(" "),
       },
     },
@@ -120,12 +142,24 @@ export function TiptapEditor({
   });
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <Toolbar editor={editor} />
+    <>
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <Toolbar
+          editor={editor}
+          onInsertImage={() => setIsImageDialogOpen(true)}
+        />
 
-      <div className="bg-white">
-        <EditorContent editor={editor} />
+        <div className="bg-white">
+          <EditorContent editor={editor} />
+        </div>
       </div>
-    </div>
+
+      {editor && isImageDialogOpen && (
+        <ImageDialog
+          editor={editor}
+          onClose={() => setIsImageDialogOpen(false)}
+        />
+      )}
+    </>
   );
 }
