@@ -262,6 +262,31 @@ export default async function ContentDetailsPage({
   [&_hr]:border-t
   [&_hr]:border-slate-300
 
+
+  [&_table]:my-8
+  [&_table]:min-w-[640px]
+  [&_table]:w-full
+  [&_table]:border-collapse
+  [&_table]:text-sm
+
+  [&_th]:border
+  [&_th]:border-slate-300
+  [&_th]:bg-slate-100
+  [&_th]:px-4
+  [&_th]:py-3
+  [&_th]:text-left
+  [&_th]:font-bold
+  [&_th]:text-slate-900
+
+  [&_td]:border
+  [&_td]:border-slate-300
+  [&_td]:px-4
+  [&_td]:py-3
+  [&_td]:align-top
+  [&_td]:text-slate-700
+
+  [&_tbody_tr:nth-child(even)]:bg-slate-50/60
+
   [&_a]:font-medium
   [&_a]:text-indigo-600
   [&_a]:underline

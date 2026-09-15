@@ -5,6 +5,7 @@ import { useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
+import { TableKit } from "@tiptap/extension-table";
 
 import { Toolbar } from "./toolbar";
 import { ImageDialog } from "./image-dialog";
@@ -29,6 +30,8 @@ export function TiptapEditor({
         inline: false,
         allowBase64: false,
       }),
+
+      TableKit,
     ],
 
     content: value,
@@ -132,6 +135,33 @@ export function TiptapEditor({
           "[&_img]:border",
           "[&_img]:border-slate-200",
           "[&_img]:object-contain",
+
+          // Tables
+          "[&_table]:my-6",
+          "[&_table]:min-w-[640px]",
+          "[&_table]:w-full",
+          "[&_table]:border-collapse",
+          "[&_table]:text-sm",
+
+          "[&_th]:border",
+          "[&_th]:border-slate-300",
+          "[&_th]:bg-slate-100",
+          "[&_th]:px-4",
+          "[&_th]:py-3",
+          "[&_th]:text-left",
+          "[&_th]:font-bold",
+          "[&_th]:text-slate-900",
+
+          "[&_td]:border",
+          "[&_td]:border-slate-300",
+          "[&_td]:px-4",
+          "[&_td]:py-3",
+          "[&_td]:align-top",
+          "[&_td]:text-slate-700",
+
+          // Selected table cells
+          "[&_.selectedCell]:bg-indigo-50",
+          "[&_.selectedCell]:shadow-[inset_0_0_0_2px_rgb(99_102_241)]",
         ].join(" "),
       },
     },
@@ -146,10 +176,12 @@ export function TiptapEditor({
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <Toolbar
           editor={editor}
-          onInsertImage={() => setIsImageDialogOpen(true)}
+          onInsertImage={() =>
+            setIsImageDialogOpen(true)
+          }
         />
 
-        <div className="bg-white">
+        <div className="overflow-x-auto bg-white">
           <EditorContent editor={editor} />
         </div>
       </div>
@@ -157,7 +189,9 @@ export function TiptapEditor({
       {editor && isImageDialogOpen && (
         <ImageDialog
           editor={editor}
-          onClose={() => setIsImageDialogOpen(false)}
+          onClose={() =>
+            setIsImageDialogOpen(false)
+          }
         />
       )}
     </>

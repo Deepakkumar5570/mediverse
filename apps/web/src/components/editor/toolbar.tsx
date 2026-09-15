@@ -52,15 +52,87 @@ function ToolbarButton({
   );
 }
 
+function Divider() {
+  return (
+    <div className="mx-1 h-6 w-px bg-slate-200" />
+  );
+}
+
 export function Toolbar({
   editor,
   onInsertImage,
 }: Props) {
   if (!editor) return null;
 
+  const isInsideTable = editor.isActive("table");
+
+  const canMergeCells = editor
+    .can()
+    .chain()
+    .focus()
+    .mergeCells()
+    .run();
+
+  const canSplitCell = editor
+    .can()
+    .chain()
+    .focus()
+    .splitCell()
+    .run();
+
+  const canAddRowBefore = editor
+    .can()
+    .chain()
+    .focus()
+    .addRowBefore()
+    .run();
+
+  const canAddRowAfter = editor
+    .can()
+    .chain()
+    .focus()
+    .addRowAfter()
+    .run();
+
+  const canDeleteRow = editor
+    .can()
+    .chain()
+    .focus()
+    .deleteRow()
+    .run();
+
+  const canAddColumnBefore = editor
+    .can()
+    .chain()
+    .focus()
+    .addColumnBefore()
+    .run();
+
+  const canAddColumnAfter = editor
+    .can()
+    .chain()
+    .focus()
+    .addColumnAfter()
+    .run();
+
+  const canDeleteColumn = editor
+    .can()
+    .chain()
+    .focus()
+    .deleteColumn()
+    .run();
+
+  const canDeleteTable = editor
+    .can()
+    .chain()
+    .focus()
+    .deleteTable()
+    .run();
+
   return (
     <div className="border-b border-slate-200 bg-slate-50/80 px-3 py-3">
       <div className="flex flex-wrap items-center gap-1.5">
+
         {/* TEXT */}
         <div className="mr-1 flex items-center gap-1">
           <ToolbarButton
@@ -90,7 +162,7 @@ export function Toolbar({
           />
         </div>
 
-        <div className="mx-1 h-6 w-px bg-slate-200" />
+        <Divider />
 
         {/* HEADINGS */}
         <div className="flex items-center gap-1">
@@ -146,7 +218,7 @@ export function Toolbar({
           />
         </div>
 
-        <div className="mx-1 h-6 w-px bg-slate-200" />
+        <Divider />
 
         {/* LISTS */}
         <div className="flex items-center gap-1">
@@ -177,7 +249,7 @@ export function Toolbar({
           />
         </div>
 
-        <div className="mx-1 h-6 w-px bg-slate-200" />
+        <Divider />
 
         {/* BLOCKS */}
         <div className="flex items-center gap-1">
@@ -220,7 +292,7 @@ export function Toolbar({
           />
         </div>
 
-        <div className="mx-1 h-6 w-px bg-slate-200" />
+        <Divider />
 
         {/* MEDIA */}
         <div className="flex items-center gap-1">
@@ -231,7 +303,171 @@ export function Toolbar({
           />
         </div>
 
-        <div className="mx-1 h-6 w-px bg-slate-200" />
+        <Divider />
+
+        {/* TABLE INSERT */}
+        <div className="flex items-center gap-1">
+          <ToolbarButton
+            label="Table"
+            title="Insert 3 × 3 table"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertTable({
+                  rows: 3,
+                  cols: 3,
+                  withHeaderRow: true,
+                })
+                .run()
+            }
+          />
+        </div>
+
+        {/* TABLE CONTROLS */}
+        {isInsideTable && (
+          <>
+            <Divider />
+
+            <div className="flex items-center gap-1">
+              <ToolbarButton
+                label="+ Row"
+                title="Add row after"
+                disabled={!canAddRowAfter}
+                onClick={() =>
+                  editor
+                    .chain()
+                    .focus()
+                    .addRowAfter()
+                    .run()
+                }
+              />
+
+              <ToolbarButton
+                label="− Row"
+                title="Delete current row"
+                disabled={!canDeleteRow}
+                onClick={() =>
+                  editor
+                    .chain()
+                    .focus()
+                    .deleteRow()
+                    .run()
+                }
+              />
+
+              <ToolbarButton
+                label="+ Col"
+                title="Add column after"
+                disabled={!canAddColumnAfter}
+                onClick={() =>
+                  editor
+                    .chain()
+                    .focus()
+                    .addColumnAfter()
+                    .run()
+                }
+              />
+
+              <ToolbarButton
+                label="− Col"
+                title="Delete current column"
+                disabled={!canDeleteColumn}
+                onClick={() =>
+                  editor
+                    .chain()
+                    .focus()
+                    .deleteColumn()
+                    .run()
+                }
+              />
+            </div>
+
+            <div className="flex items-center gap-1">
+              <ToolbarButton
+                label="↑ Row"
+                title="Add row before"
+                disabled={!canAddRowBefore}
+                onClick={() =>
+                  editor
+                    .chain()
+                    .focus()
+                    .addRowBefore()
+                    .run()
+                }
+              />
+
+              <ToolbarButton
+                label="← Col"
+                title="Add column before"
+                disabled={!canAddColumnBefore}
+                onClick={() =>
+                  editor
+                    .chain()
+                    .focus()
+                    .addColumnBefore()
+                    .run()
+                }
+              />
+            </div>
+
+            <div className="flex items-center gap-1">
+              <ToolbarButton
+                label="Merge"
+                title="Merge selected cells"
+                disabled={!canMergeCells}
+                onClick={() =>
+                  editor
+                    .chain()
+                    .focus()
+                    .mergeCells()
+                    .run()
+                }
+              />
+
+              <ToolbarButton
+                label="Split"
+                title="Split merged cell"
+                disabled={!canSplitCell}
+                onClick={() =>
+                  editor
+                    .chain()
+                    .focus()
+                    .splitCell()
+                    .run()
+                }
+              />
+
+              <ToolbarButton
+                label="Header"
+                title="Toggle header row"
+                active={editor.isActive("tableHeader")}
+                onClick={() =>
+                  editor
+                    .chain()
+                    .focus()
+                    .toggleHeaderRow()
+                    .run()
+                }
+              />
+
+              <ToolbarButton
+                label="Delete Table"
+                title="Delete table"
+                disabled={!canDeleteTable}
+                onClick={() =>
+                  editor
+                    .chain()
+                    .focus()
+                    .deleteTable()
+                    .run()
+                }
+              />
+            </div>
+          </>
+        )}
+
+        <Divider />
 
         {/* HISTORY */}
         <div className="flex items-center gap-1">
@@ -239,7 +475,12 @@ export function Toolbar({
             label="↶"
             title="Undo"
             disabled={
-              !editor.can().chain().focus().undo().run()
+              !editor
+                .can()
+                .chain()
+                .focus()
+                .undo()
+                .run()
             }
             onClick={() =>
               editor
@@ -254,7 +495,12 @@ export function Toolbar({
             label="↷"
             title="Redo"
             disabled={
-              !editor.can().chain().focus().redo().run()
+              !editor
+                .can()
+                .chain()
+                .focus()
+                .redo()
+                .run()
             }
             onClick={() =>
               editor
@@ -266,7 +512,7 @@ export function Toolbar({
           />
         </div>
 
-        <div className="mx-1 h-6 w-px bg-slate-200" />
+        <Divider />
 
         {/* CLEAR */}
         <ToolbarButton

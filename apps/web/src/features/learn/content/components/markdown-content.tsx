@@ -7,9 +7,13 @@ export function MarkdownContent({ content }: Props) {
     <article className="max-w-none">
       <div
         className="
+          max-w-none
+
           [&_h1]:mb-6
           [&_h1]:text-4xl
           [&_h1]:font-bold
+          [&_h1]:leading-tight
+          [&_h1]:text-slate-950
 
           [&_h2]:mb-4
           [&_h2]:mt-10
@@ -24,6 +28,8 @@ export function MarkdownContent({ content }: Props) {
           [&_h3]:mt-8
           [&_h3]:text-xl
           [&_h3]:font-bold
+          [&_h3]:leading-tight
+          [&_h3]:text-slate-900
 
           [&_p]:my-5
           [&_p]:text-base
@@ -59,19 +65,38 @@ export function MarkdownContent({ content }: Props) {
           [&_hr]:my-10
           [&_hr]:border-slate-200
 
+          /* Tables */
           [&_table]:my-8
+          [&_table]:min-w-[640px]
           [&_table]:w-full
           [&_table]:border-collapse
+          [&_table]:text-sm
 
           [&_th]:border
+          [&_th]:border-slate-300
           [&_th]:bg-slate-100
           [&_th]:px-4
           [&_th]:py-3
           [&_th]:text-left
+          [&_th]:font-bold
+          [&_th]:text-slate-900
 
           [&_td]:border
+          [&_td]:border-slate-300
           [&_td]:px-4
           [&_td]:py-3
+          [&_td]:align-top
+          [&_td]:text-slate-700
+
+          [&_tbody_tr:nth-child(even)]:bg-slate-50/60
+
+          /* Images */
+          [&_img]:my-8
+          [&_img]:max-w-full
+          [&_img]:rounded-xl
+          [&_img]:border
+          [&_img]:border-slate-200
+          [&_img]:object-contain
         "
         dangerouslySetInnerHTML={{
           __html: content,
