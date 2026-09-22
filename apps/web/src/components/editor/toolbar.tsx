@@ -218,6 +218,62 @@ export function Toolbar({
                 .run()
             }
           />
+
+          <ToolbarButton
+            label="Link"
+            title="Insert or edit link"
+            active={editor.isActive("link")}
+            onClick={() => {
+              const currentUrl =
+                editor.getAttributes("link").href ?? "";
+
+              const url = window.prompt(
+                "Enter URL",
+                currentUrl
+              );
+
+              if (url === null) {
+                return;
+              }
+
+              const trimmedUrl = url.trim();
+
+              if (!trimmedUrl) {
+                editor
+                  .chain()
+                  .focus()
+                  .unsetLink()
+                  .run();
+
+                return;
+              }
+
+              editor
+                .chain()
+                .focus()
+                .setLink({
+                  href: trimmedUrl,
+                  target: "_blank",
+                  rel: "noopener noreferrer nofollow",
+                })
+                .run();
+            }}
+          />
+
+
+
+          <ToolbarButton
+            label="Unlink"
+            title="Remove link"
+            disabled={!editor.isActive("link")}
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .unsetLink()
+                .run()
+            }
+          />
         </div>
 
         <Divider />

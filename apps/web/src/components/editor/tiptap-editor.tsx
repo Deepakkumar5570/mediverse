@@ -34,7 +34,13 @@ export function TiptapEditor({
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        link: {
+          openOnClick: false,
+          autolink: true,
+          linkOnPaste: true,
+        },
+      }),
 
       Image.configure({
         inline: false,
@@ -101,8 +107,6 @@ export function TiptapEditor({
           "[&_li]:my-1",
           "[&_li]:pl-1",
           "[&_li]:leading-7",
-
-
 
           // Underline
           "[&_u]:underline",
@@ -260,6 +264,54 @@ export function TiptapEditor({
 
           "[&_.mediverse-callout_li]:my-1",
         ].join(" "),
+      },
+
+      // Prevent newly typed text after a link from
+      // continuing inside the link mark.
+      handleKeyDown(view, event) {
+        if (event.key !== " ") {
+          return false;
+        }
+
+        const { state } = view;
+
+        if (!state.selection.empty) {
+          return false;
+        }
+
+        const { $from } = state.selection;
+        const linkMark = state.schema.marks.link;
+
+        if (!linkMark) {
+          return false;
+        }
+
+        const hasLinkBefore =
+          $from.nodeBefore?.marks.some(
+            (mark) => mark.type === linkMark
+          ) ?? false;
+
+        if (!hasLinkBefore) {
+          return false;
+        }
+
+        window.setTimeout(() => {
+          const currentState = view.state;
+          const storedMarks =
+            currentState.storedMarks ?? [];
+
+          const withoutLink = storedMarks.filter(
+            (mark) => mark.type !== linkMark
+          );
+
+          view.dispatch(
+            currentState.tr.setStoredMarks(
+              withoutLink
+            )
+          );
+        }, 0);
+
+        return false;
       },
     },
 
