@@ -64,7 +64,11 @@ export function Toolbar({
 }: Props) {
   if (!editor) return null;
 
-  const isInsideTable = editor.isActive("table");
+  const isInsideTable =
+    editor.isActive("table");
+
+  const isInsideCallout =
+    editor.isActive("callout");
 
   const canMergeCells = editor
     .can()
@@ -157,6 +161,60 @@ export function Toolbar({
                 .chain()
                 .focus()
                 .toggleItalic()
+                .run()
+            }
+          />
+
+          <ToolbarButton
+            label="U"
+            title="Underline"
+            active={editor.isActive("underline")}
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .toggleUnderline()
+                .run()
+            }
+          />
+
+          <ToolbarButton
+            label="H"
+            title="Highlight"
+            active={editor.isActive("highlight")}
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .toggleHighlight()
+                .run()
+            }
+          />
+
+          <ToolbarButton
+            label="x²"
+            title="Superscript"
+            active={editor.isActive("superscript")}
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .unsetSubscript()
+                .toggleSuperscript()
+                .run()
+            }
+          />
+
+          <ToolbarButton
+            label="x₂"
+            title="Subscript"
+            active={editor.isActive("subscript")}
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .unsetSuperscript()
+                .toggleSubscript()
                 .run()
             }
           />
@@ -294,6 +352,127 @@ export function Toolbar({
 
         <Divider />
 
+        {/* CALLOUT */}
+        <div className="flex items-center gap-1">
+          <ToolbarButton
+            label="Note"
+            title={
+              isInsideCallout
+                ? "Change callout to Note"
+                : "Create Note callout"
+            }
+            active={editor.isActive("callout", {
+              type: "note",
+            })}
+            onClick={() => {
+              if (editor.isActive("callout")) {
+                editor
+                  .chain()
+                  .focus()
+                  .setCalloutType("note")
+                  .run();
+
+                return;
+              }
+
+              editor
+                .chain()
+                .focus()
+                .setCallout("note")
+                .run();
+            }}
+          />
+
+          <ToolbarButton
+            label="Important"
+            title={
+              isInsideCallout
+                ? "Change callout to Important"
+                : "Create Important callout"
+            }
+            active={editor.isActive("callout", {
+              type: "important",
+            })}
+            onClick={() => {
+              if (editor.isActive("callout")) {
+                editor
+                  .chain()
+                  .focus()
+                  .setCalloutType("important")
+                  .run();
+
+                return;
+              }
+
+              editor
+                .chain()
+                .focus()
+                .setCallout("important")
+                .run();
+            }}
+          />
+
+          <ToolbarButton
+            label="Warning"
+            title={
+              isInsideCallout
+                ? "Change callout to Warning"
+                : "Create Warning callout"
+            }
+            active={editor.isActive("callout", {
+              type: "warning",
+            })}
+            onClick={() => {
+              if (editor.isActive("callout")) {
+                editor
+                  .chain()
+                  .focus()
+                  .setCalloutType("warning")
+                  .run();
+
+                return;
+              }
+
+              editor
+                .chain()
+                .focus()
+                .setCallout("warning")
+                .run();
+            }}
+          />
+
+          <ToolbarButton
+            label="Tip"
+            title={
+              isInsideCallout
+                ? "Change callout to Tip"
+                : "Create Tip callout"
+            }
+            active={editor.isActive("callout", {
+              type: "tip",
+            })}
+            onClick={() => {
+              if (editor.isActive("callout")) {
+                editor
+                  .chain()
+                  .focus()
+                  .setCalloutType("tip")
+                  .run();
+
+                return;
+              }
+
+              editor
+                .chain()
+                .focus()
+                .setCallout("tip")
+                .run();
+            }}
+          />
+        </div>
+
+        <Divider />
+
         {/* MEDIA */}
         <div className="flex items-center gap-1">
           <ToolbarButton
@@ -305,7 +484,7 @@ export function Toolbar({
 
         <Divider />
 
-        {/* TABLE INSERT */}
+        {/* TABLE */}
         <div className="flex items-center gap-1">
           <ToolbarButton
             label="Table"
@@ -441,7 +620,9 @@ export function Toolbar({
               <ToolbarButton
                 label="Header"
                 title="Toggle header row"
-                active={editor.isActive("tableHeader")}
+                active={editor.isActive(
+                  "tableHeader"
+                )}
                 onClick={() =>
                   editor
                     .chain()

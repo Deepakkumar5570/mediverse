@@ -2,11 +2,21 @@
 
 import { useState } from "react";
 
-import { EditorContent, useEditor } from "@tiptap/react";
+import {
+  EditorContent,
+  useEditor,
+} from "@tiptap/react";
+
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import { TableKit } from "@tiptap/extension-table";
 
+import Highlight from "@tiptap/extension-highlight";
+import Underline from "@tiptap/extension-underline";
+import Superscript from "@tiptap/extension-superscript";
+import Subscript from "@tiptap/extension-subscript";
+
+import { Callout } from "./callout";
 import { Toolbar } from "./toolbar";
 import { ImageDialog } from "./image-dialog";
 
@@ -32,6 +42,16 @@ export function TiptapEditor({
       }),
 
       TableKit,
+
+      Highlight,
+
+      Underline,
+
+      Superscript,
+
+      Subscript,
+
+      Callout,
     ],
 
     content: value,
@@ -82,6 +102,28 @@ export function TiptapEditor({
           "[&_li]:pl-1",
           "[&_li]:leading-7",
 
+
+
+          // Underline
+          "[&_u]:underline",
+          "[&_u]:decoration-2",
+          "[&_u]:underline-offset-2",
+
+          // Highlight
+          "[&_mark]:rounded",
+          "[&_mark]:bg-yellow-200",
+          "[&_mark]:px-0.5",
+
+          // Superscript
+          "[&_sup]:text-[0.7em]",
+          "[&_sup]:leading-none",
+          "[&_sup]:align-super",
+
+          // Subscript
+          "[&_sub]:text-[0.7em]",
+          "[&_sub]:leading-none",
+          "[&_sub]:align-sub",
+
           // Blockquote
           "[&_blockquote]:my-5",
           "[&_blockquote]:rounded-r-xl",
@@ -103,7 +145,6 @@ export function TiptapEditor({
           "[&_pre]:text-sm",
           "[&_pre]:text-slate-100",
 
-          // Code inside code block
           "[&_pre_code]:bg-transparent",
           "[&_pre_code]:p-0",
           "[&_pre_code]:font-mono",
@@ -162,6 +203,62 @@ export function TiptapEditor({
           // Selected table cells
           "[&_.selectedCell]:bg-indigo-50",
           "[&_.selectedCell]:shadow-[inset_0_0_0_2px_rgb(99_102_241)]",
+
+          // Callout container
+          "[&_.mediverse-callout]:my-6",
+          "[&_.mediverse-callout]:rounded-xl",
+          "[&_.mediverse-callout]:border",
+          "[&_.mediverse-callout]:px-5",
+          "[&_.mediverse-callout]:py-4",
+
+          // Note
+          "[&_.mediverse-callout[data-callout='note']]:border-blue-200",
+          "[&_.mediverse-callout[data-callout='note']]:bg-blue-50",
+
+          // Important
+          "[&_.mediverse-callout[data-callout='important']]:border-violet-200",
+          "[&_.mediverse-callout[data-callout='important']]:bg-violet-50",
+
+          // Warning
+          "[&_.mediverse-callout[data-callout='warning']]:border-amber-200",
+          "[&_.mediverse-callout[data-callout='warning']]:bg-amber-50",
+
+          // Tip
+          "[&_.mediverse-callout[data-callout='tip']]:border-emerald-200",
+          "[&_.mediverse-callout[data-callout='tip']]:bg-emerald-50",
+
+          // Callout label
+          "[&_.mediverse-callout::before]:block",
+          "[&_.mediverse-callout::before]:mb-2",
+          "[&_.mediverse-callout::before]:text-xs",
+          "[&_.mediverse-callout::before]:font-bold",
+          "[&_.mediverse-callout::before]:uppercase",
+          "[&_.mediverse-callout::before]:tracking-wider",
+
+          "[&_.mediverse-callout[data-callout='note']::before]:text-blue-700",
+          "[&_.mediverse-callout[data-callout='note']::before]:content-['Note']",
+
+          "[&_.mediverse-callout[data-callout='important']::before]:text-violet-700",
+          "[&_.mediverse-callout[data-callout='important']::before]:content-['Important']",
+
+          "[&_.mediverse-callout[data-callout='warning']::before]:text-amber-700",
+          "[&_.mediverse-callout[data-callout='warning']::before]:content-['Warning']",
+
+          "[&_.mediverse-callout[data-callout='tip']::before]:text-emerald-700",
+          "[&_.mediverse-callout[data-callout='tip']::before]:content-['Tip']",
+
+          // Callout content
+          "[&_.mediverse-callout_p]:my-1",
+          "[&_.mediverse-callout_p]:leading-7",
+          "[&_.mediverse-callout_p]:text-slate-700",
+
+          "[&_.mediverse-callout_ul]:my-3",
+          "[&_.mediverse-callout_ul]:pl-6",
+
+          "[&_.mediverse-callout_ol]:my-3",
+          "[&_.mediverse-callout_ol]:pl-6",
+
+          "[&_.mediverse-callout_li]:my-1",
         ].join(" "),
       },
     },

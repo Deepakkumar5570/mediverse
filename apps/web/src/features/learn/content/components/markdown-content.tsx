@@ -9,6 +9,7 @@ export function MarkdownContent({ content }: Props) {
         className="
           max-w-none
 
+          /* Headings */
           [&_h1]:mb-6
           [&_h1]:text-4xl
           [&_h1]:font-bold
@@ -31,11 +32,13 @@ export function MarkdownContent({ content }: Props) {
           [&_h3]:leading-tight
           [&_h3]:text-slate-900
 
+          /* Paragraphs */
           [&_p]:my-5
           [&_p]:text-base
           [&_p]:leading-8
           [&_p]:text-slate-700
 
+          /* Lists */
           [&_ul]:my-5
           [&_ul]:list-disc
           [&_ul]:pl-6
@@ -48,9 +51,11 @@ export function MarkdownContent({ content }: Props) {
           [&_li]:leading-7
           [&_li]:text-slate-700
 
+          /* Text */
           [&_strong]:font-bold
           [&_strong]:text-slate-950
 
+          /* Blockquote */
           [&_blockquote]:my-7
           [&_blockquote]:border-l-4
           [&_blockquote]:border-violet-400
@@ -58,10 +63,12 @@ export function MarkdownContent({ content }: Props) {
           [&_blockquote]:px-5
           [&_blockquote]:py-3
 
+          /* Links */
           [&_a]:font-medium
           [&_a]:text-violet-600
           [&_a]:underline
 
+          /* Horizontal rule */
           [&_hr]:my-10
           [&_hr]:border-slate-200
 
@@ -97,6 +104,62 @@ export function MarkdownContent({ content }: Props) {
           [&_img]:border
           [&_img]:border-slate-200
           [&_img]:object-contain
+
+          /* Callout container */
+          [&_.mediverse-callout]:my-8
+          [&_.mediverse-callout]:rounded-xl
+          [&_.mediverse-callout]:border
+          [&_.mediverse-callout]:px-6
+          [&_.mediverse-callout]:py-5
+
+          /* Note */
+          [&_.mediverse-callout[data-callout='note']]:border-blue-200
+          [&_.mediverse-callout[data-callout='note']]:bg-blue-50
+
+          /* Important */
+          [&_.mediverse-callout[data-callout='important']]:border-violet-200
+          [&_.mediverse-callout[data-callout='important']]:bg-violet-50
+
+          /* Warning */
+          [&_.mediverse-callout[data-callout='warning']]:border-amber-200
+          [&_.mediverse-callout[data-callout='warning']]:bg-amber-50
+
+          /* Tip */
+          [&_.mediverse-callout[data-callout='tip']]:border-emerald-200
+          [&_.mediverse-callout[data-callout='tip']]:bg-emerald-50
+
+          /* Callout label */
+          [&_.mediverse-callout::before]:block
+          [&_.mediverse-callout::before]:mb-2
+          [&_.mediverse-callout::before]:text-xs
+          [&_.mediverse-callout::before]:font-bold
+          [&_.mediverse-callout::before]:uppercase
+          [&_.mediverse-callout::before]:tracking-wider
+
+          [&_.mediverse-callout[data-callout='note']::before]:text-blue-700
+          [&_.mediverse-callout[data-callout='note']::before]:content-['Note']
+
+          [&_.mediverse-callout[data-callout='important']::before]:text-violet-700
+          [&_.mediverse-callout[data-callout='important']::before]:content-['Important']
+
+          [&_.mediverse-callout[data-callout='warning']::before]:text-amber-700
+          [&_.mediverse-callout[data-callout='warning']::before]:content-['Warning']
+
+          [&_.mediverse-callout[data-callout='tip']::before]:text-emerald-700
+          [&_.mediverse-callout[data-callout='tip']::before]:content-['Tip']
+
+          /* Callout content */
+          [&_.mediverse-callout_p]:my-1
+          [&_.mediverse-callout_p]:leading-7
+          [&_.mediverse-callout_p]:text-slate-700
+
+          [&_.mediverse-callout_ul]:my-3
+          [&_.mediverse-callout_ul]:pl-6
+
+          [&_.mediverse-callout_ol]:my-3
+          [&_.mediverse-callout_ol]:pl-6
+
+          [&_.mediverse-callout_li]:my-1
         "
         dangerouslySetInnerHTML={{
           __html: content,
