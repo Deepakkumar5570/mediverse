@@ -14,18 +14,25 @@ export function LessonNavigation({
   previous,
   next,
 }: Props) {
+  if (!previous && !next) {
+    return null;
+  }
+
   return (
-    <nav className="mt-10 grid gap-4 border-t pt-6 sm:grid-cols-2">
+    <nav
+      aria-label="Lesson navigation"
+      className="mt-14 grid gap-8 border-t border-slate-200 pt-8 sm:grid-cols-2"
+    >
       {previous ? (
         <Link
           href={`/learn/subtopics/${previous.id}`}
-          className="group rounded-xl border p-4 transition hover:bg-muted"
+          className="group"
         >
-          <span className="text-sm text-muted-foreground">
-            Previous Lesson
+          <span className="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">
+            Previous lesson
           </span>
 
-          <span className="mt-1 block font-medium group-hover:underline">
+          <span className="mt-2 block text-sm font-semibold leading-6 text-slate-800 group-hover:text-indigo-600">
             ← {previous.title}
           </span>
         </Link>
@@ -36,13 +43,13 @@ export function LessonNavigation({
       {next ? (
         <Link
           href={`/learn/subtopics/${next.id}`}
-          className="group rounded-xl border p-4 text-right transition hover:bg-muted"
+          className="group text-left sm:text-right"
         >
-          <span className="text-sm text-muted-foreground">
-            Next Lesson
+          <span className="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">
+            Next lesson
           </span>
 
-          <span className="mt-1 block font-medium group-hover:underline">
+          <span className="mt-2 block text-sm font-semibold leading-6 text-slate-800 group-hover:text-indigo-600">
             {next.title} →
           </span>
         </Link>

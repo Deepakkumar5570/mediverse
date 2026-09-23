@@ -19,6 +19,8 @@ export const semesters = pgTable("semesters", {
 
   name: varchar("name", { length: 100 }).notNull(),
 
+  slug: varchar("slug", { length: 120 }).notNull().unique(),
+
   number: integer("number").notNull(),
 
   status: varchar("status", { length: 20 })

@@ -53,6 +53,17 @@ export const createUnitsSchema = z.object({
           )
           .max(200),
 
+
+        slug: z
+          .string()
+          .trim()
+          .min(2)
+          .max(220)
+          .regex(
+            /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+            "Slug must contain only lowercase letters, numbers, and hyphens.",
+          ),
+
         description: z
           .string()
           .trim()

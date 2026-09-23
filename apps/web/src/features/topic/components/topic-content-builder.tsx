@@ -160,22 +160,54 @@ export default function TopicContentBuilder() {
   }, []);
 
 
+  function handleProgramChange(value: string) {
+    setProgramId(value);
+    setSemesterId("");
+    setSubjectId("");
+    setUnitId("");
+    setSemesters([]);
+    setSubjects([]);
+    setUnits([]);
+    setTopics([]);
+    setError("");
+    setSuccess("");
+  }
+
+  function handleSemesterChange(value: string) {
+    setSemesterId(value);
+    setSubjectId("");
+    setUnitId("");
+    setSubjects([]);
+    setUnits([]);
+    setTopics([]);
+    setError("");
+    setSuccess("");
+  }
+
+  function handleSubjectChange(value: string) {
+    setSubjectId(value);
+    setUnitId("");
+    setUnits([]);
+    setTopics([]);
+    setError("");
+    setSuccess("");
+  }
+
+  function handleUnitChange(value: string) {
+    setUnitId(value);
+    setTopics([]);
+    setError("");
+    setSuccess("");
+  }
+
+
   /**
    * Load semesters when program changes.
    */
   useEffect(() => {
     if (!programId) {
-      setSemesters([]);
       return;
     }
-
-    setSemesterId("");
-    setSubjectId("");
-    setUnitId("");
-
-    setSubjects([]);
-    setUnits([]);
-    setTopics([]);
 
     async function load() {
       try {
@@ -205,15 +237,8 @@ export default function TopicContentBuilder() {
    */
   useEffect(() => {
     if (!semesterId) {
-      setSubjects([]);
       return;
     }
-
-    setSubjectId("");
-    setUnitId("");
-
-    setUnits([]);
-    setTopics([]);
 
     async function load() {
       try {
@@ -243,12 +268,8 @@ export default function TopicContentBuilder() {
    */
   useEffect(() => {
     if (!subjectId) {
-      setUnits([]);
       return;
     }
-
-    setUnitId("");
-    setTopics([]);
 
     async function load() {
       try {
@@ -278,7 +299,6 @@ export default function TopicContentBuilder() {
    */
   useEffect(() => {
     if (!unitId) {
-      setTopics([]);
       return;
     }
 
@@ -503,7 +523,7 @@ export default function TopicContentBuilder() {
             <select
               value={programId}
               onChange={(event) =>
-                setProgramId(
+                handleProgramChange(
                   event.target.value,
                 )
               }
@@ -535,7 +555,7 @@ export default function TopicContentBuilder() {
               value={semesterId}
               disabled={!programId}
               onChange={(event) =>
-                setSemesterId(
+                handleSemesterChange(
                   event.target.value,
                 )
               }
@@ -567,7 +587,7 @@ export default function TopicContentBuilder() {
               value={subjectId}
               disabled={!semesterId}
               onChange={(event) =>
-                setSubjectId(
+                handleSubjectChange(
                   event.target.value,
                 )
               }
@@ -599,7 +619,7 @@ export default function TopicContentBuilder() {
               value={unitId}
               disabled={!subjectId}
               onChange={(event) =>
-                setUnitId(
+                handleUnitChange(
                   event.target.value,
                 )
               }

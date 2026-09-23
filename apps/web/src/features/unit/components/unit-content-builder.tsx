@@ -1,12 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+} from "react";
+
 import { useRouter } from "next/navigation";
 
 import {
-  createUnitsAction,
   getUnitsBySubjectAction,
-} from "../actions";
+} from "../actions/get-units";
+
+import {
+  createUnitsAction,
+} from "../actions/create-units";
 
 type Program = {
   id: string;
@@ -73,75 +82,103 @@ export function UnitContentBuilder({
 }: Props) {
   const router = useRouter();
 
-  const [programId, setProgramId] = useState("");
-  const [semesterId, setSemesterId] = useState("");
-  const [subjectId, setSubjectId] = useState("");
+  const [programId, setProgramId] =
+    useState("");
 
-  const [units, setUnits] = useState<Unit[]>([]);
-  const [drafts, setDrafts] = useState<UnitDraft[]>([
-    emptyDraft(),
-  ]);
+  const [semesterId, setSemesterId] =
+    useState("");
 
-  const [loadingUnits, setLoadingUnits] = useState(false);
-  const [creating, setCreating] = useState(false);
+  const [subjectId, setSubjectId] =
+    useState("");
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [units, setUnits] =
+    useState<Unit[]>([]);
 
-  const filteredSemesters = useMemo(() => {
-    if (!programId) return [];
+  const [drafts, setDrafts] =
+    useState<UnitDraft[]>([
+      emptyDraft(),
+    ]);
 
-    return semesters
-      .filter(
-        (semester) =>
-          semester.programId === programId,
-      )
-      .sort(
-        (a, b) => a.number - b.number,
+  const [loadingUnits, setLoadingUnits] =
+    useState(false);
+
+  const [creating, setCreating] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  const [success, setSuccess] =
+    useState("");
+
+  const filteredSemesters =
+    useMemo(() => {
+      if (!programId) {
+        return [];
+      }
+
+      return semesters
+        .filter(
+          (semester) =>
+            semester.programId ===
+            programId,
+        )
+        .sort(
+          (a, b) =>
+            a.number - b.number,
+        );
+    }, [programId, semesters]);
+
+  const filteredSubjects =
+    useMemo(() => {
+      if (!semesterId) {
+        return [];
+      }
+
+      return subjects.filter(
+        (subject) =>
+          subject.semesterId ===
+          semesterId,
       );
-  }, [programId, semesters]);
+    }, [semesterId, subjects]);
 
-  const filteredSubjects = useMemo(() => {
-    if (!semesterId) return [];
-
-    return subjects.filter(
-      (subject) =>
-        subject.semesterId === semesterId,
+  const selectedProgram =
+    programs.find(
+      (program) =>
+        program.id === programId,
     );
-  }, [semesterId, subjects]);
 
-  const selectedProgram = programs.find(
-    (program) =>
-      program.id === programId,
-  );
+  const selectedSemester =
+    semesters.find(
+      (semester) =>
+        semester.id === semesterId,
+    );
 
-  const selectedSemester = semesters.find(
-    (semester) =>
-      semester.id === semesterId,
-  );
-
-  const selectedSubject = subjects.find(
-    (subject) =>
-      subject.id === subjectId,
-  );
+  const selectedSubject =
+    subjects.find(
+      (subject) =>
+        subject.id === subjectId,
+    );
 
   const nextUnitNumber =
     units.length > 0
       ? Math.max(
-          ...units.map(
-            (unit) => unit.unitNumber,
-          ),
-        ) + 1
+        ...units.map(
+          (unit) =>
+            unit.unitNumber,
+        ),
+      ) + 1
       : 1;
 
-  const readyCount = drafts.filter(
-    (draft) =>
-      draft.title.trim().length >= 2,
-  ).length;
+  const readyCount =
+    drafts.filter(
+      (draft) =>
+        draft.title.trim().length >=
+        2,
+    ).length;
 
   useEffect(() => {
     if (!subjectId) {
-      setUnits([]);
       return;
     }
 
@@ -221,9 +258,9 @@ export function UnitContentBuilder({
         (draft, draftIndex) =>
           draftIndex === index
             ? {
-                ...draft,
-                [field]: value,
-              }
+              ...draft,
+              [field]: value,
+            }
             : draft,
       ),
     );
@@ -264,7 +301,7 @@ export function UnitContentBuilder({
   }
 
   async function handleSubmit(
-    event: React.FormEvent<HTMLFormElement>,
+    event: FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
 
@@ -278,10 +315,12 @@ export function UnitContentBuilder({
       return;
     }
 
-    const validDrafts = drafts.filter(
-      (draft) =>
-        draft.title.trim().length >= 2,
-    );
+    const validDrafts =
+      drafts.filter(
+        (draft) =>
+          draft.title.trim()
+            .length >= 2,
+      );
 
     if (validDrafts.length === 0) {
       setError(
@@ -293,21 +332,35 @@ export function UnitContentBuilder({
     setCreating(true);
 
     try {
+      /*
+       * IMPORTANT:
+       *
+       * Batch unit creation intentionally
+       * does NOT send slug.
+       *
+       * The server/repository generates:
+       * - unitNumber
+       * - slug
+       *
+       * for every unit.
+       */
       const created =
         await createUnitsAction({
           subjectId,
 
           units: validDrafts.map(
             (draft) => ({
-              title:
-                draft.title.trim(),
+              title: draft.title.trim(),
+
+              slug: slugify(
+                draft.title,
+              ),
 
               description:
                 draft.description.trim() ||
                 undefined,
 
-              status:
-                draft.status,
+              status: draft.status,
             }),
           ),
         });
@@ -322,10 +375,9 @@ export function UnitContentBuilder({
       setDrafts([emptyDraft()]);
 
       setSuccess(
-        `${created.length} ${
-          created.length === 1
-            ? "unit"
-            : "units"
+        `${created.length} ${created.length === 1
+          ? "unit"
+          : "units"
         } created successfully.`,
       );
 
@@ -344,38 +396,42 @@ export function UnitContentBuilder({
   return (
     <main className="min-h-screen bg-slate-50/60">
       <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-
-        {/* Page header */}
+        {/* =================================================
+                    HEADER
+                ================================================== */}
 
         <div className="mb-8">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-indigo-600">
+            Curriculum
+          </p>
+
+          <h1 className="mt-1 text-2xl font-black tracking-tight text-slate-900">
             Unit Builder
           </h1>
 
           <p className="mt-1 text-sm text-slate-500">
-            Create and organize units for a subject.
+            Create and organize multiple
+            units for a subject at once.
           </p>
         </div>
 
+        {/* =================================================
+                    HIERARCHY
+                ================================================== */}
 
-        {/* 1. Select subject */}
-
-        <section className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-
+        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="border-b border-slate-200 px-5 py-5">
-            <h2 className="text-base font-semibold text-slate-900">
+            <h2 className="text-base font-bold text-slate-900">
               Select subject
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
-              Choose the exact academic hierarchy
-              for the units you want to create.
+              Choose the academic hierarchy
+              where these units belong.
             </p>
           </div>
 
-
           <div className="grid gap-5 p-5 md:grid-cols-3">
-
             {/* Program */}
 
             <div>
@@ -403,16 +459,21 @@ export function UnitContentBuilder({
                 {programs.map(
                   (program) => (
                     <option
-                      key={program.id}
-                      value={program.id}
+                      key={
+                        program.id
+                      }
+                      value={
+                        program.id
+                      }
                     >
-                      {program.name}
+                      {
+                        program.name
+                      }
                     </option>
                   ),
                 )}
               </select>
             </div>
-
 
             {/* Semester */}
 
@@ -442,16 +503,21 @@ export function UnitContentBuilder({
                 {filteredSemesters.map(
                   (semester) => (
                     <option
-                      key={semester.id}
-                      value={semester.id}
+                      key={
+                        semester.id
+                      }
+                      value={
+                        semester.id
+                      }
                     >
-                      {semester.name}
+                      {
+                        semester.name
+                      }
                     </option>
                   ),
                 )}
               </select>
             </div>
-
 
             {/* Subject */}
 
@@ -481,37 +547,42 @@ export function UnitContentBuilder({
                 {filteredSubjects.map(
                   (subject) => (
                     <option
-                      key={subject.id}
-                      value={subject.id}
+                      key={
+                        subject.id
+                      }
+                      value={
+                        subject.id
+                      }
                     >
-                      {subject.name}
+                      {
+                        subject.name
+                      }
                     </option>
                   ),
                 )}
               </select>
             </div>
-
           </div>
         </section>
 
-
-        {/* Working context */}
+        {/* =================================================
+                    CONTEXT
+                ================================================== */}
 
         {subjectId &&
           selectedSubject && (
-            <section className="mt-6 rounded-xl border border-indigo-100 bg-indigo-50/40 px-5 py-4">
-
+            <section className="mt-5 rounded-2xl border border-indigo-100 bg-indigo-50/50 px-5 py-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-indigo-600">
+                  <p className="text-xs font-bold uppercase tracking-wide text-indigo-600">
                     Working context
                   </p>
 
                   <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-
                     <span className="text-slate-500">
-                      {selectedProgram?.name}
+                      {
+                        selectedProgram?.name
+                      }
                     </span>
 
                     <span className="text-slate-300">
@@ -519,78 +590,79 @@ export function UnitContentBuilder({
                     </span>
 
                     <span className="text-slate-500">
-                      {selectedSemester?.name}
+                      {
+                        selectedSemester?.name
+                      }
                     </span>
 
                     <span className="text-slate-300">
                       ›
                     </span>
 
-                    <span className="font-medium text-slate-900">
-                      {selectedSubject.name}
+                    <span className="font-semibold text-slate-900">
+                      {
+                        selectedSubject.name
+                      }
                     </span>
-
                   </div>
                 </div>
-
 
                 <button
                   type="button"
                   onClick={() => {
-                    setSubjectId("");
+                    setSubjectId(
+                      "",
+                    );
                     setUnits([]);
                     setError("");
                     setSuccess("");
                   }}
-                  className="self-start text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                  className="self-start text-sm font-semibold text-indigo-600 hover:text-indigo-700"
                 >
                   Change subject
                 </button>
-
               </div>
             </section>
           )}
 
-
-        {/* Existing units */}
+        {/* =================================================
+                    EXISTING UNITS
+                ================================================== */}
 
         {subjectId && (
           <section className="mt-8">
-
             <div className="mb-3">
-              <h2 className="text-base font-semibold text-slate-900">
+              <h2 className="text-base font-bold text-slate-900">
                 Existing units
               </h2>
 
               <p className="mt-1 text-sm text-slate-500">
                 {units.length === 0
                   ? "No units have been created yet."
-                  : `${units.length} ${
-                      units.length === 1
-                        ? "unit"
-                        : "units"
-                    } already created.`}
+                  : `${units.length} ${units.length ===
+                    1
+                    ? "unit"
+                    : "units"
+                  } already created.`}
               </p>
             </div>
 
-
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               {loadingUnits ? (
                 <div className="px-5 py-12 text-center text-sm text-slate-500">
                   Loading units...
                 </div>
-              ) : units.length === 0 ? (
+              ) : units.length ===
+                0 ? (
                 <div className="px-5 py-12 text-center">
-
-                  <p className="text-sm font-medium text-slate-700">
+                  <p className="text-sm font-semibold text-slate-700">
                     No units yet
                   </p>
 
                   <p className="mt-1 text-sm text-slate-400">
-                    Add the first unit below.
+                    Add the first unit
+                    below.
                   </p>
-
                 </div>
               ) : (
                 units
@@ -601,84 +673,86 @@ export function UnitContentBuilder({
                       b.unitNumber,
                   )
                   .map(
-                    (unit, index) => (
+                    (
+                      unit,
+                      index,
+                    ) => (
                       <div
-                        key={unit.id}
-                        className={`flex items-center gap-4 px-5 py-4 ${
-                          index !==
-                          units.length - 1
+                        key={
+                          unit.id
+                        }
+                        className={`flex items-center gap-4 px-5 py-4 ${index !==
+                            units.length -
+                            1
                             ? "border-b border-slate-100"
                             : ""
-                        }`}
+                          }`}
                       >
-
-                        {/* Number */}
-
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-xs font-medium text-slate-600">
-                          {unit.unitNumber}
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-xs font-bold text-indigo-700">
+                          {
+                            unit.unitNumber
+                          }
                         </div>
-
-
-                        {/* Content */}
 
                         <div className="min-w-0 flex-1">
-
                           <p className="truncate text-sm font-semibold text-slate-900">
-                            {unit.title}
+                            {
+                              unit.title
+                            }
                           </p>
 
-                          <p className="mt-1 truncate text-xs text-slate-400">
-                            /{unit.slug}
+                          <p className="mt-1 truncate font-mono text-xs text-slate-400">
+                            /
+                            {
+                              unit.slug
+                            }
                           </p>
-
                         </div>
-
-
-                        {/* Edit */}
 
                         <a
                           href={`/admin/units/${unit.id}/edit`}
-                          className="shrink-0 text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                          className="shrink-0 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
                         >
                           Edit
                         </a>
-
                       </div>
                     ),
                   )
               )}
-
             </div>
           </section>
         )}
 
-
-        {/* Add units */}
+        {/* =================================================
+                    ADD UNITS
+                ================================================== */}
 
         {subjectId && (
           <section className="mt-8">
-
             <div className="mb-3">
-              <h2 className="text-base font-semibold text-slate-900">
+              <h2 className="text-base font-bold text-slate-900">
                 Add units
               </h2>
 
               <p className="mt-1 text-sm text-slate-500">
-                Create units in bulk. Numbers and
-                slugs are generated automatically.
+                Create multiple units together.
+                Unit numbers and slugs are
+                generated automatically.
               </p>
             </div>
 
-
             <form
-              onSubmit={handleSubmit}
-              className="overflow-hidden rounded-xl border border-slate-200 bg-white"
+              onSubmit={
+                handleSubmit
+              }
+              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
             >
-
               <div className="space-y-4 p-5">
-
                 {drafts.map(
-                  (draft, index) => {
+                  (
+                    draft,
+                    index,
+                  ) => {
                     const number =
                       nextUnitNumber +
                       index;
@@ -691,30 +765,32 @@ export function UnitContentBuilder({
 
                     return (
                       <div
-                        key={index}
-                        className="rounded-xl border border-slate-200 bg-slate-50/40 p-4 sm:p-5"
+                        key={
+                          index
+                        }
+                        className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4 sm:p-5"
                       >
-
-                        {/* Card header */}
-
                         <div className="mb-5 flex items-center gap-3">
-
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-600">
-                            {number}
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-xs font-black text-indigo-700">
+                            {
+                              number
+                            }
                           </div>
 
                           <div>
-                            <p className="text-sm font-medium text-slate-900">
-                              New unit
+                            <p className="text-sm font-bold text-slate-900">
+                              New
+                              unit
                             </p>
 
                             <p className="text-xs text-slate-400">
-                              Unit {number}
+                              Unit{" "}
+                              {
+                                number
+                              }
                             </p>
                           </div>
-
                         </div>
-
 
                         {/* Title */}
 
@@ -732,11 +808,15 @@ export function UnitContentBuilder({
                             value={
                               draft.title
                             }
-                            onChange={(event) =>
+                            onChange={(
+                              event,
+                            ) =>
                               updateDraft(
                                 index,
                                 "title",
-                                event.target.value,
+                                event
+                                  .target
+                                  .value,
                               )
                             }
                             placeholder="e.g. Chromatographic Techniques"
@@ -744,11 +824,9 @@ export function UnitContentBuilder({
                           />
                         </div>
 
-
                         {/* Description */}
 
                         <div className="mt-5">
-
                           <label
                             htmlFor={`unit-description-${index}`}
                             className="mb-2 block text-sm font-medium text-slate-900"
@@ -761,43 +839,46 @@ export function UnitContentBuilder({
 
                           <textarea
                             id={`unit-description-${index}`}
-                            rows={3}
+                            rows={
+                              3
+                            }
                             value={
                               draft.description
                             }
-                            onChange={(event) =>
+                            onChange={(
+                              event,
+                            ) =>
                               updateDraft(
                                 index,
                                 "description",
-                                event.target.value,
+                                event
+                                  .target
+                                  .value,
                               )
                             }
                             placeholder="Short description..."
                             className="w-full resize-y rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
                           />
-
                         </div>
-
 
                         {/* Slug preview */}
 
-                        <div className="mt-4 rounded-lg border border-dashed border-slate-200 bg-white px-4 py-3">
-
+                        <div className="mt-4 rounded-xl border border-dashed border-slate-200 bg-white px-4 py-3">
                           <p className="text-xs text-slate-400">
-                            Slug preview
+                            Slug
+                            preview
                           </p>
 
                           <p className="mt-1 break-all font-mono text-xs text-slate-600">
-                            {slug}
+                            {
+                              slug
+                            }
                           </p>
-
                         </div>
-
 
                         {/* Status */}
 
                         <div className="mt-4">
-
                           <label
                             htmlFor={`unit-status-${index}`}
                             className="mb-2 block text-sm font-medium text-slate-900"
@@ -810,11 +891,15 @@ export function UnitContentBuilder({
                             value={
                               draft.status
                             }
-                            onChange={(event) =>
+                            onChange={(
+                              event,
+                            ) =>
                               updateDraft(
                                 index,
                                 "status",
-                                event.target.value,
+                                event
+                                  .target
+                                  .value,
                               )
                             }
                             className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
@@ -827,49 +912,46 @@ export function UnitContentBuilder({
                               Inactive
                             </option>
                           </select>
-
                         </div>
 
-
-                        {/* Remove */}
-
-                        {drafts.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              removeDraft(
-                                index,
-                              )
-                            }
-                            className="mt-4 text-sm font-medium text-slate-500 hover:text-red-600"
-                          >
-                            Remove
-                          </button>
-                        )}
-
+                        {drafts.length >
+                          1 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                removeDraft(
+                                  index,
+                                )
+                              }
+                              className="mt-4 text-sm font-semibold text-slate-500 hover:text-red-600"
+                            >
+                              Remove
+                            </button>
+                          )}
                       </div>
                     );
                   },
                 )}
-
               </div>
 
-
-              {/* Bottom actions */}
+              {/* =================================================
+                                ACTIONS
+                            ================================================== */}
 
               <div className="border-t border-slate-200 px-5 py-4">
-
                 <button
                   type="button"
                   onClick={
                     addAnotherUnit
                   }
-                  disabled={creating}
-                  className="flex min-h-10 w-full items-center justify-center rounded-lg border border-dashed border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 disabled:opacity-50"
+                  disabled={
+                    creating
+                  }
+                  className="flex min-h-10 w-full items-center justify-center rounded-lg border border-dashed border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50/40 disabled:opacity-50"
                 >
-                  + Add another unit
+                  + Add another
+                  unit
                 </button>
-
 
                 {error && (
                   <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -877,29 +959,25 @@ export function UnitContentBuilder({
                   </div>
                 )}
 
-
                 {success && (
                   <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                     {success}
                   </div>
                 )}
 
-
                 <div className="mt-5 flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
-
-                  <div className="text-sm text-slate-500">
-                    {readyCount === 0
+                  <p className="text-sm text-slate-500">
+                    {readyCount ===
+                      0
                       ? "0 ready to create"
-                      : `${readyCount} ${
-                          readyCount === 1
-                            ? "unit"
-                            : "units"
-                        } ready to create`}
-                  </div>
-
+                      : `${readyCount} ${readyCount ===
+                        1
+                        ? "unit"
+                        : "units"
+                      } ready to create`}
+                  </p>
 
                   <div className="flex gap-3">
-
                     <button
                       type="button"
                       onClick={
@@ -908,41 +986,34 @@ export function UnitContentBuilder({
                       disabled={
                         creating
                       }
-                      className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+                      className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
                     >
                       Clear
                     </button>
-
 
                     <button
                       type="submit"
                       disabled={
                         creating ||
                         readyCount ===
-                          0
+                        0
                       }
-                      className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+                      className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
                     >
                       {creating
                         ? "Creating..."
-                        : `Create ${readyCount} ${
-                            readyCount ===
-                            1
-                              ? "Unit"
-                              : "Units"
-                          }`}
+                        : `Create ${readyCount} ${readyCount ===
+                          1
+                          ? "Unit"
+                          : "Units"
+                        }`}
                     </button>
-
                   </div>
-
                 </div>
-
               </div>
-
             </form>
           </section>
         )}
-
       </div>
     </main>
   );

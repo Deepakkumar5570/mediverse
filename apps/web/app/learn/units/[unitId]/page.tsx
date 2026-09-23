@@ -1,24 +1,28 @@
-import { notFound } from "next/navigation";
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
 
 import {
     Breadcrumb,
     LearnLayout,
-    ExplorerGrid,
-    Section,
 } from "@/src/components/learn";
 
-import {
-    getUnitDetailsAction,
-} from "@/src/features/learn/units";
+import { getUnitDetailsAction } from "@/src/features/learn/units";
+
+import { getTopicsByUnitAction } from "@/src/features/topic";
+
+import { getSubtopicsByTopicAction } from "@/src/features/subtopic";
 
 import {
-    getTopicsByUnitAction,
-    TopicCard,
-} from "@/src/features/learn/topics";
+    getUnitByIdAction,
+    getUnitBySlugAction,
+} from "@/src/features/unit";
 
 import {
     getSingleUnitProgressAction,
+    getSubtopicProgressAction,
 } from "@/src/features/progress";
+
+import { isUuid } from "@/src/lib/learn/routing";
 
 type Props = {
     params: Promise<{
@@ -29,25 +33,143 @@ type Props = {
     }>;
 };
 
+type TopicGroup = {
+    id: string;
+    title: string;
+    topicNumber: number;
+    description: string | null;
+    subtopics: Array<{
+        id: string;
+        title: string;
+        slug: string;
+        subtopicNumber: number;
+        description: string | null;
+        completed: boolean;
+    }>;
+};
+
 export default async function UnitDetailsPage({
     params,
     searchParams,
 }: Props) {
-    const { unitId } = await params;
+    const { unitId: unitSlugOrId } = await params;
     const { mode } = await searchParams;
 
     const isPracticeMode = mode === "practice";
 
-    const details = await getUnitDetailsAction(unitId);
+    /*
+     * Support both:
+     *
+     * /learn/units/:uuid
+     * /learn/units/:slug
+     */
+    const resolvedUnit = isUuid(unitSlugOrId)
+        ? await getUnitByIdAction(unitSlugOrId)
+        : await getUnitBySlugAction(unitSlugOrId);
+
+    if (!resolvedUnit) {
+        notFound();
+    }
+
+    /*
+     * Old UUID URL -> canonical slug URL.
+     */
+    if (isUuid(unitSlugOrId)) {
+        redirect(
+            `/learn/units/${resolvedUnit.slug}`,
+        );
+    }
+
+    const unitId = resolvedUnit.id;
+
+    const details =
+        await getUnitDetailsAction(unitId);
 
     if (!details) {
         notFound();
     }
 
-    const topics = await getTopicsByUnitAction(unitId);
+    const topics =
+        await getTopicsByUnitAction(unitId);
+
+    /*
+     * Build:
+     *
+     * Unit
+     *   ├── Topic
+     *   │    ├── Lesson
+     *   │    ├── Lesson
+     *   │
+     *   ├── Topic
+     *        ├── Lesson
+     *
+     * Progress is fetched for each lesson so
+     * the Completed badge is real.
+     */
+    const topicGroups: TopicGroup[] =
+        await Promise.all(
+            topics.map(async (topic) => {
+                const subtopics =
+                    await getSubtopicsByTopicAction(
+                        topic.id,
+                    );
+
+                const subtopicsWithProgress =
+                    await Promise.all(
+                        subtopics.map(
+                            async (subtopic) => {
+                                const progress =
+                                    await getSubtopicProgressAction(
+                                        subtopic.id,
+                                    );
+
+                                return {
+                                    id: subtopic.id,
+                                    title: subtopic.title,
+                                    slug: subtopic.slug,
+                                    subtopicNumber:
+                                        subtopic.subtopicNumber,
+                                    description:
+                                        subtopic.description,
+                                    completed:
+                                        progress.percentage >=
+                                        100,
+                                };
+                            },
+                        ),
+                    );
+
+                return {
+                    id: topic.id,
+                    title: topic.title,
+                    topicNumber:
+                        topic.topicNumber,
+                    description:
+                        topic.description,
+                    subtopics:
+                        subtopicsWithProgress,
+                };
+            }),
+        );
 
     const unitProgress =
-        await getSingleUnitProgressAction(unitId);
+        await getSingleUnitProgressAction(
+            unitId,
+        );
+
+    const totalLessons =
+        topicGroups.reduce(
+            (total, topic) =>
+                total +
+                topic.subtopics.length,
+            0,
+        );
+
+    const completedLessons =
+        unitProgress.completed;
+
+    const progressPercentage =
+        unitProgress.percentage;
 
     const {
         unit,
@@ -56,22 +178,12 @@ export default async function UnitDetailsPage({
         program,
     } = details;
 
-    const progressMessage =
-        unitProgress.percentage === 100
-            ? "You&apos;ve completed this entire unit."
-            : unitProgress.percentage >= 75
-                ? "You&apos;re almost done. Keep going."
-                : unitProgress.percentage >= 50
-                    ? "You&apos;re more than halfway through. Keep the momentum going."
-                    : unitProgress.percentage > 0
-                        ? "Good progress. Keep learning one topic at a time."
-                        : "Start your journey by exploring the first topic.";
-
     return (
         <LearnLayout>
             {/* =====================================================
-                BREADCRUMBS
-            ===================================================== */}
+                BREADCRUMB
+            ====================================================== */}
+
             <Breadcrumb
                 items={[
                     {
@@ -84,11 +196,11 @@ export default async function UnitDetailsPage({
                     },
                     {
                         label: semester.name,
-                        href: `/learn/semesters/${semester.id}`,
+                        href: `/learn/semesters/${semester.slug}`,
                     },
                     {
                         label: subject.name,
-                        href: `/learn/subjects/${subject.id}`,
+                        href: `/learn/subjects/${subject.slug}`,
                     },
                     {
                         label: unit.title,
@@ -96,261 +208,511 @@ export default async function UnitDetailsPage({
                 ]}
             />
 
-            {/* =====================================================
-                HERO
-            ===================================================== */}
-            <section className="relative mt-5 overflow-hidden rounded-[2rem] border border-slate-200 bg-gradient-to-br from-white via-indigo-50/70 to-violet-100/70 px-6 py-8 shadow-sm sm:px-8 sm:py-10 lg:px-10 lg:py-12">
-                {/* Decorative blobs */}
-                <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-indigo-300/20 blur-3xl" />
+            <div className="mx-auto mt-5 max-w-7xl px-4 pb-10 sm:px-6 lg:px-8">
+                {/* =================================================
+                    BACK TO SUBJECT
+                ================================================== */}
 
-                <div className="pointer-events-none absolute bottom-[-100px] left-1/2 h-64 w-64 rounded-full bg-violet-300/15 blur-3xl" />
-
-                <div className="relative">
-                    {/* Badges */}
-                    <div className="flex flex-wrap items-center gap-2">
-                        <span className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white px-3 py-1.5 text-xs font-bold text-indigo-700 shadow-sm">
-                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                            {program.name}
-                        </span>
-
-                        <span className="rounded-full border border-slate-200 bg-white/80 px-3 py-1.5 text-xs font-semibold text-slate-600">
-                            {semester.name}
-                        </span>
-
-                        <span className="rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-700">
-                            Unit {unit.unitNumber}
-                        </span>
-                    </div>
-
-                    {/* Heading */}
-                    <h1 className="mt-6 max-w-4xl text-4xl font-black tracking-[-0.04em] text-slate-950 sm:text-5xl lg:text-6xl">
-                        {unit.title}
-                    </h1>
-
-                    <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-                        Explore the topics inside this unit and build
-                        your understanding step by step.
-                    </p>
-
-                    {/* Hero meta */}
-                    <div className="mt-7 flex flex-wrap gap-2">
-                        <span className="rounded-full border border-indigo-100 bg-white px-3 py-1.5 text-xs font-semibold text-indigo-700">
-                            🧠 {subject.name}
-                        </span>
-
-                        <span className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
-                            📚 {topics.length}{" "}
-                            {topics.length === 1
-                                ? "Topic"
-                                : "Topics"}
-                        </span>
-
-                        <span className="rounded-full border border-amber-100 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700">
-                            🎯 {unitProgress.percentage}% complete
-                        </span>
-                    </div>
-                </div>
-            </section>
-
-            {/* =====================================================
-                UNIT OVERVIEW
-            ===================================================== */}
-            <section className="mt-10">
-                <div className="mb-5">
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-600">
-                        Unit Overview
-                    </p>
-
-                    <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
-                        Understand what you&apos;ll learn.
-                    </h2>
-
-                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                        Get familiar with this unit before moving into
-                        its topics and focused learning material.
-                    </p>
-                </div>
-
-                <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                    <div className="p-6 sm:p-8">
-                        <div className="flex gap-4">
-                            <div className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-xl ring-1 ring-indigo-100 sm:flex">
-                                🧠
-                            </div>
-
-                            <div className="min-w-0">
-                                <p className="text-xs font-bold uppercase tracking-[0.16em] text-indigo-600">
-                                    About this unit
-                                </p>
-
-                                <h3 className="mt-1 text-lg font-black text-slate-950">
-                                    {unit.title}
-                                </h3>
-                            </div>
-                        </div>
-
-                        <div className="mt-6 rounded-2xl border border-slate-100 bg-slate-50/70 p-5 sm:p-6">
-                            <p className="text-sm leading-7 text-slate-600 sm:text-base">
-                                {unit.description ??
-                                    "No description available."}
-                            </p>
-                        </div>
-                    </div>
-                </section>
-            </section>
-
-            {/* =====================================================
-                PROGRESS
-            ===================================================== */}
-            <section className="mt-10">
-                <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-                    <div>
-                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-600">
-                            Your Progress
-                        </p>
-
-                        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
-                            Keep moving forward.
-                        </h2>
-                    </div>
-
-                    <p className="text-xs font-semibold text-slate-400">
-                        {unitProgress.completed} of{" "}
-                        {unitProgress.total} lessons completed
-                    </p>
-                </div>
-
-                <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                    <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-                        {/* Percentage */}
-                        <div className="flex items-center gap-4">
-                            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-indigo-50 ring-8 ring-indigo-50/50">
-                                <span className="text-lg font-black text-indigo-700">
-                                    {unitProgress.percentage}%
-                                </span>
-                            </div>
-
-                            <div>
-                                <p className="text-sm font-bold text-slate-900">
-                                    Unit completion
-                                </p>
-
-                                <p className="mt-1 text-xs text-slate-500">
-                                    {progressMessage}
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Progress */}
-                        <div className="w-full md:max-w-xl">
-                            <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
-                                <div
-                                    className="h-full rounded-full bg-gradient-to-r from-indigo-600 via-violet-600 to-emerald-500 transition-all duration-700"
-                                    style={{
-                                        width: `${unitProgress.percentage}%`,
-                                    }}
-                                />
-                            </div>
-
-                            <div className="mt-2 flex justify-between text-[11px] font-medium text-slate-400">
-                                <span>Start</span>
-
-                                <span>
-                                    {unitProgress.percentage}% complete
-                                </span>
-
-                                <span>100%</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </section>
-
-            {/* =====================================================
-                TOPICS
-            ===================================================== */}
-            <section className="mt-10" id="topics">
-                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-                    <div>
-                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-600">
-                            Curriculum
-                        </p>
-
-                        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
-                            Explore the topics.
-                        </h2>
-
-                        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                            Choose a topic to continue deeper into this
-                            unit.
-                        </p>
-                    </div>
-
-                    <span className="w-fit rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600">
-                        {topics.length}{" "}
-                        {topics.length === 1
-                            ? "topic"
-                            : "topics"}
+                <Link
+                    href={`/learn/subjects/${subject.slug}`}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition-colors hover:text-indigo-600"
+                >
+                    <span className="text-base">
+                        ←
                     </span>
-                </div>
 
-                <div className="mt-6">
-                    {topics.length === 0 ? (
-                        <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-12 text-center">
-                            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-2xl">
-                                📚
+                    Back to Subject
+                </Link>
+
+                {/* =================================================
+                    UNIT HEADER
+                ================================================== */}
+
+                <section className="mt-5 overflow-hidden rounded-[26px] border border-indigo-100 bg-white shadow-sm">
+                    <div className="grid gap-7 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_220px] lg:p-8">
+                        <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <span className="rounded-lg bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-indigo-700">
+                                    Unit{" "}
+                                    {unit.unitNumber}
+                                </span>
+
+                                <span className="text-sm text-slate-400">
+                                    {subject.name}
+                                </span>
                             </div>
 
-                            <h3 className="mt-4 text-lg font-black text-slate-950">
-                                No topics available yet
-                            </h3>
+                            <h1 className="mt-3 max-w-4xl text-2xl font-black tracking-tight text-slate-950 sm:text-3xl lg:text-4xl">
+                                {unit.title}
+                            </h1>
 
-                            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
-                                Topics for this unit will appear here
-                                once they are added.
-                            </p>
+                            {unit.description && (
+                                <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-600 sm:text-base sm:leading-7">
+                                    {unit.description}
+                                </p>
+                            )}
+
+                            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-3 text-sm">
+                                <div className="flex items-center gap-2 text-slate-600">
+                                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                                        ▦
+                                    </span>
+
+                                    <span>
+                                        <strong className="font-bold text-slate-900">
+                                            {
+                                                topicGroups.length
+                                            }
+                                        </strong>{" "}
+                                        {topicGroups.length ===
+                                        1
+                                            ? "topic"
+                                            : "topics"}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center gap-2 text-slate-600">
+                                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
+                                        ▤
+                                    </span>
+
+                                    <span>
+                                        <strong className="font-bold text-slate-900">
+                                            {
+                                                totalLessons
+                                            }
+                                        </strong>{" "}
+                                        {totalLessons ===
+                                        1
+                                            ? "lesson"
+                                            : "lessons"}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center gap-2 text-slate-600">
+                                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                                        ◷
+                                    </span>
+
+                                    <span>
+                                        Self-paced learning
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                    ) : (
-                        <ExplorerGrid>
-                            {topics.map((topic) => (
-                               <TopicCard
-    key={topic.id}
-    topic={topic}
-    hrefSuffix={isPracticeMode ? "?mode=practice" : ""}
-/>
-                            ))}
-                        </ExplorerGrid>
-                    )}
-                </div>
-            </section>
 
-            {/* =====================================================
-                BOTTOM CTA
-            ===================================================== */}
-            {topics.length > 0 && (
-                <section className="mt-10 overflow-hidden rounded-[2rem] bg-slate-950 px-6 py-8 text-white shadow-xl sm:px-8 sm:py-9">
-                    <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                            <p className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-300">
-                                Continue learning
+                        {/* =================================================
+                            PROGRESS
+                        ================================================== */}
+
+                        <div className="rounded-[22px] border border-indigo-100 bg-gradient-to-br from-indigo-50/80 to-white p-5 text-center">
+                            <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full border-[9px] border-indigo-100 bg-white">
+                                <div className="flex h-[88px] w-[88px] items-center justify-center rounded-full border-[7px] border-indigo-500">
+                                    <span className="text-xl font-black text-slate-900">
+                                        {
+                                            progressPercentage
+                                        }
+                                        %
+                                    </span>
+                                </div>
+                            </div>
+
+                            <p className="mt-3 text-sm font-bold text-slate-900">
+                                {progressPercentage ===
+                                100
+                                    ? "Unit completed!"
+                                    : "Unit progress"}
                             </p>
 
-                            <h2 className="mt-2 text-2xl font-black tracking-tight">
-                                Ready to explore the topics?
+                            <p className="mt-1 text-xs leading-5 text-slate-500">
+                                {
+                                    completedLessons
+                                }{" "}
+                                of{" "}
+                                {
+                                    totalLessons
+                                }{" "}
+                                lessons completed
+                            </p>
+
+                            {progressPercentage ===
+                                100 && (
+                                <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2.5 text-xs font-semibold text-emerald-700">
+                                    ✓ All lessons
+                                    completed
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </section>
+
+                {/* =================================================
+                    PRACTICE MODE
+                ================================================== */}
+
+                {isPracticeMode && (
+                    <div className="mt-5 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-800">
+                        <span className="font-semibold">
+                            Practice mode
+                        </span>{" "}
+                        — choose a lesson below to
+                        continue.
+                    </div>
+                )}
+
+                {/* =================================================
+                    MAIN CONTENT
+                ================================================== */}
+
+                <div className="mt-8 grid gap-7 lg:grid-cols-[minmax(0,1fr)_290px]">
+                    {/* =================================================
+                        LESSON NAVIGATION
+                    ================================================== */}
+
+                    <main>
+                        <div className="mb-5">
+                            <p className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-600">
+                                Unit contents
+                            </p>
+
+                            <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+                                Choose a lesson
                             </h2>
 
-                            <p className="mt-2 max-w-xl text-sm leading-6 text-slate-400">
-                                Pick a topic above and continue your
-                                learning journey.
+                            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                                Select a topic to reveal
+                                its lessons. Open any
+                                lesson to start reading.
                             </p>
                         </div>
 
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-2xl">
-                            🚀
+                        {topicGroups.length ===
+                        0 ? (
+                            <div className="rounded-[22px] border border-slate-200 bg-white px-5 py-12 text-center">
+                                <h3 className="font-bold text-slate-900">
+                                    No lessons available
+                                    yet
+                                </h3>
+
+                                <p className="mt-1 text-sm text-slate-500">
+                                    Lessons will appear
+                                    here when they are
+                                    added.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {topicGroups.map(
+                                    (
+                                        topic,
+                                        index,
+                                    ) => {
+                                        const lessonCount =
+                                            topic
+                                                .subtopics
+                                                .length;
+
+                                        return (
+                                            <details
+                                                key={
+                                                    topic.id
+                                                }
+                                                id={`topic-${topic.id}`}
+                                                open={
+                                                    index ===
+                                                    0
+                                                }
+                                                className="group overflow-hidden rounded-[22px] border border-indigo-100 bg-white shadow-sm transition-all hover:border-indigo-200 hover:shadow-md"
+                                            >
+                                                {/* =================================================
+                                                    TOPIC HEADER
+                                                ================================================== */}
+
+                                                <summary className="cursor-pointer list-none px-4 py-4 sm:px-5 sm:py-5">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-sm font-black text-indigo-700 ring-1 ring-indigo-100">
+                                                            {String(
+                                                                topic.topicNumber,
+                                                            ).padStart(
+                                                                2,
+                                                                "0",
+                                                            )}
+                                                        </div>
+
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                                                                <h3 className="text-sm font-bold text-slate-900 sm:text-base">
+                                                                    {
+                                                                        topic.title
+                                                                    }
+                                                                </h3>
+
+                                                                <span className="text-xs font-semibold text-indigo-500">
+                                                                    {
+                                                                        lessonCount
+                                                                    }{" "}
+                                                                    {lessonCount ===
+                                                                    1
+                                                                        ? "lesson"
+                                                                        : "lessons"}
+                                                                </span>
+                                                            </div>
+
+                                                            {topic.description && (
+                                                                <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500 sm:text-sm">
+                                                                    {
+                                                                        topic.description
+                                                                    }
+                                                                </p>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Expand / collapse */}
+                                                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-indigo-100 bg-indigo-50 text-indigo-600 transition-all duration-200 group-open:rotate-180 group-hover:bg-indigo-100">
+                                                            ↓
+                                                        </span>
+                                                    </div>
+                                                </summary>
+
+                                                {/* =================================================
+                                                    LESSON LIST
+                                                ================================================== */}
+
+                                                <div className="border-t border-indigo-50 bg-slate-50/50 px-3 py-3 sm:px-4">
+                                                    {lessonCount ===
+                                                    0 ? (
+                                                        <div className="rounded-xl bg-white px-4 py-5 text-sm text-slate-500">
+                                                            No lessons
+                                                            available
+                                                            yet.
+                                                        </div>
+                                                    ) : (
+                                                        <div className="space-y-1.5">
+                                                            {topic.subtopics.map(
+                                                                (
+                                                                    subtopic,
+                                                                    lessonIndex,
+                                                                ) => (
+                                                                    <Link
+                                                                        key={
+                                                                            subtopic.id
+                                                                        }
+                                                                        href={`/learn/subtopics/${subtopic.id}`}
+                                                                        className="group/lesson flex items-center gap-3 rounded-xl border border-transparent bg-white px-3 py-3 transition-all hover:border-indigo-200 hover:bg-indigo-50/50 hover:shadow-sm sm:px-4"
+                                                                    >
+                                                                        {/* Number */}
+                                                                        <span className="w-6 shrink-0 text-center text-xs font-bold text-slate-400">
+                                                                            {String(
+                                                                                subtopic.subtopicNumber ??
+                                                                                    lessonIndex +
+                                                                                        1,
+                                                                            ).padStart(
+                                                                                2,
+                                                                                "0",
+                                                                            )}
+                                                                        </span>
+
+                                                                        {/* Lesson icon */}
+                                                                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100 transition group-hover/lesson:bg-indigo-100">
+                                                                            ▤
+                                                                        </span>
+
+                                                                        {/* Lesson content */}
+                                                                        <div className="min-w-0 flex-1">
+                                                                            <p className="text-sm font-bold text-indigo-800 transition-colors group-hover/lesson:text-indigo-600 sm:text-[15px]">
+                                                                                {
+                                                                                    subtopic.title
+                                                                                }
+                                                                            </p>
+
+                                                                            {subtopic.description && (
+                                                                                <p className="mt-0.5 line-clamp-1 text-xs leading-5 text-slate-400">
+                                                                                    {
+                                                                                        subtopic.description
+                                                                                    }
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+
+                                                                        {/* Completed */}
+                                                                        {subtopic.completed && (
+                                                                            <span className="hidden shrink-0 items-center gap-1 rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 sm:inline-flex">
+                                                                                <span>
+                                                                                    ✓
+                                                                                </span>
+                                                                                Completed
+                                                                            </span>
+                                                                        )}
+
+                                                                        {/* Navigation arrow */}
+                                                                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white shadow-sm transition-all group-hover/lesson:translate-x-0.5 group-hover/lesson:bg-violet-600 group-hover/lesson:shadow-md">
+                                                                            →
+                                                                        </span>
+                                                                    </Link>
+                                                                ),
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </details>
+                                        );
+                                    },
+                                )}
+                            </div>
+                        )}
+                    </main>
+
+                    {/* =================================================
+                        UNIT MAP
+                    ================================================== */}
+
+                    <aside>
+                        <div className="rounded-[24px] border border-indigo-100 bg-white p-5 shadow-sm lg:sticky lg:top-24">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-xl text-indigo-600">
+                                    ◫
+                                </div>
+
+                                <div>
+                                    <p className="text-xs font-bold uppercase tracking-[0.15em] text-indigo-400">
+                                        Unit map
+                                    </p>
+
+                                    <h3 className="mt-0.5 text-lg font-black text-slate-900">
+                                        In this unit
+                                    </h3>
+                                </div>
+                            </div>
+
+                            {/* Topic navigation */}
+                            <div className="relative mt-6">
+                                <div className="absolute bottom-6 left-[9px] top-5 w-px bg-indigo-100" />
+
+                                <div className="space-y-1">
+                                    {topicGroups.map(
+                                        (
+                                            topic,
+                                            index,
+                                        ) => (
+                                            <Link
+                                                key={
+                                                    topic.id
+                                                }
+                                                href={`#topic-${topic.id}`}
+                                                className="group/map relative flex gap-3 rounded-xl px-2 py-3 transition-colors hover:bg-indigo-50/60"
+                                            >
+                                                <span
+                                                    className={`relative z-10 mt-1 h-[18px] w-[18px] shrink-0 rounded-full border-4 border-white ${
+                                                        index ===
+                                                        0
+                                                            ? "bg-indigo-600 shadow-sm"
+                                                            : "bg-indigo-100 group-hover/map:bg-indigo-300"
+                                                    }`}
+                                                />
+
+                                                <span className="min-w-0">
+                                                    <span
+                                                        className={`block text-sm font-bold ${
+                                                            index ===
+                                                            0
+                                                                ? "text-indigo-700"
+                                                                : "text-slate-800 group-hover/map:text-indigo-700"
+                                                        }`}
+                                                    >
+                                                        <span className="mr-2 text-xs text-slate-400">
+                                                            {String(
+                                                                topic.topicNumber,
+                                                            ).padStart(
+                                                                2,
+                                                                "0",
+                                                            )}
+                                                        </span>
+
+                                                        {
+                                                            topic.title
+                                                        }
+                                                    </span>
+
+                                                    <span className="mt-1 block text-xs text-slate-400">
+                                                        {
+                                                            topic
+                                                                .subtopics
+                                                                .length
+                                                        }{" "}
+                                                        {topic
+                                                            .subtopics
+                                                            .length ===
+                                                        1
+                                                            ? "lesson"
+                                                            : "lessons"}
+                                                    </span>
+                                                </span>
+                                            </Link>
+                                        ),
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Unit statistics */}
+                            <div className="mt-5 border-t border-slate-100 pt-4">
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-slate-500">
+                                        Total lessons
+                                    </span>
+
+                                    <span className="font-bold text-slate-900">
+                                        {
+                                            totalLessons
+                                        }
+                                    </span>
+                                </div>
+
+                                <div className="mt-3 flex items-center justify-between text-sm">
+                                    <span className="text-slate-500">
+                                        Your progress
+                                    </span>
+
+                                    <span className="font-bold text-indigo-600">
+                                        {
+                                            progressPercentage
+                                        }
+                                        %
+                                    </span>
+                                </div>
+
+                                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-indigo-50">
+                                    <div
+                                        className="h-full rounded-full bg-indigo-600"
+                                        style={{
+                                            width: `${progressPercentage}%`,
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Navigation hint */}
+                            <div className="mt-5 rounded-xl border border-indigo-100 bg-indigo-50/60 px-3 py-3 text-xs leading-5 text-indigo-700">
+                                Click a topic above to
+                                jump directly to its
+                                lessons.
+                            </div>
                         </div>
-                    </div>
-                </section>
-            )}
+                    </aside>
+                </div>
+
+                {/* =================================================
+                    FOOTER
+                ================================================== */}
+
+                <footer className="mt-8 border-t border-slate-200 pt-5">
+                    <Link
+                        href={`/learn/subjects/${subject.slug}`}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
+                    >
+                        ← Back to Subject
+                    </Link>
+                </footer>
+            </div>
         </LearnLayout>
     );
 }

@@ -1,3 +1,5 @@
+
+import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
 
 import { LearnLayout } from "@/src/components/learn";
@@ -64,20 +66,20 @@ export default async function ProfilePage() {
 
               {/* Actions */}
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <a
+                <Link
                   href="/sign-in"
                   className="inline-flex h-11 min-w-32 items-center justify-center rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-md"
                 >
                   Sign in
                   <span className="ml-2">→</span>
-                </a>
+                </Link>
 
-                <a
+                <Link
                   href="/sign-up"
                   className="inline-flex h-11 min-w-32 items-center justify-center rounded-xl border border-slate-200/90 bg-white/70 px-5 text-sm font-semibold text-slate-700 backdrop-blur transition hover:-translate-y-0.5 hover:bg-white"
                 >
                   Create account
-                </a>
+                </Link>
               </div>
 
               {/* Product benefits */}
@@ -145,7 +147,15 @@ export default async function ProfilePage() {
           }}
           profile={profile}
           summary={summary}
-          continueLearning={continueLearning}
+          continueLearning={
+            continueLearning
+              ? {
+                ...continueLearning,
+                programName:
+                  profile.programName ?? "Program",
+              }
+              : null
+          }
           mcqStats={mcqStats}
           activityStats={activityStats}
           gamificationStats={gamificationStats}

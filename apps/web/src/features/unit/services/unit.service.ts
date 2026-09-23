@@ -16,12 +16,13 @@ import type {
 export async function createUnitService(
   data: CreateUnitInput,
 ) {
-  const existing = await getUnitBySlugRepository(
-    data.slug,
-  );
+  const existing =
+    await getUnitBySlugRepository(data.slug);
 
   if (existing) {
-    throw new Error("Unit slug already exists.");
+    throw new Error(
+      "Unit slug already exists.",
+    );
   }
 
   return createUnitRepository(data);
@@ -46,31 +47,46 @@ export async function getUnitByIdService(
   return getUnitByIdRepository(id);
 }
 
+export async function getUnitBySlugService(
+  slug: string,
+) {
+  return getUnitBySlugRepository(slug);
+}
+
 export async function getUnitsBySubjectService(
   subjectId: string,
 ) {
-  return getUnitsBySubjectRepository(subjectId);
+  return getUnitsBySubjectRepository(
+    subjectId,
+  );
 }
 
 export async function updateUnitService(
   id: string,
   data: CreateUnitInput,
 ) {
-  const existing = await getUnitBySlugRepository(
-    data.slug,
-  );
+  const existing =
+    await getUnitBySlugRepository(data.slug);
 
-  if (existing && existing.id !== id) {
-    throw new Error("Unit slug already exists.");
+  if (
+    existing &&
+    existing.id !== id
+  ) {
+    throw new Error(
+      "Unit slug already exists.",
+    );
   }
 
-  const unit = await updateUnitRepository(
-    id,
-    data,
-  );
+  const unit =
+    await updateUnitRepository(
+      id,
+      data,
+    );
 
   if (!unit) {
-    throw new Error("Unit not found.");
+    throw new Error(
+      "Unit not found.",
+    );
   }
 
   return unit;

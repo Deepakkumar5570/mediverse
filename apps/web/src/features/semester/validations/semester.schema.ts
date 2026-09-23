@@ -9,6 +9,16 @@ export const CreateSemesterSchema = z.object({
     .min(2)
     .max(100),
 
+  slug: z
+    .string()
+    .trim()
+    .min(2)
+    .max(120)
+    .regex(
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      "Slug must contain only lowercase letters, numbers, and hyphens.",
+    ),
+
   number: z
     .number()
     .int()

@@ -41,7 +41,14 @@ type Props = {
         percentage: number;
     };
 
-    continueLearning: any;
+    continueLearning: {
+        subtopicId: string;
+        subtopicTitle: string;
+        topicTitle: string;
+        unitTitle: string;
+        subjectName: string;
+        programName: string;
+    } | null;
 
     mcqStats: {
         attempted: number;

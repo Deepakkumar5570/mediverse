@@ -17,6 +17,7 @@ type SemesterData = {
   id: string;
   programId: string;
   name: string;
+  slug?: string;
   number: number;
   status: "active" | "inactive";
 };
@@ -37,11 +38,13 @@ export function SemesterForm({
   const [form, setForm] = useState<{
     programId: string;
     name: string;
+    slug: string;
     number: number;
     status: "active" | "inactive";
   }>({
     programId: initialData?.programId ?? "",
     name: initialData?.name ?? "",
+    slug: initialData?.slug ?? "",
     number: initialData?.number ?? 1,
     status: initialData?.status ?? "active",
   });
@@ -67,6 +70,14 @@ export function SemesterForm({
 
       router.push("/admin/semesters");
       router.refresh();
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong.",
+      );
     } finally {
       setLoading(false);
     }
@@ -153,6 +164,40 @@ export function SemesterForm({
             required
             className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
           />
+        </div>
+
+        <div>
+          <label
+            htmlFor="semester-slug"
+            className="mb-2 block text-sm font-medium text-slate-900"
+          >
+            Semester Slug
+            <span className="ml-1 text-red-500">*</span>
+          </label>
+
+          <input
+            id="semester-slug"
+            type="text"
+            placeholder="e.g. bpharm-semester-1"
+            value={form.slug}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                slug: e.target.value
+                  .toLowerCase()
+                  .trim()
+                  .replace(/\s+/g, "-"),
+              })
+            }
+            required
+            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
+          />
+
+          <p className="mt-2 text-xs text-slate-500">
+            Used in the public URL, for example:
+            {" "}
+            /learn/semesters/bpharm-semester-1
+          </p>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">

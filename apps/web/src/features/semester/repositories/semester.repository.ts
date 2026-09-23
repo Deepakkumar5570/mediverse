@@ -1,4 +1,5 @@
 import { db, semesters } from "@mediverse/database";
+
 import { eq } from "drizzle-orm";
 
 import type { CreateSemesterInput } from "../validations/semester.schema";
@@ -15,7 +16,9 @@ export async function createSemesterRepository(
 }
 
 export async function getSemestersRepository() {
-  return db.select().from(semesters);
+  return db
+    .select()
+    .from(semesters);
 }
 
 export async function getSemestersByProgramRepository(
@@ -39,13 +42,28 @@ export async function getSemesterByIdRepository(
   return semester ?? null;
 }
 
+export async function getSemesterBySlugRepository(
+  slug: string,
+) {
+  const [semester] = await db
+    .select()
+    .from(semesters)
+    .where(eq(semesters.slug, slug))
+    .limit(1);
+
+  return semester ?? null;
+}
+
 export async function updateSemesterRepository(
   id: string,
   data: CreateSemesterInput,
 ) {
   const [semester] = await db
     .update(semesters)
-    .set(data)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
     .where(eq(semesters.id, id))
     .returning();
 
