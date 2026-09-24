@@ -1,7 +1,7 @@
 import { ExplorerCard } from "@/src/components/learn";
 
 type Semester = {
-    id: string;
+    slug: string;
     number: number;
     name: string;
 };
@@ -17,7 +17,7 @@ export function SemesterCard({
 }: Props) {
     return (
         <ExplorerCard
-            href={`/learn/semesters/${semester.id}${hrefSuffix}`}
+            href={`/learn/semesters/${semester.slug}${hrefSuffix}`}
             title={semester.name}
             description={`Semester ${semester.number}`}
         />

@@ -1,9 +1,22 @@
 "use server";
 
-import { getSubjectDetailsService } from "../services";
+import {
+  getSubjectDetailsBySlugService,
+  getSubjectDetailsService,
+} from "../services";
+
+import { isUuid } from "@/src/lib/learn/routing";
 
 export async function getSubjectDetailsAction(
-    subjectId: string
+  subjectIdOrSlug: string,
 ) {
-    return getSubjectDetailsService(subjectId);
+  if (isUuid(subjectIdOrSlug)) {
+    return getSubjectDetailsService(
+      subjectIdOrSlug,
+    );
+  }
+
+  return getSubjectDetailsBySlugService(
+    subjectIdOrSlug,
+  );
 }

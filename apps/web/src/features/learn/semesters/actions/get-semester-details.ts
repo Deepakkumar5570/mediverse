@@ -1,9 +1,22 @@
 "use server";
 
-import { getSemesterDetailsService } from "../services";
+import {
+  getSemesterDetailsBySlugService,
+  getSemesterDetailsService,
+} from "../services";
+
+import { isUuid } from "@/src/lib/learn/routing";
 
 export async function getSemesterDetailsAction(
-    semesterId: string
+  semesterIdOrSlug: string,
 ) {
-    return getSemesterDetailsService(semesterId);
+  if (isUuid(semesterIdOrSlug)) {
+    return getSemesterDetailsService(
+      semesterIdOrSlug,
+    );
+  }
+
+  return getSemesterDetailsBySlugService(
+    semesterIdOrSlug,
+  );
 }

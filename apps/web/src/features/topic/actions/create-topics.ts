@@ -13,7 +13,6 @@ import {
   type CreateTopicsInput,
 } from "../validations";
 
-
 /**
  * Create multiple topics at once.
  */
@@ -25,20 +24,17 @@ export async function createTopicsAction(
    */
   await requireAdmin();
 
-
   /**
    * Validate input on the server.
    */
   const data =
     createTopicsSchema.parse(input);
 
-
   /**
    * Create topics.
    */
   const created =
     await createTopicsService(data);
-
 
   /**
    * Refresh admin topic pages.
@@ -52,7 +48,6 @@ export async function createTopicsAction(
   revalidatePath(
     "/admin/content-builder",
   );
-
 
   return created;
 }

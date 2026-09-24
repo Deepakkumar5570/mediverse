@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/src/lib/auth/require-admin";
 
 import { createSubtopicsService } from "../services";
+
 import {
   createSubtopicsSchema,
   type CreateSubtopicsInput,
@@ -15,16 +16,14 @@ export async function createSubtopicsAction(
 ) {
   await requireAdmin();
 
-  const data = createSubtopicsSchema.parse(input);
+  const data =
+    createSubtopicsSchema.parse(input);
 
-  const created = await createSubtopicsService(
-    data.topicId,
-    data.subtopics,
-  );
+  const created =
+    await createSubtopicsService(data);
 
   revalidatePath("/admin/subtopics");
   revalidatePath("/admin/content-builder");
 
   return created;
 }
-

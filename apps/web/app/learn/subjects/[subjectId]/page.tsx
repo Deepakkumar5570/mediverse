@@ -39,17 +39,25 @@ export default async function SubjectDetailsPage({
 
     const isPracticeMode = mode === "practice";
 
-    const details = await getSubjectDetailsAction(
-        subjectId,
-    );
+        const details =
+        await getSubjectDetailsAction(
+            subjectId,
+        );
 
     if (!details) {
         notFound();
     }
 
-    const units = await getUnitsBySubjectAction(
-        subjectId,
-    );
+    const {
+        subject,
+        semester,
+        program,
+    } = details;
+
+    const units =
+        await getUnitsBySubjectAction(
+            subject.id,
+        );
 
     /*
      * Progress is personalized data.
@@ -64,21 +72,24 @@ export default async function SubjectDetailsPage({
     const { userId } = await auth();
 
     const subjectProgress = userId
-        ? await getSingleSubjectProgressAction(subjectId)
+        ? await getSingleSubjectProgressAction(
+              subject.id,
+          )
         : null;
-
-    const {
-        subject,
-        semester,
-        program,
-    } = details;
 
     const progress = subjectProgress
         ? Math.min(
-            100,
-            Math.max(0, subjectProgress.percentage),
-        )
+              100,
+              Math.max(
+                  0,
+                  subjectProgress.percentage,
+              ),
+          )
         : 0;
+
+    
+
+   
 
     return (
         <LearnLayout>
@@ -109,7 +120,7 @@ export default async function SubjectDetailsPage({
                 </span>
 
                 <Link
-                    href={`/learn/semesters/${semester.id}`}
+                    href={`/learn/semesters/${semester.slug}`}
                     className="font-medium text-slate-400 transition hover:text-indigo-600"
                 >
                     {semester.name}

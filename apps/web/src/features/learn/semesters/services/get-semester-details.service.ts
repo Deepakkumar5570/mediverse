@@ -1,7 +1,20 @@
-import { getSemesterDetailsRepository } from "../repositories";
+import {
+  getSemesterDetailsBySlugRepository,
+  getSemesterDetailsRepository,
+} from "../repositories";
 
 export async function getSemesterDetailsService(
-    semesterId: string
+  semesterId: string,
 ) {
-    return getSemesterDetailsRepository(semesterId);
+  return getSemesterDetailsRepository(
+    semesterId,
+  );
+}
+
+export async function getSemesterDetailsBySlugService(
+  slug: string,
+) {
+  return getSemesterDetailsBySlugRepository(
+    slug,
+  );
 }

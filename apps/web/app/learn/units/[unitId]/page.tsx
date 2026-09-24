@@ -52,27 +52,37 @@ export default async function UnitDetailsPage({
     params,
     searchParams,
 }: Props) {
-    const { unitId: unitSlugOrId } = await params;
+    const { unitId: unitSlugOrId } =
+        await params;
+
     const { mode } = await searchParams;
 
-    const isPracticeMode = mode === "practice";
+    const isPracticeMode =
+        mode === "practice";
 
     /*
      * Support both:
      *
      * /learn/units/:uuid
      * /learn/units/:slug
+     *
+     * UUIDs are resolved internally and
+     * redirected to the canonical slug URL.
      */
     const resolvedUnit = isUuid(unitSlugOrId)
-        ? await getUnitByIdAction(unitSlugOrId)
-        : await getUnitBySlugAction(unitSlugOrId);
+        ? await getUnitByIdAction(
+              unitSlugOrId,
+          )
+        : await getUnitBySlugAction(
+              unitSlugOrId,
+          );
 
     if (!resolvedUnit) {
         notFound();
     }
 
     /*
-     * Old UUID URL -> canonical slug URL.
+     * Legacy UUID URL -> canonical slug URL.
      */
     if (isUuid(unitSlugOrId)) {
         redirect(
@@ -80,6 +90,10 @@ export default async function UnitDetailsPage({
         );
     }
 
+    /*
+     * Everything below this point works with
+     * the internal database UUID.
+     */
     const unitId = resolvedUnit.id;
 
     const details =
@@ -93,18 +107,18 @@ export default async function UnitDetailsPage({
         await getTopicsByUnitAction(unitId);
 
     /*
-     * Build:
+     * Build the complete unit curriculum:
      *
      * Unit
      *   ├── Topic
-     *   │    ├── Lesson
-     *   │    ├── Lesson
+     *   │    ├── Subtopic / Lesson
+     *   │    ├── Subtopic / Lesson
      *   │
      *   ├── Topic
-     *        ├── Lesson
+     *        ├── Subtopic / Lesson
      *
-     * Progress is fetched for each lesson so
-     * the Completed badge is real.
+     * Progress is fetched per subtopic so the
+     * completion state shown in the UI is real.
      */
     const topicGroups: TopicGroup[] =
         await Promise.all(
@@ -492,64 +506,74 @@ export default async function UnitDetailsPage({
                                                                 (
                                                                     subtopic,
                                                                     lessonIndex,
-                                                                ) => (
-                                                                    <Link
-                                                                        key={
-                                                                            subtopic.id
-                                                                        }
-                                                                        href={`/learn/subtopics/${subtopic.id}`}
-                                                                        className="group/lesson flex items-center gap-3 rounded-xl border border-transparent bg-white px-3 py-3 transition-all hover:border-indigo-200 hover:bg-indigo-50/50 hover:shadow-sm sm:px-4"
-                                                                    >
-                                                                        {/* Number */}
-                                                                        <span className="w-6 shrink-0 text-center text-xs font-bold text-slate-400">
-                                                                            {String(
-                                                                                subtopic.subtopicNumber ??
-                                                                                    lessonIndex +
-                                                                                        1,
-                                                                            ).padStart(
-                                                                                2,
-                                                                                "0",
-                                                                            )}
-                                                                        </span>
+                                                                ) => {
+                                                                    const lessonHref =
+                                                                        isPracticeMode
+                                                                            ? `/learn/subtopics/${subtopic.slug}?mode=practice`
+                                                                            : `/learn/subtopics/${subtopic.slug}`;
 
-                                                                        {/* Lesson icon */}
-                                                                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100 transition group-hover/lesson:bg-indigo-100">
-                                                                            ▤
-                                                                        </span>
+                                                                    return (
+                                                                        <Link
+                                                                            key={
+                                                                                subtopic.id
+                                                                            }
+                                                                            href={
+                                                                                lessonHref
+                                                                            }
+                                                                            className="group/lesson flex items-center gap-3 rounded-xl border border-transparent bg-white px-3 py-3 transition-all hover:border-indigo-200 hover:bg-indigo-50/50 hover:shadow-sm sm:px-4"
+                                                                        >
+                                                                            {/* Number */}
+                                                                            <span className="w-6 shrink-0 text-center text-xs font-bold text-slate-400">
+                                                                                {String(
+                                                                                    subtopic.subtopicNumber ??
+                                                                                        lessonIndex +
+                                                                                            1,
+                                                                                ).padStart(
+                                                                                    2,
+                                                                                    "0",
+                                                                                )}
+                                                                            </span>
 
-                                                                        {/* Lesson content */}
-                                                                        <div className="min-w-0 flex-1">
-                                                                            <p className="text-sm font-bold text-indigo-800 transition-colors group-hover/lesson:text-indigo-600 sm:text-[15px]">
-                                                                                {
-                                                                                    subtopic.title
-                                                                                }
-                                                                            </p>
+                                                                            {/* Lesson icon */}
+                                                                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100 transition group-hover/lesson:bg-indigo-100">
+                                                                                ▤
+                                                                            </span>
 
-                                                                            {subtopic.description && (
-                                                                                <p className="mt-0.5 line-clamp-1 text-xs leading-5 text-slate-400">
+                                                                            {/* Lesson content */}
+                                                                            <div className="min-w-0 flex-1">
+                                                                                <p className="text-sm font-bold text-indigo-800 transition-colors group-hover/lesson:text-indigo-600 sm:text-[15px]">
                                                                                     {
-                                                                                        subtopic.description
+                                                                                        subtopic.title
                                                                                     }
                                                                                 </p>
-                                                                            )}
-                                                                        </div>
 
-                                                                        {/* Completed */}
-                                                                        {subtopic.completed && (
-                                                                            <span className="hidden shrink-0 items-center gap-1 rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 sm:inline-flex">
-                                                                                <span>
-                                                                                    ✓
+                                                                                {subtopic.description && (
+                                                                                    <p className="mt-0.5 line-clamp-1 text-xs leading-5 text-slate-400">
+                                                                                        {
+                                                                                            subtopic.description
+                                                                                        }
+                                                                                    </p>
+                                                                                )}
+                                                                            </div>
+
+                                                                            {/* Completed */}
+                                                                            {subtopic.completed && (
+                                                                                <span className="hidden shrink-0 items-center gap-1 rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 sm:inline-flex">
+                                                                                    <span>
+                                                                                        ✓
+                                                                                    </span>
+
+                                                                                    Completed
                                                                                 </span>
-                                                                                Completed
-                                                                            </span>
-                                                                        )}
+                                                                            )}
 
-                                                                        {/* Navigation arrow */}
-                                                                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white shadow-sm transition-all group-hover/lesson:translate-x-0.5 group-hover/lesson:bg-violet-600 group-hover/lesson:shadow-md">
-                                                                            →
-                                                                        </span>
-                                                                    </Link>
-                                                                ),
+                                                                            {/* Navigation arrow */}
+                                                                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white shadow-sm transition-all group-hover/lesson:translate-x-0.5 group-hover/lesson:bg-violet-600 group-hover/lesson:shadow-md">
+                                                                                →
+                                                                            </span>
+                                                                        </Link>
+                                                                    );
+                                                                },
                                                             )}
                                                         </div>
                                                     )}

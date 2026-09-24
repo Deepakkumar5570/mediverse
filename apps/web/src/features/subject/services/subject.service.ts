@@ -33,6 +33,12 @@ export async function getSubjectByIdService(
   return getSubjectByIdRepository(id);
 }
 
+export async function getSubjectBySlugService(
+  slug: string,
+) {
+  return getSubjectBySlugRepository(slug);
+}
+
 export async function getSubjectsBySemesterService(
   semesterId: string,
 ) {

@@ -1,4 +1,14 @@
-import { notFound } from "next/navigation";
+import {
+    notFound,
+    redirect,
+} from "next/navigation";
+
+import {
+    getTopicByIdAction,
+    getTopicBySlugAction,
+} from "@/src/features/topic";
+
+import { isUuid } from "@/src/lib/learn/routing";
 
 import {
     Breadcrumb,
@@ -32,7 +42,30 @@ export default async function TopicDetailsPage({
     params,
     searchParams,
 }: Props) {
-    const { topicId } = await params;
+    const { topicId: topicSlugOrId } =
+        await params;
+
+    const resolvedTopic = isUuid(
+        topicSlugOrId,
+    )
+        ? await getTopicByIdAction(
+            topicSlugOrId,
+        )
+        : await getTopicBySlugAction(
+            topicSlugOrId,
+        );
+
+    if (!resolvedTopic) {
+        notFound();
+    }
+
+    if (isUuid(topicSlugOrId)) {
+        redirect(
+            `/learn/topics/${resolvedTopic.slug}`,
+        );
+    }
+
+    const topicId = resolvedTopic.id;
     const { mode } = await searchParams;
 
     const isPracticeMode = mode === "practice";
@@ -85,18 +118,19 @@ export default async function TopicDetailsPage({
                     },
                     {
                         label: semester.name,
-                        href: `/learn/semesters/${semester.id}`,
+                        href: `/learn/semesters/${semester.slug}`,
                     },
                     {
                         label: subject.name,
-                        href: `/learn/subjects/${subject.id}`,
+                        href: `/learn/subjects/${subject.slug}`,
                     },
                     {
                         label: unit.title,
-                        href: `/learn/units/${unit.id}`,
+                        href: `/learn/units/${unit.slug}`,
                     },
                     {
                         label: topic.title,
+                        href: `/learn/topics/${topic.slug}`,
                     },
                 ]}
             />
@@ -318,11 +352,11 @@ export default async function TopicDetailsPage({
                     ) : (
                         <ExplorerGrid>
                             {subtopics.map((subtopic) => (
-                               <SubtopicCard
-    key={subtopic.id}
-    subtopic={subtopic}
-    hrefSuffix={isPracticeMode ? "?mode=practice" : ""}
-/>
+                                <SubtopicCard
+                                    key={subtopic.id}
+                                    subtopic={subtopic}
+                                    hrefSuffix={isPracticeMode ? "?mode=practice" : ""}
+                                />
                             ))}
                         </ExplorerGrid>
                     )}

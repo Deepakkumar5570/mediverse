@@ -24,31 +24,39 @@ type Props = {
     }>;
 };
 
-export default async function SemesterDetailsPage({
+
+    export default async function SemesterDetailsPage({
     params,
     searchParams,
 }: Props) {
     const { semesterId } = await params;
     const { mode } = await searchParams;
 
-    const isPracticeMode = mode === "practice";
+    const isPracticeMode =
+        mode === "practice";
 
-    const details = await getSemesterDetailsAction(
-        semesterId,
-    );
+    const details =
+        await getSemesterDetailsAction(
+            semesterId,
+        );
 
     if (!details) {
         notFound();
     }
 
-    const subjects = await getSubjectsBySemesterAction(
-        semesterId,
-    );
-
     const {
         semester,
         program,
     } = details;
+
+    const subjects =
+        await getSubjectsBySemesterAction(
+            semester.id,
+        );
+
+    
+
+    // existing JSX continues from here...
 
     return (
         <LearnLayout>

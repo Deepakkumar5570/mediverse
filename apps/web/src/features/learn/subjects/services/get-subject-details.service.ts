@@ -1,7 +1,20 @@
-import { getSubjectDetailsRepository } from "../repositories";
+import {
+  getSubjectDetailsBySlugRepository,
+  getSubjectDetailsRepository,
+} from "../repositories";
 
 export async function getSubjectDetailsService(
-    subjectId: string
+  subjectId: string,
 ) {
-    return getSubjectDetailsRepository(subjectId);
+  return getSubjectDetailsRepository(
+    subjectId,
+  );
+}
+
+export async function getSubjectDetailsBySlugService(
+  slug: string,
+) {
+  return getSubjectDetailsBySlugRepository(
+    slug,
+  );
 }

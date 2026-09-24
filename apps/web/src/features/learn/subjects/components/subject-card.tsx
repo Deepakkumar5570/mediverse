@@ -3,6 +3,7 @@ import { ExplorerCard } from "@/src/components/learn";
 type Subject = {
     id: string;
     name: string;
+    slug: string;
     code: string | null;
 };
 
@@ -17,7 +18,7 @@ export function SubjectCard({
 }: Props) {
     return (
         <ExplorerCard
-            href={`/learn/subjects/${subject.id}${hrefSuffix}`}
+            href={`/learn/subjects/${subject.slug}${hrefSuffix}`}
             title={subject.name}
             description={subject.code ?? "Subject"}
         />

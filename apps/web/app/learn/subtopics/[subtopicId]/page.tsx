@@ -1,11 +1,18 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { LearnLayout } from "@/src/components/learn";
 
 import {
   getSubtopicDetailsAction,
 } from "@/src/features/learn/subtopics";
+
+import {
+  getSubtopicByIdAction,
+  getSubtopicBySlugAction,
+} from "@/src/features/subtopic";
+
+import { isUuid } from "@/src/lib/learn/routing";
 
 import {
   getContentBySubtopicAction,
@@ -51,16 +58,59 @@ type Props = {
   }>;
 };
 
+type NavigationLesson = {
+  id: string;
+  title: string;
+  slug: string;
+};
+
 export default async function SubtopicDetailsPage({
   params,
   searchParams,
 }: Props) {
-  const { subtopicId } = await params;
+  const {
+    subtopicId: subtopicSlugOrId,
+  } = await params;
+
+  /*
+   * Canonical article routing:
+   *
+   * /learn/subtopics/:slug
+   *
+   * Legacy UUID URLs remain supported and redirect
+   * to the canonical slug URL.
+   */
+  const resolvedSubtopic = isUuid(
+    subtopicSlugOrId,
+  )
+    ? await getSubtopicByIdAction(
+        subtopicSlugOrId,
+      )
+    : await getSubtopicBySlugAction(
+        subtopicSlugOrId,
+      );
+
+  if (!resolvedSubtopic) {
+    notFound();
+  }
+
+  if (isUuid(subtopicSlugOrId)) {
+    redirect(
+      `/learn/subtopics/${resolvedSubtopic.slug}`,
+    );
+  }
+
+  const subtopicId = resolvedSubtopic.id;
+
   const { mode } = await searchParams;
 
   const isPracticeMode =
     mode === "practice";
 
+  /*
+   * Load the actual relational record using UUID.
+   * URLs never use these IDs.
+   */
   const details =
     await getSubtopicDetailsAction(
       subtopicId,
@@ -77,8 +127,8 @@ export default async function SubtopicDetailsPage({
 
   const lessonProgress = lesson
     ? await getContentProgressAction(
-      lesson.id,
-    )
+        lesson.id,
+      )
     : null;
 
   const lessonNavigation =
@@ -106,18 +156,15 @@ export default async function SubtopicDetailsPage({
   } = details;
 
   /*
-   * Build:
+   * Build the complete Unit curriculum.
    *
    * Unit
    *   ├── Topic
    *   │    ├── Subtopic
    *   │    ├── Subtopic
    *   │
-   *   ├── Topic
-   *   │    ├── Subtopic
-   *
-   * This powers the GFG-style accordion
-   * curriculum on the left.
+   *   └── Topic
+   *        ├── Subtopic
    */
   const unitTopics =
     await getTopicsByUnitAction(
@@ -130,6 +177,7 @@ export default async function SubtopicDetailsPage({
         async (unitTopic) => ({
           id: unitTopic.id,
           title: unitTopic.title,
+          slug: unitTopic.slug,
           topicNumber:
             unitTopic.topicNumber,
           subtopics:
@@ -145,13 +193,37 @@ export default async function SubtopicDetailsPage({
 
   const flashcards = lesson
     ? await getFlashcardsByContentAction(
-      lesson.id,
-    )
+        lesson.id,
+      )
     : [];
+
+  /*
+   * Convert lesson navigation records into
+   * canonical slug-based navigation.
+   *
+   * Existing navigation service can continue
+   * returning IDs internally.
+   */
+  const previousLesson: NavigationLesson | null =
+    lessonNavigation?.previous
+      ? await getSubtopicByIdAction(
+          lessonNavigation.previous.id,
+        )
+      : null;
+
+  const nextLesson: NavigationLesson | null =
+    lessonNavigation?.next
+      ? await getSubtopicByIdAction(
+          lessonNavigation.next.id,
+        )
+      : null;
 
   return (
     <LearnLayout>
-      {/* Breadcrumb */}
+      {/* =====================================================
+          BREADCRUMB
+      ====================================================== */}
+
       <ArticleBreadcrumb
         items={[
           {
@@ -164,36 +236,42 @@ export default async function SubtopicDetailsPage({
           },
           {
             label: semester.name,
-            href: `/learn/semesters/${semester.id}`,
+            href: `/learn/semesters/${semester.slug}`,
           },
           {
             label: subject.name,
-            href: `/learn/subjects/${subject.id}`,
+            href: `/learn/subjects/${subject.slug}`,
           },
           {
             label: unit.title,
-            href: `/learn/units/${unit.id}`,
+            href: `/learn/units/${unit.slug}`,
           },
           {
             label: topic.title,
-            href: `/learn/topics/${topic.id}`,
+            href: `/learn/topics/${topic.slug}`,
           },
           {
             label: subtopic.title,
+            href: `/learn/subtopics/${subtopic.slug}`,
           },
         ]}
       />
 
-      {/* Mobile curriculum */}
+      {/* =====================================================
+          MOBILE CURRICULUM
+      ====================================================== */}
+
       <div className="mt-5 lg:hidden">
-        <details className="overflow-hidden border border-slate-200 bg-white">
+        <details className="overflow-hidden rounded-xl border border-slate-200 bg-white">
           <summary className="cursor-pointer list-none px-4 py-3 text-sm font-bold text-slate-900">
             <div className="flex items-center justify-between gap-3">
-              <span>{unit.title}</span>
+              <span className="min-w-0 truncate">
+                {unit.title}
+              </span>
 
               <span
                 aria-hidden="true"
-                className="text-slate-400"
+                className="shrink-0 text-slate-400"
               >
                 ≡
               </span>
@@ -202,11 +280,26 @@ export default async function SubtopicDetailsPage({
 
           <div className="border-t border-slate-100">
             <div className="px-3 py-2">
+              {/* Back to Unit */}
+
               <Link
-                href={`/learn/units/${unit.id}`}
+                href={`/learn/units/${unit.slug}`}
+                className="mb-1 flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-indigo-50 hover:text-indigo-700"
+              >
+                <span aria-hidden="true">
+                  ←
+                </span>
+
+                <span>
+                  Back to Unit
+                </span>
+              </Link>
+
+              <Link
+                href={`/learn/units/${unit.slug}`}
                 className="block px-2 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
               >
-                Overview
+                Unit Overview
               </Link>
 
               {topicGroups.map(
@@ -226,7 +319,7 @@ export default async function SubtopicDetailsPage({
                     >
                       <summary className="cursor-pointer list-none px-2 py-3 text-sm font-semibold text-slate-800">
                         <div className="flex items-center justify-between gap-3">
-                          <span>
+                          <span className="min-w-0 truncate">
                             {
                               topicGroup.title
                             }
@@ -234,7 +327,7 @@ export default async function SubtopicDetailsPage({
 
                           <span
                             aria-hidden="true"
-                            className="text-xs text-slate-400"
+                            className="shrink-0 text-xs text-slate-400"
                           >
                             ⌄
                           </span>
@@ -253,9 +346,9 @@ export default async function SubtopicDetailsPage({
                                 key={
                                   item.id
                                 }
-                                href={`/learn/subtopics/${item.id}`}
+                                href={`/learn/subtopics/${item.slug}`}
                                 className={[
-                                  "flex items-start gap-2 px-3 py-2.5 text-sm",
+                                  "flex items-start gap-2 rounded-lg px-3 py-2.5 text-sm transition",
                                   isCurrent
                                     ? "bg-violet-50 font-semibold text-violet-700"
                                     : "text-slate-600 hover:bg-slate-50",
@@ -272,7 +365,7 @@ export default async function SubtopicDetailsPage({
                                   )}
                                 </span>
 
-                                <span>
+                                <span className="min-w-0 flex-1">
                                   {
                                     item.title
                                   }
@@ -280,7 +373,7 @@ export default async function SubtopicDetailsPage({
 
                                 {isCurrent &&
                                   lessonProgress?.completed && (
-                                    <span className="ml-auto text-xs font-bold text-emerald-600">
+                                    <span className="ml-auto shrink-0 text-xs font-bold text-emerald-600">
                                       ✓
                                     </span>
                                   )}
@@ -298,9 +391,15 @@ export default async function SubtopicDetailsPage({
         </details>
       </div>
 
-      {/* Main 3-column lesson layout */}
+      {/* =====================================================
+          MAIN 3-COLUMN LESSON LAYOUT
+      ====================================================== */}
+
       <div className="mt-6 grid gap-8 lg:grid-cols-[230px_minmax(0,1fr)_250px] lg:gap-8 xl:grid-cols-[240px_minmax(0,1fr)_260px] xl:gap-10">
-        {/* LEFT SIDEBAR */}
+        {/* =================================================
+            LEFT SIDEBAR
+        ================================================== */}
+
         <ArticleSidebar
           subjectId={subject.id}
           unitId={unit.id}
@@ -308,7 +407,9 @@ export default async function SubtopicDetailsPage({
           subjectTitle={subject.name}
           unitNumber={unit.unitNumber}
           topicGroups={topicGroups}
-          currentSubtopicId={subtopicId}
+          currentSubtopicId={
+            subtopicId
+          }
           completed={
             subtopicProgress.completed
           }
@@ -321,8 +422,24 @@ export default async function SubtopicDetailsPage({
           }
         />
 
-        {/* CENTER ARTICLE */}
+        {/* =================================================
+            CENTER ARTICLE
+        ================================================== */}
+
         <main className="min-w-0">
+          {/* Desktop / mobile explicit Unit navigation */}
+
+          <Link
+            href={`/learn/units/${unit.slug}`}
+            className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-violet-600"
+          >
+            <span aria-hidden="true">
+              ←
+            </span>
+
+            Back to Unit
+          </Link>
+
           {isPracticeMode ? (
             <section>
               <div className="border-b border-slate-200 pb-8">
@@ -377,6 +494,7 @@ export default async function SubtopicDetailsPage({
               />
 
               {/* FLASHCARDS */}
+
               {flashcards.length > 0 && (
                 <section
                   id="flashcards"
@@ -408,6 +526,7 @@ export default async function SubtopicDetailsPage({
               )}
 
               {/* MCQs */}
+
               {mcqs.length > 0 && (
                 <section
                   id="mcq-practice"
@@ -453,6 +572,7 @@ export default async function SubtopicDetailsPage({
           )}
 
           {/* Progress footer */}
+
           <div className="mt-12 border-t border-slate-200 py-6">
             <div className="flex items-center justify-between gap-4 text-sm">
               <span className="text-slate-500">
@@ -469,17 +589,18 @@ export default async function SubtopicDetailsPage({
           </div>
         </main>
 
-        {/* RIGHT TOC */}
+        {/* =================================================
+            RIGHT TOC
+        ================================================== */}
+
         <ArticleToc
           articleId="article-content"
-          practiceHref={`/learn/subtopics/${subtopicId}?mode=practice`}
+          practiceHref={`/learn/subtopics/${subtopic.slug}?mode=practice`}
           nextLesson={
-            lessonNavigation?.next ??
-            null
+            nextLesson
           }
           previousLesson={
-            lessonNavigation?.previous ??
-            null
+            previousLesson
           }
           flashcardsAvailable={
             flashcards.length > 0
