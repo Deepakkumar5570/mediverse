@@ -1,14 +1,12 @@
-"use server";
-
 import Link from "next/link";
 
 import { getProgramsService } from "@/src/features/program/services/program.service";
 
 const explorerCards = [
-  ["📚", "Browse Programs", "Choose your medical program and follow its structured curriculum.", "/learn/programs", "sky"],
-  ["🔎", "Search Anything", "Find subjects, units, topics, lessons and educational content quickly.", "/learn/search", "amber"],
-  ["👥", "Join Community", "Discover discussions and connect with other learners.", "/learn/community", "rose"],
-  ["📈", "Track Progress", "Keep your learning journey organized and see how far you've come.", "/learn/progress", "emerald"],
+  ["📚", "Browse Programs", "Choose your medical program and follow its structured curriculum.", "/learn/programs", "border-sky-100 bg-sky-50/70", "bg-sky-100", "text-sky-600"],
+  ["🔎", "Search Anything", "Find subjects, units, topics, lessons and educational content quickly.", "/learn/search", "border-amber-100 bg-amber-50/70", "bg-amber-100", "text-amber-600"],
+  ["👥", "Join Community", "Discover discussions and connect with other learners.", "/learn/community", "border-rose-100 bg-rose-50/70", "bg-rose-100", "text-rose-600"],
+  ["📈", "Track Progress", "Keep your learning journey organized and see how far you've come.", "/learn/progress", "border-emerald-100 bg-emerald-50/70", "bg-emerald-100", "text-emerald-600"],
 ] as const;
 
 const featureCards = [
@@ -204,12 +202,12 @@ export default async function LearnPage() {
           <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Everything you need, in one place.</h2>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">Whether you want to follow your curriculum, find something specific or connect with learners, start from here.</p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {explorerCards.map(([icon, title, description, href, color]) => (
-              <Link key={title} href={href} className={`group rounded-2xl border p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md border-${color}-100 bg-${color}-50/70`}>
-                <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-${color}-100`}>{icon}</div>
+            {explorerCards.map(([icon, title, description, href, cardTone, iconTone, textTone]) => (
+              <Link key={title} href={href} className={`group rounded-2xl border p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md ${cardTone}`}>
+                <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${iconTone}`}>{icon}</div>
                 <h3 className="mt-5 text-base font-black">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
-                <span className={`mt-5 inline-flex text-sm font-bold text-${color}-600 transition group-hover:translate-x-1`}>Explore →</span>
+                <span className={`mt-5 inline-flex text-sm font-bold transition group-hover:translate-x-1 ${textTone}`}>Explore →</span>
               </Link>
             ))}
           </div>
