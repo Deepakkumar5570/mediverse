@@ -1,495 +1,284 @@
+"use server";
+
 import Link from "next/link";
 
-import {
-  getContinueLearningAction,
-  getProgressSummaryAction,
-  getRecentLearningActivityAction,
-} from "@/src/features/progress";
+import { getProgramsService } from "@/src/features/program/services/program.service";
+
+const explorerCards = [
+  ["📚", "Browse Programs", "Choose your medical program and follow its structured curriculum.", "/learn/programs", "sky"],
+  ["🔎", "Search Anything", "Find subjects, units, topics, lessons and educational content quickly.", "/learn/search", "amber"],
+  ["👥", "Join Community", "Discover discussions and connect with other learners.", "/learn/community", "rose"],
+  ["📈", "Track Progress", "Keep your learning journey organized and see how far you've come.", "/learn/progress", "emerald"],
+] as const;
+
+const featureCards = [
+  ["📁", "Structured curriculum", "Move from program to semester, subject, unit, topic and lesson without getting lost."],
+  ["⚡", "Find things faster", "Search directly for the educational material you need instead of jumping between resources."],
+  ["📖", "Student-friendly content", "Focused medical learning content designed around how students actually study."],
+  ["🎯", "Learn at your pace", "Build your own learning journey and continue from where you left off."],
+] as const;
+
+const tones = [
+  ["border-sky-100 bg-sky-50/70", "bg-sky-100", "text-sky-600"],
+  ["border-emerald-100 bg-emerald-50/70", "bg-emerald-100", "text-emerald-600"],
+  ["border-amber-100 bg-amber-50/70", "bg-amber-100", "text-amber-600"],
+  ["border-rose-100 bg-rose-50/70", "bg-rose-100", "text-rose-600"],
+  ["border-violet-100 bg-violet-50/70", "bg-violet-100", "text-violet-600"],
+  ["border-teal-100 bg-teal-50/70", "bg-teal-100", "text-teal-600"],
+] as const;
+
+function iconForProgram(name: string) {
+  const value = name.toLowerCase();
+  if (value.includes("pharma")) return "💊";
+  if (value.includes("nursing")) return "🩺";
+  if (value.includes("ayur")) return "🌿";
+  if (value.includes("medical")) return "⚕️";
+  return "🎓";
+}
 
 export default async function LearnPage() {
-  const [summary, continueLearning, recentActivity] =
-    await Promise.all([
-      getProgressSummaryAction(),
-      getContinueLearningAction(),
-      getRecentLearningActivityAction(),
-    ]);
-
-  const remaining = Math.max(
-    summary.total - summary.completed,
-    0,
+  const programs = (await getProgramsService()).filter(
+    (program) => program.status === "active",
   );
 
   return (
-    <main className="mx-auto max-w-7xl space-y-8 p-6 md:p-8">
+    <main className="min-h-screen overflow-x-hidden bg-white text-slate-950">
+      <section className="relative overflow-hidden">
+        <div className="pointer-events-none absolute -left-32 top-20 h-80 w-80 rounded-full bg-violet-100/70 blur-3xl" />
+        <div className="pointer-events-none absolute -right-32 top-10 h-96 w-96 rounded-full bg-indigo-100/60 blur-3xl" />
 
-      {/* HERO */}
-      <section
-        className="
-          relative overflow-hidden rounded-3xl
-          border border-slate-200
-          bg-gradient-to-br from-white via-slate-50 to-slate-100
-          p-8 shadow-sm md:p-10
-        "
-      >
-        <div className="relative z-10 max-w-3xl">
-          <div
-            className="
-              mb-5 inline-flex items-center gap-2
-              rounded-full border border-slate-200
-              bg-white/80 px-3 py-1.5
-              text-xs font-medium text-slate-600
-            "
-          >
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            MediVerse Learning
-          </div>
-
-          <h1
-            className="
-              text-3xl font-semibold tracking-tight
-              text-slate-900 md:text-5xl
-            "
-          >
-            Welcome back.
-            <br />
-            Keep learning, one lesson at a time.
-          </h1>
-
-          <p
-            className="
-              mt-4 max-w-2xl
-              text-sm leading-6 text-slate-500
-              md:text-base
-            "
-          >
-            Continue your medical learning journey through
-            structured programs, subjects, topics and lessons.
-          </p>
-
-          <div className="mt-7">
-            <Link
-              href="/learn/programs"
-              className="
-                inline-flex items-center
-                rounded-xl bg-slate-900
-                px-5 py-3
-                text-sm font-semibold text-white
-                transition hover:bg-slate-800
-              "
-            >
-              Explore Programs →
-            </Link>
-          </div>
-        </div>
-
-        <div
-          className="
-            absolute -right-20 -top-20
-            h-64 w-64 rounded-full
-            bg-slate-200/60
-          "
-        />
-
-        <div
-          className="
-            absolute -bottom-24 right-24
-            h-48 w-48 rounded-full
-            bg-white/80
-          "
-        />
-      </section>
-
-      {/* OVERVIEW */}
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-
-        <div
-          className="
-            rounded-2xl border border-slate-200
-            bg-white p-6 shadow-sm
-          "
-        >
-          <p className="text-sm font-medium text-slate-500">
-            Total Lessons
-          </p>
-
-          <p className="mt-3 text-4xl font-semibold text-slate-900">
-            {summary.total}
-          </p>
-
-          <p className="mt-3 text-xs text-slate-400">
-            Available in your learning path
-          </p>
-        </div>
-
-        <div
-          className="
-            rounded-2xl border border-slate-200
-            bg-white p-6 shadow-sm
-          "
-        >
-          <p className="text-sm font-medium text-slate-500">
-            Completed
-          </p>
-
-          <p className="mt-3 text-4xl font-semibold text-slate-900">
-            {summary.completed}
-          </p>
-
-          <p className="mt-3 text-xs text-slate-400">
-            Lessons you&apos;ve completed
-          </p>
-        </div>
-
-        <div
-          className="
-            rounded-2xl border border-slate-200
-            bg-white p-6 shadow-sm
-          "
-        >
-          <p className="text-sm font-medium text-slate-500">
-            Remaining
-          </p>
-
-          <p className="mt-3 text-4xl font-semibold text-slate-900">
-            {remaining}
-          </p>
-
-          <p className="mt-3 text-xs text-slate-400">
-            Lessons waiting to be explored
-          </p>
-        </div>
-      </section>
-
-      {/* OVERALL PROGRESS */}
-      <section
-        className="
-          overflow-hidden rounded-3xl
-          border border-slate-200
-          bg-white shadow-sm
-        "
-      >
-        <div className="p-7 md:p-8">
-
-          <div
-            className="
-              flex flex-col gap-5
-              md:flex-row md:items-end
-              md:justify-between
-            "
-          >
-            <div>
-              <p className="text-sm font-medium text-slate-500">
-                Overall completion
-              </p>
-
-              <div className="mt-2 flex items-baseline gap-2">
-                <span className="text-5xl font-semibold tracking-tight text-slate-900">
-                  {summary.percentage}
-                </span>
-
-                <span className="text-xl font-medium text-slate-400">
-                  %
-                </span>
-              </div>
+        <div className="relative mx-auto grid max-w-7xl gap-12 px-5 pb-14 pt-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:pb-16 lg:pt-24">
+          <div className="flex flex-col justify-center">
+            <div className="w-fit rounded-full border border-violet-100 bg-white px-3 py-1.5 text-xs font-semibold text-violet-600 shadow-sm">
+              <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              Your medical learning space
             </div>
 
-            <div
-              className="
-                w-fit rounded-full
-                bg-slate-100 px-4 py-2
-                text-sm font-medium text-slate-600
-              "
-            >
-              {summary.completed} of {summary.total} completed
-            </div>
-          </div>
+            <h1 className="mt-6 max-w-3xl text-5xl font-black tracking-[-0.055em] text-slate-950 sm:text-6xl lg:text-[4.35rem] lg:leading-[0.98]">
+              Learn medicine.
+              <br />
+              <span className="text-violet-600">Understand better.</span>
+            </h1>
 
-          <div className="mt-8">
-            <div className="h-4 overflow-hidden rounded-full bg-slate-100">
-              <div
-                className="
-                  h-full rounded-full
-                  bg-gradient-to-r
-                  from-slate-900
-                  via-slate-700
-                  to-slate-500
-                  transition-all duration-700
-                "
-                style={{
-                  width: `${summary.percentage}%`,
-                }}
+            <p className="mt-6 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
+              One structured, searchable space that organizes medical education
+              from program to lesson — built for how students actually study.
+            </p>
+
+            <form action="/learn/search" method="get" className="mt-8 flex max-w-2xl overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <input
+                name="q"
+                placeholder="Search anatomy, pharmacology, topics..."
+                className="min-w-0 flex-1 bg-transparent px-4 py-3.5 text-sm outline-none placeholder:text-slate-400"
               />
+              <button type="submit" className="bg-violet-600 px-6 text-sm font-semibold text-white hover:bg-violet-700">
+                Search
+              </button>
+            </form>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href="/learn/programs" className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white hover:bg-violet-600">
+                Explore programs
+              </Link>
+              <Link href="/learn/community" className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 hover:border-violet-200 hover:text-violet-600">
+                Join community
+              </Link>
+            </div>
+
+            <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-slate-500">
+              <span>✓ Structured curriculum</span>
+              <span>✓ Searchable content</span>
+              <span>✓ Built for learners</span>
             </div>
           </div>
 
-          <div className="mt-3 flex justify-between text-xs text-slate-400">
-            <span>Start</span>
-            <span>{summary.percentage}% complete</span>
-            <span>100%</span>
-          </div>
-        </div>
-
-        <div
-          className="
-            border-t border-slate-100
-            bg-slate-50/70
-            px-7 py-5 md:px-8
-          "
-        >
-          <p className="text-sm text-slate-600">
-            {summary.percentage === 100
-              ? "Amazing. You've completed your entire learning path."
-              : summary.percentage >= 75
-                ? "You're almost there. Keep the momentum going."
-                : summary.percentage >= 50
-                  ? "You're halfway there. Keep building your progress."
-                  : summary.percentage > 0
-                    ? "A great start. Keep learning one lesson at a time."
-                    : "Your journey starts here. Complete your first lesson."}
-          </p>
-        </div>
-      </section>
-
-      {/* CONTINUE LEARNING */}
-      <section
-        className="
-          overflow-hidden rounded-3xl
-          border border-slate-200
-          bg-white shadow-sm
-        "
-      >
-        <div className="border-b border-slate-100 px-7 py-6 md:px-8">
-          <p className="text-sm font-medium text-slate-500">
-            Continue Learning
-          </p>
-
-          <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
-            Pick up where you left off
-          </h2>
-        </div>
-
-        {continueLearning ? (
-          <div className="p-7 md:p-8">
-            <div
-              className="
-                rounded-2xl
-                border border-slate-200
-                bg-slate-50/70
-                p-6
-              "
-            >
-              <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-
-                <div className="min-w-0">
-                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                    {continueLearning.subjectName}
-                  </p>
-
-                  <h3 className="mt-2 text-xl font-semibold text-slate-900">
-                    {continueLearning.contentTitle}
-                  </h3>
-
-                  <p className="mt-2 text-sm text-slate-500">
-                    {continueLearning.unitTitle}
-                    {" • "}
-                    {continueLearning.topicTitle}
-                    {" • "}
-                    {continueLearning.subtopicTitle}
-                  </p>
-
-                  {continueLearning.readingTime ? (
-                    <p className="mt-2 text-xs text-slate-400">
-                      {continueLearning.readingTime} min read
-                    </p>
-                  ) : null}
+          <div className="relative flex items-center justify-center">
+            <div className="absolute inset-0 rounded-[3rem] bg-violet-100/60 blur-3xl" />
+            <div className="relative w-full max-w-[430px] rounded-[2rem] border border-slate-200 bg-white p-5 shadow-xl sm:p-6">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-600">MediVerse</p>
+                  <p className="mt-1 text-sm font-bold">Your learning path</p>
                 </div>
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-50">📚</span>
+              </div>
 
-                <Link
-                  href={`/learn/subtopics/${continueLearning.subtopicId}`}
-                  className="
-                    inline-flex w-fit shrink-0
-                    items-center
-                    rounded-xl bg-slate-900
-                    px-5 py-3
-                    text-sm font-semibold text-white
-                    transition hover:bg-slate-800
-                  "
-                >
-                  Continue →
-                </Link>
+              <div className="mt-4 space-y-2">
+                {[
+                  ["STEP 1", "Choose your program", "Start your medical learning journey", "🎓", "border-violet-100 bg-violet-50/70"],
+                  ["STEP 2", "Explore semesters", "", "📁", "border-slate-100 bg-slate-50"],
+                  ["STEP 3", "Discover subjects", "", "📖", "border-slate-100 bg-slate-50"],
+                ].map(([step, title, description, icon, tone], index) => (
+                  <div key={step}>
+                    <div className={`rounded-2xl border p-3.5 ${tone}`}>
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm">{icon}</span>
+                        <div>
+                          <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-violet-600">{step}</p>
+                          <p className="mt-0.5 text-sm font-bold">{title}</p>
+                          {description ? <p className="mt-0.5 text-[11px] text-slate-500">{description}</p> : null}
+                        </div>
+                      </div>
+                    </div>
+                    {index < 2 ? <div className="ml-5 h-2 border-l border-slate-200" /> : null}
+                  </div>
+                ))}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-xl border border-violet-100 bg-violet-50/70 p-3">
+                    <p className="text-[9px] font-bold uppercase text-violet-600">STEP 4</p>
+                    <p className="mt-1 text-xs font-bold">Units</p>
+                  </div>
+                  <div className="rounded-xl border border-emerald-100 bg-emerald-50/70 p-3">
+                    <p className="text-[9px] font-bold uppercase text-emerald-600">STEP 5</p>
+                    <p className="mt-1 text-xs font-bold">Topics & Lessons</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 rounded-xl bg-slate-950 px-4 py-3 text-white">
+                <p className="text-[10px] text-slate-400">Learning made simple</p>
+                <div className="mt-0.5 flex items-center justify-between">
+                  <p className="text-sm font-bold">Explore → Learn → Grow</p>
+                  <span>✨</span>
+                </div>
               </div>
             </div>
           </div>
-        ) : (
-          <div className="p-8 text-center">
-            <p className="text-sm font-medium text-slate-700">
-              You&apos;re all caught up.
-            </p>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Complete learning content is up to date.
-            </p>
-
-            <Link
-              href="/learn/programs"
-              className="
-                mt-5 inline-flex
-                rounded-xl bg-slate-900
-                px-5 py-3
-                text-sm font-semibold text-white
-              "
-            >
-              Explore More →
-            </Link>
-          </div>
-        )}
+        </div>
       </section>
 
-      {/* RECENT ACTIVITY */}
-      <section
-        className="
-          overflow-hidden rounded-3xl
-          border border-slate-200
-          bg-white shadow-sm
-        "
-      >
-        <div className="border-b border-slate-100 px-7 py-6 md:px-8">
-          <p className="text-sm font-medium text-slate-500">
-            Recent Activity
-          </p>
-
-          <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
-            Your recent learning
-          </h2>
+      <section className="mx-auto max-w-7xl px-5 pb-14 sm:px-6 lg:px-8">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            [String(programs.length || 6), "Programs", "🎓"],
+            ["120+", "Subjects covered", "📖"],
+            ["1,800+", "Lessons", "✓"],
+            ["Free", "To get started", "▱"],
+          ].map(([value, label, icon]) => (
+            <div key={label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="text-lg text-violet-600">{icon}</div>
+              <p className="mt-5 text-2xl font-black">{value}</p>
+              <p className="mt-1 text-sm text-slate-500">{label}</p>
+            </div>
+          ))}
         </div>
+      </section>
 
-        {recentActivity.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-sm font-medium text-slate-700">
-              No learning activity yet.
-            </p>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Complete your first lesson and your activity will
-              appear here.
-            </p>
+      <section className="border-y border-slate-100 bg-white">
+        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-600">Explore MediVerse</p>
+              <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Start with your program.</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">Choose your academic program and explore its complete learning structure.</p>
+            </div>
+            <Link href="/learn/programs" className="text-sm font-bold text-violet-600">View all programs →</Link>
           </div>
-        ) : (
-          <div className="divide-y divide-slate-100">
-            {recentActivity.map((activity) => (
-              <Link
-                key={activity.progressId}
-                href={`/learn/subtopics/${activity.subtopicId}`}
-                className="
-                  block px-7 py-5
-                  transition hover:bg-slate-50
-                  md:px-8
-                "
-              >
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
-                  <div className="min-w-0">
-                    <h3 className="truncate text-sm font-semibold text-slate-900">
-                      {activity.contentTitle}
-                    </h3>
-
-                    <p className="mt-1 text-xs text-slate-400">
-                      {activity.subjectName}
-                      {" • "}
-                      {activity.unitTitle}
-                      {" • "}
-                      {activity.topicTitle}
-                    </p>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {programs.slice(0, 6).map((program, index) => {
+              const [cardTone, iconTone, textTone] = tones[index % tones.length];
+              return (
+                <Link key={program.id} href={`/learn/programs/${program.slug}`} className={`group rounded-2xl border p-5 transition hover:-translate-y-1 hover:shadow-lg ${cardTone}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${iconTone}`}>{iconForProgram(program.name)}</div>
+                    <span className={`rounded-full border border-white/70 bg-white/70 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider ${textTone}`}>Program</span>
                   </div>
+                  <p className={`mt-5 text-[10px] font-bold uppercase tracking-[0.18em] ${textTone}`}>{program.code}</p>
+                  <h3 className="mt-1 text-xl font-black tracking-tight">{program.name}</h3>
+                  <p className="mt-2 line-clamp-2 min-h-12 text-sm leading-6 text-slate-600">{program.description ?? "Explore the structured curriculum for this program."}</p>
+                  <div className="mt-5 flex items-center justify-between border-t border-black/5 pt-4">
+                    <span className="text-xs text-slate-500">{program.duration} {program.duration === 1 ? "year" : "years"}</span>
+                    <span className={`flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold ${textTone} transition group-hover:translate-x-1`}>→</span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-                  <span
-                    className={`
-                      w-fit shrink-0 rounded-full
-                      px-3 py-1.5
-                      text-xs font-medium
-                      ${
-                        activity.completed
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "bg-amber-50 text-amber-700"
-                      }
-                    `}
-                  >
-                    {activity.completed
-                      ? "Completed"
-                      : "In progress"}
-                  </span>
-                </div>
+      <section className="bg-slate-50">
+        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-600">Keep exploring</p>
+          <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Everything you need, in one place.</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">Whether you want to follow your curriculum, find something specific or connect with learners, start from here.</p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {explorerCards.map(([icon, title, description, href, color]) => (
+              <Link key={title} href={href} className={`group rounded-2xl border p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md border-${color}-100 bg-${color}-50/70`}>
+                <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-${color}-100`}>{icon}</div>
+                <h3 className="mt-5 text-base font-black">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+                <span className={`mt-5 inline-flex text-sm font-bold text-${color}-600 transition group-hover:translate-x-1`}>Explore →</span>
               </Link>
             ))}
           </div>
-        )}
-      </section>
-
-      {/* EXPLORE */}
-      <section>
-        <div className="mb-5">
-          <p className="text-sm font-medium text-slate-500">
-            Explore MediVerse
-          </p>
-
-          <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
-            Continue exploring
-          </h2>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-2">
-          <Link
-            href="/learn/programs"
-            className="
-              group rounded-2xl
-              border border-slate-200
-              bg-white p-6 shadow-sm
-              transition hover:-translate-y-0.5 hover:shadow-md
-            "
-          >
-            <p className="text-xl">📘</p>
-
-            <h3 className="mt-4 text-lg font-semibold text-slate-900">
-              Programs
-            </h3>
-
-            <p className="mt-2 text-sm text-slate-500">
-              Browse programs, semesters, subjects and structured
-              learning content.
-            </p>
-
-            <p className="mt-5 text-sm font-semibold text-slate-700">
-              Explore Programs →
-            </p>
-          </Link>
-
-          <Link
-            href="/learn/search"
-            className="
-              group rounded-2xl
-              border border-slate-200
-              bg-white p-6 shadow-sm
-              transition hover:-translate-y-0.5 hover:shadow-md
-            "
-          >
-            <p className="text-xl">🔎</p>
-
-            <h3 className="mt-4 text-lg font-semibold text-slate-900">
-              Search
-            </h3>
-
-            <p className="mt-2 text-sm text-slate-500">
-              Find learning content across your MediVerse
-              knowledge base.
-            </p>
-
-            <p className="mt-5 text-sm font-semibold text-slate-700">
-              Search MediVerse →
-            </p>
-          </Link>
         </div>
       </section>
 
+      <section className="bg-white">
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:px-8">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-600">Structured learning</p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Everything connected.</h2>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-slate-500 sm:text-base">MediVerse organizes your education into a clear hierarchy so you always know where you are and what comes next.</p>
+            <Link href="/learn/programs" className="mt-6 inline-flex rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white hover:bg-violet-600">Browse Programs →</Link>
+          </div>
+
+          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-sm sm:p-7">
+            <div className="space-y-2">
+              {[
+                ["LEVEL 1", "Program", "🎓", "border-violet-100 bg-violet-50/70"],
+                ["LEVEL 2", "Semester", "📁", "border-slate-200 bg-white"],
+                ["LEVEL 3", "Subject", "📖", "border-slate-200 bg-white"],
+              ].map(([level, title, icon, tone], index) => (
+                <div key={level}>
+                  <div className={`flex items-center gap-4 rounded-2xl border p-4 ${tone}`}>
+                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm">{icon}</span>
+                    <div><p className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400">{level}</p><p className="text-sm font-bold">{title}</p></div>
+                  </div>
+                  {index < 2 ? <div className="ml-5 h-2 border-l border-slate-200" /> : null}
+                </div>
+              ))}
+              <div className="grid grid-cols-3 gap-2">
+                <div className="rounded-2xl border border-violet-100 bg-violet-50 p-4"><p className="text-[9px] font-bold uppercase text-violet-600">LEVEL 4</p><p className="mt-1 text-sm font-bold">Unit</p></div>
+                <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4"><p className="text-[9px] font-bold uppercase text-amber-600">LEVEL 5</p><p className="mt-1 text-sm font-bold">Topic</p></div>
+                <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4"><p className="text-[9px] font-bold uppercase text-emerald-600">LEVEL 6</p><p className="mt-1 text-sm font-bold">Lesson</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-slate-50">
+        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-600">Why MediVerse</p>
+          <h2 className="mt-2 max-w-2xl text-3xl font-black tracking-tight sm:text-4xl">Built around how students actually learn.</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">A simpler way to discover, organize and learn medical education without jumping between disconnected resources.</p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {featureCards.map(([icon, title, description]) => (
+              <div key={title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="text-xl">{icon}</div>
+                <h3 className="mt-4 text-base font-black">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-500">{description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white">
+        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
+          <div className="flex flex-col justify-between gap-6 rounded-3xl bg-slate-950 px-6 py-8 text-white shadow-xl sm:flex-row sm:items-center sm:px-10">
+            <div>
+              <span className="inline-flex rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-violet-200">Welcome back 👋</span>
+              <h2 className="mt-3 text-2xl font-black sm:text-3xl">Continue your learning journey.</h2>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-slate-400">Pick up where you left off and keep building your medical knowledge.</p>
+            </div>
+            <Link href="/learn" className="inline-flex shrink-0 rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-950 hover:bg-violet-50">Continue Learning →</Link>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
