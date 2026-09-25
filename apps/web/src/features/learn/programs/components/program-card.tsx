@@ -1,157 +1,87 @@
 import Link from "next/link";
 
 type Program = {
-    id: string;
-    name: string;
-    slug: string;
-    description: string | null;
+  id: string;
+  name: string;
+  slug: string;
+  code: string;
+  description: string | null;
+  duration: number;
 };
 
 type Props = {
-    program: Program;
-    hrefSuffix?: string;
+  program: Program;
+  hrefSuffix?: string;
 };
 
-function getProgramTheme(slug: string) {
-    const themes = [
-        {
-            gradient: "from-indigo-500/15 via-indigo-50 to-white",
-            iconBg: "bg-indigo-100 text-indigo-700",
-            badge: "bg-indigo-50 text-indigo-700 border-indigo-100",
-            arrow: "bg-indigo-600",
-            glow: "bg-indigo-200/40",
-        },
-        {
-            gradient: "from-violet-500/15 via-violet-50 to-white",
-            iconBg: "bg-violet-100 text-violet-700",
-            badge: "bg-violet-50 text-violet-700 border-violet-100",
-            arrow: "bg-violet-600",
-            glow: "bg-violet-200/40",
-        },
-        {
-            gradient: "from-emerald-500/15 via-emerald-50 to-white",
-            iconBg: "bg-emerald-100 text-emerald-700",
-            badge: "bg-emerald-50 text-emerald-700 border-emerald-100",
-            arrow: "bg-emerald-600",
-            glow: "bg-emerald-200/40",
-        },
-        {
-            gradient: "from-amber-500/15 via-amber-50 to-white",
-            iconBg: "bg-amber-100 text-amber-700",
-            badge: "bg-amber-50 text-amber-700 border-amber-100",
-            arrow: "bg-amber-500",
-            glow: "bg-amber-200/40",
-        },
-        {
-            gradient: "from-sky-500/15 via-sky-50 to-white",
-            iconBg: "bg-sky-100 text-sky-700",
-            badge: "bg-sky-50 text-sky-700 border-sky-100",
-            arrow: "bg-sky-600",
-            glow: "bg-sky-200/40",
-        },
-        {
-            gradient: "from-rose-500/15 via-rose-50 to-white",
-            iconBg: "bg-rose-100 text-rose-700",
-            badge: "bg-rose-50 text-rose-700 border-rose-100",
-            arrow: "bg-rose-600",
-            glow: "bg-rose-200/40",
-        },
-    ];
+const themes = [
+  ["border-sky-100 bg-sky-50/80", "bg-sky-100", "text-sky-600"],
+  ["border-emerald-100 bg-emerald-50/80", "bg-emerald-100", "text-emerald-600"],
+  ["border-amber-100 bg-amber-50/80", "bg-amber-100", "text-amber-600"],
+  ["border-rose-100 bg-rose-50/80", "bg-rose-100", "text-rose-600"],
+  ["border-violet-100 bg-violet-50/80", "bg-violet-100", "text-violet-600"],
+  ["border-teal-100 bg-teal-50/80", "bg-teal-100", "text-teal-600"],
+] as const;
 
-    const index = Array.from(slug).reduce(
-        (total, character) => total + character.charCodeAt(0),
-        0,
-    );
-
-    return themes[index % themes.length];
+function iconForProgram(name: string) {
+  const value = name.toLowerCase();
+  if (value.includes("pharma")) return "💊";
+  if (value.includes("nursing")) return "🩺";
+  if (value.includes("ayur")) return "🌿";
+  if (value.includes("medical")) return "⚕️";
+  return "🎓";
 }
 
-function getProgramIcon(name: string) {
-    const value = name.toLowerCase();
+export function ProgramCard({ program, hrefSuffix = "" }: Props) {
+  const index =
+    Array.from(program.code).reduce(
+      (sum, character) => sum + character.charCodeAt(0),
+      0,
+    ) % themes.length;
 
-    if (value.includes("pharma")) {
-        return "💊";
-    }
+  const [cardTone, iconTone, textTone] = themes[index];
 
-    if (value.includes("nursing")) {
-        return "🩺";
-    }
+  return (
+    <Link
+      href={`/learn/programs/${program.slug}${hrefSuffix}`}
+      className={`group relative block h-full overflow-hidden rounded-2xl border p-5 transition duration-200 hover:-translate-y-1 hover:shadow-lg ${cardTone}`}
+    >
+      <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-white/50" />
 
-    if (value.includes("ayur")) {
-        return "🌿";
-    }
+      <div className="relative">
+        <div className="flex items-start justify-between gap-3">
+          <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${iconTone}`}>
+            {iconForProgram(program.name)}
+          </div>
 
-    if (value.includes("medical")) {
-        return "⚕️";
-    }
+          <span className={`rounded-full border border-white/70 bg-white/70 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider ${textTone}`}>
+            Program
+          </span>
+        </div>
 
-    if (value.includes("btech") || value.includes("tech")) {
-        return "💻";
-    }
+        <p className={`mt-5 text-[10px] font-bold uppercase tracking-[0.18em] ${textTone}`}>
+          {program.code}
+        </p>
 
-    return "🎓";
-}
+        <h3 className="mt-1 text-xl font-black tracking-tight text-slate-950">
+          {program.name}
+        </h3>
 
-export function ProgramCard({
-    program,
-    hrefSuffix = "",
-}: Props) {
-    const theme = getProgramTheme(program.slug);
-    const icon = getProgramIcon(program.name);
+        <p className="mt-2 line-clamp-2 min-h-12 text-sm leading-6 text-slate-600">
+          {program.description ??
+            "Explore the structured curriculum for this program."}
+        </p>
 
-    return (
-        <Link
-            href={`/learn/programs/${program.slug}${hrefSuffix}`}
-            className="group relative block h-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-slate-300 hover:shadow-xl hover:shadow-slate-200/70"
-        >
-            {/* Decorative glow */}
-            <div
-                className={`pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full ${theme.glow} blur-3xl transition-transform duration-500 group-hover:scale-125`}
-            />
+        <div className="mt-5 flex items-center justify-between border-t border-black/5 pt-4">
+          <span className="text-xs text-slate-500">
+            {program.duration} {program.duration === 1 ? "year" : "years"}
+          </span>
 
-            <div
-                className={`relative flex h-full min-h-[285px] flex-col bg-gradient-to-br ${theme.gradient} p-6`}
-            >
-                {/* Top */}
-                <div className="flex items-start justify-between gap-4">
-                    <div
-                        className={`flex h-12 w-12 items-center justify-center rounded-2xl text-2xl shadow-sm ${theme.iconBg}`}
-                    >
-                        {icon}
-                    </div>
-
-                    <span
-                        className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${theme.badge}`}
-                    >
-                        Program
-                    </span>
-                </div>
-
-                {/* Content */}
-                <div className="mt-6 flex-1">
-                    <h3 className="text-xl font-black tracking-tight text-slate-950">
-                        {program.name}
-                    </h3>
-
-                    <p className="mt-3 line-clamp-4 text-sm leading-6 text-slate-600">
-                        {program.description ||
-                            "Explore this academic program and discover its learning path on MediVerse."}
-                    </p>
-                </div>
-
-                {/* Footer */}
-                <div className="mt-6 flex items-center justify-between border-t border-slate-200/70 pt-5">
-                    <span className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
-                        Explore program
-                    </span>
-
-                    <span
-                        className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-white transition-all duration-300 ${theme.arrow} group-hover:translate-x-1 group-hover:shadow-md`}
-                    >
-                        →
-                    </span>
-                </div>
-            </div>
-        </Link>
-    );
+          <span className={`flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold ${textTone} transition group-hover:translate-x-1`}>
+            →
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
 }
