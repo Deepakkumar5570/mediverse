@@ -33,7 +33,14 @@ function iconForProgram(name: string) {
 }
 
 export function ProgramCard({ program, hrefSuffix = "" }: Props) {
+  const name = program.name.toLowerCase();
   const index =
+    name.includes("anm") ? 0 :
+    name.includes("b-pharma") || name.includes("b pharma") ? 1 :
+    name.includes("b.sc") || name.includes("bachelor") ? 2 :
+    name.includes("bams") ? 3 :
+    name.includes("nursing") ? 4 :
+    name.includes("d. pharma") || name.includes("d pharma") ? 5 :
     Array.from(program.code).reduce(
       (sum, character) => sum + character.charCodeAt(0),
       0,
